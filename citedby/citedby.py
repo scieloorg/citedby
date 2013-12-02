@@ -40,8 +40,7 @@ def citedby_title(request):
     return Response(json.dumps(sn))
 
 
-def main(config, *args, **xargs):
-    settings = dict(config.items())
+def main(settings, *args, **xargs):
     config_citedby = Configurator(settings=settings)
 
     db_url = urlparse.urlparse(settings['app']['mongo_uri'])
@@ -72,7 +71,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     config = utils.Configuration.from_file(args.config_file)
 
-    app = main(config)
+    settings = dict(config.items())
 
-    server = make_server('0.0.0.0', 8080, app)
+    app = main(settings)
+
+    server = make_server(settings['http_server']['ip'], int(settings['http_server']['port']), app)
+
     server.serve_forever()
