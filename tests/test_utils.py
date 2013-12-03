@@ -1,8 +1,71 @@
+# coding: utf-8
+
+from mocker import Mocker
 import mocker
 import unittest
 import ConfigParser
+import json
+
+from mocker import ANY, MockerTestCase
+from xylose.scielodocument import Article
 
 from citedby import utils
+from citedby import controller
+import fixtures
+
+
+class ControllerTests(mocker.MockerTestCase):
+
+    def test_remove_accents(self):
+
+        self.assertEqual(controller.remove_accents(u'á, b c de F'), u'abcdef')
+
+    def test_load_article_title_keys(self):
+
+        article = Article(fixtures.article)
+
+        expected = [u'estrategiasdelutadasenfermeirasdamaternidadeleiladinizparaimplantacaodeummodelohumanizadodeassistenciaaoparto',
+                    u'nursingfightingstrategiesintheleiladinizmaternitytowardstheimplantationofahumanizedmodelfordeliverycare',
+                    u'estrategiasdeluchadelasenfermerasdelamaternidadleiladinizparalaimplantaciondeunmodelohumanizadodeasistenciaalparto']
+
+        self.assertEqual(controller.load_article_title_keys(article), expected)
+
+    def test_query_by_pid(self):
+        article = Article(fixtures.article)
+
+        mock_load_article_title_keys = self.mocker.replace(controller.load_article)
+        mock_load_article_title_keys(ANY, ANY)
+        self.mocker.result(article)
+
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(fixtures.articles)
+        self.mocker.replay()
+
+        expected = { 
+                'article':{
+                        'code': u'S0101-31222002000100038',
+                        'title': u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto',
+                        'issn': u'0101-3122',
+                        'journal': u'Revista Brasileira de Sementes',
+                        'article_url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038'
+                },
+                'cited_by':[{
+                        'code': u'S0104-07072013000100023',
+                        'title': u'title en',
+                        'issn': u'0104-0707',
+                        'journal': u'Texto & Contexto - Enfermagem',
+                        'article_url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                    },{
+                        'code': u'S1414-81452012000300003',
+                        'title': u'title pt',
+                        'issn': u'1414-8145',
+                        'journal': u'Escola Anna Nery',
+                        'article_url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                    }
+                ]
+            }
+        self.assertEqual(controller.query_by_pid(mock_coll, 'S0101-31222002000100038'), expected)
 
 class SingletonMixinTests(mocker.MockerTestCase):
 

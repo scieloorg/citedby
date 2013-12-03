@@ -9,35 +9,35 @@ from pyramid.config import Configurator
 from pyramid.view import view_config
 from pyramid.response import Response
 
+from controller import query_by_pid
 
 @view_config(route_name='index', request_method='GET')
 def index(request):
     return Response('Cited by SciELO API')
 
-@view_config(route_name='citedby_pid', request_method='GET')
+@view_config(route_name='citedby_pid', request_method='GET', renderer='json')
 def citedby_pid(request):
-    sn = request.db['articles'].find_one({'code': request.matchdict['pid']}, {'article': 1})
 
-    del(sn['_id'])
+    articles = query_by_pid(request.db['articles'], request.matchdict['pid'])
 
-    return Response(json.dumps(sn))
+    return articles
 
 
-@view_config(route_name='citedby_doi', request_method='GET')
+@view_config(route_name='citedby_doi', request_method='GET', renderer='json')
 def citedby_doi(request):
     sn = request.db['articles'].find_one({'code': request.matchdict['doi']},  {'article': 1})
 
     del(sn['_id'])
 
-    return Response(json.dumps(sn))
+    return sn
 
-@view_config(route_name='citedby_title', request_method='GET')
+@view_config(route_name='citedby_title', request_method='GET', renderer='json')
 def citedby_title(request):
     sn = request.db['articles'].find_one({'code': request.matchdict['title']}, {'article': 1})
 
     del(sn['_id'])
 
-    return Response(json.dumps(sn))
+    return sn
 
 
 def main(settings, *args, **xargs):
