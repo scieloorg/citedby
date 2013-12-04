@@ -6,12 +6,18 @@
 Welcome to Cited By SciELO's documentation!
 ===========================================
 
+About
+-----
+
+"Cited by SciELO" is an API that allow users to retrive citations given for a specific article.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-
+   api.rst
+   api_samples.rst
 
 Indices and tables
 ==================

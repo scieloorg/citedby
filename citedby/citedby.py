@@ -36,14 +36,6 @@ def citedby_doi(request):
 
     return articles
 
-@view_config(route_name='citedby_title', request_method='GET', renderer='json')
-def citedby_title(request):
-    sn = request.db['articles'].find_one({'code': request.matchdict['title']}, {'article': 1})
-
-    del(sn['_id'])
-
-    return sn
-
 
 def main(settings, *args, **xargs):
     config_citedby = Configurator(settings=settings)
@@ -61,7 +53,6 @@ def main(settings, *args, **xargs):
     config_citedby.add_route('index', '/')
     config_citedby.add_route('citedby_pid', '/api/v1/pid/')
     config_citedby.add_route('citedby_doi', '/api/v1/doi/')
-    config_citedby.add_route('citedby_title', '/api/v1/title/')
     config_citedby.add_request_method(add_db, 'db', reify=True)
     config_citedby.scan()
 
