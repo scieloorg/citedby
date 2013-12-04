@@ -1,3 +1,5 @@
+# encode: utf-8
+
 import urlparse
 import argparse
 import json
@@ -9,7 +11,7 @@ from pyramid.config import Configurator
 from pyramid.view import view_config
 from pyramid.response import Response
 
-from controller import query_by_pid
+from controller import query_by_pid, query_by_doi
 
 @view_config(route_name='index', request_method='GET')
 def index(request):
@@ -17,19 +19,22 @@ def index(request):
 
 @view_config(route_name='citedby_pid', request_method='GET', renderer='json')
 def citedby_pid(request):
-
-    articles = query_by_pid(request.db['articles'], request.matchdict['pid'])
+    if not 'q' in request.GET:
+        return None
+    
+    articles = query_by_pid(request.db['articles'], request.GET['q'])
 
     return articles
 
 
 @view_config(route_name='citedby_doi', request_method='GET', renderer='json')
 def citedby_doi(request):
-    sn = request.db['articles'].find_one({'code': request.matchdict['doi']},  {'article': 1})
+    if not 'q' in request.GET:
+        return None
+    
+    articles = query_by_doi(request.db['articles'], request.GET['q'])
 
-    del(sn['_id'])
-
-    return sn
+    return articles
 
 @view_config(route_name='citedby_title', request_method='GET', renderer='json')
 def citedby_title(request):
@@ -54,9 +59,9 @@ def main(settings, *args, **xargs):
         return db
 
     config_citedby.add_route('index', '/')
-    config_citedby.add_route('citedby_pid', '/api/v1/pid/{pid}/')
-    config_citedby.add_route('citedby_doi', '/api/v1/doi/{doi}/')
-    config_citedby.add_route('citedby_title', '/api/v1/title/{title}/')
+    config_citedby.add_route('citedby_pid', '/api/v1/pid/')
+    config_citedby.add_route('citedby_doi', '/api/v1/doi/')
+    config_citedby.add_route('citedby_title', '/api/v1/title/')
     config_citedby.add_request_method(add_db, 'db', reify=True)
     config_citedby.scan()
 

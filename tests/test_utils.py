@@ -1,9 +1,8 @@
 # coding: utf-8
 
-from mocker import Mocker
-import mocker
 import unittest
 import ConfigParser
+import urllib2
 import json
 
 from mocker import ANY, MockerTestCase
@@ -11,10 +10,99 @@ from xylose.scielodocument import Article
 
 from citedby import utils
 from citedby import controller
-import fixtures
+from . import fixtures
 
 
-class ControllerTests(mocker.MockerTestCase):
+class ControllerTests(MockerTestCase):
+
+    def test_query_by_doi(self):
+        load_document_meta_from_crossref = self.mocker.replace(controller.load_document_meta_from_crossref)
+        load_document_meta_from_crossref(ANY)
+        self.mocker.result(fixtures.doi_response[0])
+
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(fixtures.articles)
+        self.mocker.replay()
+
+        expected = { 
+                'article':{
+                    "normalizedScore": 100,
+                    "doi": u"http://dx.doi.org/10.1161/01.res.59.2.178",
+                    "title": u"Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog",
+                    "coins": u"ctx_ver=Z39.88-2004&amp;rft_id=info%3Adoi%2Fhttp%3A%2F%2Fdx.doi.org%2F10.1161%2F01.res.59.2.178&amp;rfr_id=info%3Asid%2Fcrossref.org%3Asearch&amp;rft.atitle=Power+spectral+analysis+of+heart+rate+and+arterial+pressure+variabilities+as+a+marker+of+sympatho-vagal+interaction+in+man+and+conscious+dog&amp;rft.jtitle=Circulation+Research&amp;rft.date=1986&amp;rft.volume=59&amp;rft.issue=2&amp;rft.spage=178&amp;rft.epage=193&amp;rft.aufirst=M.&amp;rft.aulast=Pagani&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.au=M.+Pagani&amp;rft.au=+F.+Lombardi&amp;rft.au=+S.+Guzzetti&amp;rft.au=+O.+Rimoldi&amp;rft.au=+R.+Furlan&amp;rft.au=+P.+Pizzinelli&amp;rft.au=+G.+Sandrone&amp;rft.au=+G.+Malfatto&amp;rft.au=+S.+Dell%27Orto&amp;rft.au=+E.+Piccaluga",
+                    "fullCitation": u"M. Pagani, F. Lombardi, S. Guzzetti, O. Rimoldi, R. Furlan, P. Pizzinelli, G. Sandrone, G. Malfatto, S. Dell'Orto, E. Piccaluga, 1986, 'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog', <i>Circulation Research</i>, vol. 59, no. 2, pp. 178-193",
+                    "score": 18.42057,
+                    "year": u"1986"
+                },
+                'cited_by':[{
+                        'code': u'S0104-07072013000100023',
+                        'title': u'title en',
+                        'issn': u'0104-0707',
+                        'source': u'Texto & Contexto - Enfermagem',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                    },{
+                        'code': u'S1414-81452012000300003',
+                        'title': u'title pt',
+                        'issn': u'1414-8145',
+                        'source': u'Escola Anna Nery',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                    }
+                ]
+            }
+
+        self.assertEqual(controller.query_by_doi(mock_coll, '10.1161/01.res.59.2.178'), expected)
+
+    def test_query_by_doi_invalid_document(self):
+        mock_load_article_title_keys = self.mocker.replace(controller.load_document_meta_from_crossref)
+        mock_load_article_title_keys(ANY)
+        self.mocker.result(None)
+
+        mock_coll = self.mocker.mock()
+        self.mocker.replay()
+
+        self.assertEqual(controller.query_by_doi(mock_coll, '10.1161/01.res.59.2.178'), None)
+
+    def test_load_document_meta_from_crossref(self):
+        mock_load_article_title_keys = self.mocker.replace('urllib2')
+        mock_load_article_title_keys.urlopen(ANY).read()
+        self.mocker.result(json.dumps(fixtures.doi_response))
+        self.mocker.replay()
+
+        document_meta = controller.load_document_meta_from_crossref('10.1161/01.res.59.2.178')
+
+        self.assertEqual(document_meta, fixtures.doi_response[0])
+
+    def test_load_document_meta_from_crossref_without_title(self):
+        response = [
+          {
+            "doi": u"http://dx.doi.org/10.1161/01.res.59.2.178",
+            "score": 18.42057,
+            "normalizedScore": 100,
+            "fullCitation": u"M. Pagani, F. Lombardi, S. Guzzetti, O. Rimoldi, R. Furlan, P. Pizzinelli, G. Sandrone, G. Malfatto, S. Dell'Orto, E. Piccaluga, 1986, 'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog', <i>Circulation Research</i>, vol. 59, no. 2, pp. 178-193",
+            "coins": u"ctx_ver=Z39.88-2004&amp;rft_id=info%3Adoi%2Fhttp%3A%2F%2Fdx.doi.org%2F10.1161%2F01.res.59.2.178&amp;rfr_id=info%3Asid%2Fcrossref.org%3Asearch&amp;rft.atitle=Power+spectral+analysis+of+heart+rate+and+arterial+pressure+variabilities+as+a+marker+of+sympatho-vagal+interaction+in+man+and+conscious+dog&amp;rft.jtitle=Circulation+Research&amp;rft.date=1986&amp;rft.volume=59&amp;rft.issue=2&amp;rft.spage=178&amp;rft.epage=193&amp;rft.aufirst=M.&amp;rft.aulast=Pagani&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.au=M.+Pagani&amp;rft.au=+F.+Lombardi&amp;rft.au=+S.+Guzzetti&amp;rft.au=+O.+Rimoldi&amp;rft.au=+R.+Furlan&amp;rft.au=+P.+Pizzinelli&amp;rft.au=+G.+Sandrone&amp;rft.au=+G.+Malfatto&amp;rft.au=+S.+Dell%27Orto&amp;rft.au=+E.+Piccaluga",
+            "year": u"1986"
+          }
+        ]
+
+        mock_load_article_title_keys = self.mocker.replace('urllib2')
+        mock_load_article_title_keys.urlopen(ANY).read()
+        self.mocker.result(json.dumps(response))
+        self.mocker.replay()
+
+        document_meta = controller.load_document_meta_from_crossref('10.1161/01.res.59.2.178')
+
+        self.assertEqual(document_meta, None)
+
+    def test_load_document_meta_from_crossref_without_retrieved_document(self):
+        mock_load_article_title_keys = self.mocker.replace('urllib2')
+        mock_load_article_title_keys.urlopen(ANY).read()
+        self.mocker.result('[]')
+        self.mocker.replay()
+
+        document_meta = controller.load_document_meta_from_crossref('10.1161/01.res.59.2.178')
+
+        self.assertEqual(document_meta, None)
 
     def test_load_document_meta(self):
 
@@ -135,7 +223,9 @@ class ControllerTests(mocker.MockerTestCase):
             }
 
         self.assertEqual(controller.query_by_pid(mock_coll, 'S0101-31222002000100038'), expected)
-class SingletonMixinTests(mocker.MockerTestCase):
+
+
+class SingletonMixinTests(MockerTestCase):
 
     def test_without_args(self):
         class Foo(utils.SingletonMixin):
@@ -185,7 +275,7 @@ class SingletonMixinTests(mocker.MockerTestCase):
         )
 
 
-class ConfigurationTests(mocker.MockerTestCase):
+class ConfigurationTests(MockerTestCase):
 
     def _make_fp(self):
         mock_fp = self.mocker.mock()

@@ -1,4 +1,17 @@
-# encoding: utf-8
+# coding: utf-8
+
+doi_response = [
+  {
+    "doi": u"http://dx.doi.org/10.1161/01.res.59.2.178",
+    "score": 18.42057,
+    "normalizedScore": 100,
+    "title": u"Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog",
+    "fullCitation": u"M. Pagani, F. Lombardi, S. Guzzetti, O. Rimoldi, R. Furlan, P. Pizzinelli, G. Sandrone, G. Malfatto, S. Dell'Orto, E. Piccaluga, 1986, 'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog', <i>Circulation Research</i>, vol. 59, no. 2, pp. 178-193",
+    "coins": u"ctx_ver=Z39.88-2004&amp;rft_id=info%3Adoi%2Fhttp%3A%2F%2Fdx.doi.org%2F10.1161%2F01.res.59.2.178&amp;rfr_id=info%3Asid%2Fcrossref.org%3Asearch&amp;rft.atitle=Power+spectral+analysis+of+heart+rate+and+arterial+pressure+variabilities+as+a+marker+of+sympatho-vagal+interaction+in+man+and+conscious+dog&amp;rft.jtitle=Circulation+Research&amp;rft.date=1986&amp;rft.volume=59&amp;rft.issue=2&amp;rft.spage=178&amp;rft.epage=193&amp;rft.aufirst=M.&amp;rft.aulast=Pagani&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.au=M.+Pagani&amp;rft.au=+F.+Lombardi&amp;rft.au=+S.+Guzzetti&amp;rft.au=+O.+Rimoldi&amp;rft.au=+R.+Furlan&amp;rft.au=+P.+Pizzinelli&amp;rft.au=+G.+Sandrone&amp;rft.au=+G.+Malfatto&amp;rft.au=+S.+Dell%27Orto&amp;rft.au=+E.+Piccaluga",
+    "year": u"1986"
+  }
+]
+
 article = {
     "code": "S0101-31222002000100038", 
     "title": {
