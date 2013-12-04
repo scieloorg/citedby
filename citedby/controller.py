@@ -26,6 +26,17 @@ def load_article(coll, pid):
 
     return Article(query)
 
+def load_document_meta(article):
+
+    article_meta = {
+        'code': article.publisher_id,
+        'title': article.original_title(),
+        'issn': article.any_issn(),
+        'source': article.journal_title,
+        'url': article.html_url
+    }
+
+    return article_meta
 
 def query_by_pid(coll, pid):
     article = load_article(coll, pid)
@@ -42,22 +53,10 @@ def query_by_pid(coll, pid):
         citations = []
         for doc in query:
             citation = Article(doc)
-            meta = {
-                'code': citation.publisher_id,
-                'title': citation.original_title(),
-                'issn': citation.any_issn(),
-                'journal': citation.journal_title,
-                'article_url': citation.html_url
-            }
+            meta = load_document_meta(citation)
             citations.append(meta)
 
-    article_meta = {
-        'code': article.publisher_id,
-        'title': article.original_title(),
-        'issn': article.any_issn(),
-        'journal': article.journal_title,
-        'article_url': article.html_url,
-    }
+    article_meta = load_document_meta(article)
     
     return {'article': article_meta, 'cited_by': citations}
 
