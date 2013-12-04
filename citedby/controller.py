@@ -74,6 +74,9 @@ def load_document_meta_from_crossref(doi):
     if not 'title' in response[0]:
         return None
 
+    if not response[0]['title']:
+        return None
+
     return response[0]
 
 def query_by_doi(coll, doi):
