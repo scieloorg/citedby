@@ -20,6 +20,26 @@ class ControllerTests(mocker.MockerTestCase):
 
         self.assertEqual(controller.remove_accents(u'á, b c de F'), u'abcdef')
 
+    def test_load_article(self):
+        mock_coll = self.mocker.mock()
+        mock_coll.find_one(ANY, ANY)
+        self.mocker.result(fixtures.article)
+        self.mocker.replay()
+
+        article = controller.load_article(mock_coll, u'S0101-31222002000100038')
+
+        self.assertEqual(article.original_title(), u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto')
+
+    def test_load_article_invalid_article_id(self):
+        mock_coll = self.mocker.mock()
+        mock_coll.find_one(ANY, ANY)
+        self.mocker.result(None)
+        self.mocker.replay()
+
+        article = controller.load_article(mock_coll, u'S0101-31222002000100038')
+
+        self.assertEqual(article, None)
+
     def test_load_article_title_keys(self):
 
         article = Article(fixtures.article)
@@ -67,6 +87,40 @@ class ControllerTests(mocker.MockerTestCase):
             }
         self.assertEqual(controller.query_by_pid(mock_coll, 'S0101-31222002000100038'), expected)
 
+    def test_query_by_pid_invalid_article_pid(self):
+        mock_load_article_title_keys = self.mocker.replace(controller.load_article)
+        mock_load_article_title_keys(ANY, ANY)
+        self.mocker.result(None)
+
+        mock_coll = self.mocker.mock()
+        self.mocker.replay()
+
+        self.assertEqual(controller.query_by_pid(mock_coll, 'S0101-31222002000100038'), None)
+
+    def test_query_by_pid_without_cited_by(self):
+        article = Article(fixtures.article)
+
+        mock_load_article_title_keys = self.mocker.replace(controller.load_article)
+        mock_load_article_title_keys(ANY, ANY)
+        self.mocker.result(article)
+
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(None)
+        self.mocker.replay()
+
+        expected = { 
+                'article':{
+                        'code': u'S0101-31222002000100038',
+                        'title': u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto',
+                        'issn': u'0101-3122',
+                        'journal': u'Revista Brasileira de Sementes',
+                        'article_url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038'
+                },
+                'cited_by': None
+            }
+
+        self.assertEqual(controller.query_by_pid(mock_coll, 'S0101-31222002000100038'), expected)
 class SingletonMixinTests(mocker.MockerTestCase):
 
     def test_without_args(self):

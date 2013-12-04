@@ -29,25 +29,27 @@ def load_article(coll, pid):
 
 def query_by_pid(coll, pid):
     article = load_article(coll, pid)
-    title_keys = load_article_title_keys(article)
 
-    if not title_keys:
+    if not article:
         return None
+
+    title_keys = load_article_title_keys(article)
 
     query = coll.find({'citations_title_no_accents': {'$in': title_keys}}, {'article': 1, 'title': 1})
 
-    citations = []
-
-    for doc in query:
-        citation = Article(doc)
-        meta = {
-            'code': citation.publisher_id,
-            'title': citation.original_title(),
-            'issn': citation.any_issn(),
-            'journal': citation.journal_title,
-            'article_url': citation.html_url
-        }
-        citations.append(meta)
+    citations = None
+    if query:
+        citations = []
+        for doc in query:
+            citation = Article(doc)
+            meta = {
+                'code': citation.publisher_id,
+                'title': citation.original_title(),
+                'issn': citation.any_issn(),
+                'journal': citation.journal_title,
+                'article_url': citation.html_url
+            }
+            citations.append(meta)
 
     article_meta = {
         'code': article.publisher_id,
