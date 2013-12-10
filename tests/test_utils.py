@@ -15,6 +15,119 @@ from . import fixtures
 
 class ControllerTests(MockerTestCase):
 
+    def test_query_by_meta(self):
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(fixtures.articles)
+        self.mocker.replay()
+
+        result = controller.query_by_meta(mock_coll, 
+            title=u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+            author=u'M. Pagani',
+            year=u'1986')
+
+        expected = { 
+                'article':{
+                    "title": u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+                    "author": u'M. Pagani',
+                    "year": u"1986"
+                },
+                'cited_by':[{
+                        'code': u'S0104-07072013000100023',
+                        'title': u'title en',
+                        'issn': u'0104-0707',
+                        'source': u'Texto & Contexto - Enfermagem',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                    },{
+                        'code': u'S1414-81452012000300003',
+                        'title': u'title pt',
+                        'issn': u'1414-8145',
+                        'source': u'Escola Anna Nery',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                    }
+                ]
+            }
+
+        self.assertEqual(result, expected)
+
+class ControllerTests(MockerTestCase):
+
+    def test_query_by_meta_no_author(self):
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(fixtures.articles)
+        self.mocker.replay()
+
+        result = controller.query_by_meta(mock_coll, 
+            title=u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+            year=u'1986')
+
+        expected = { 
+                'article':{
+                    "title": u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+                },
+                'cited_by':[{
+                        'code': u'S0104-07072013000100023',
+                        'title': u'title en',
+                        'issn': u'0104-0707',
+                        'source': u'Texto & Contexto - Enfermagem',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                    },{
+                        'code': u'S1414-81452012000300003',
+                        'title': u'title pt',
+                        'issn': u'1414-8145',
+                        'source': u'Escola Anna Nery',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                    }
+                ]
+            }
+
+        self.assertEqual(result, expected)
+
+class ControllerTests(MockerTestCase):
+
+    def test_query_by_meta_no_year(self):
+        mock_coll = self.mocker.mock()
+        mock_coll.find(ANY, ANY)
+        self.mocker.result(fixtures.articles)
+        self.mocker.replay()
+
+        result = controller.query_by_meta(mock_coll, 
+            title=u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+            author=u'M. Pagani')
+
+        expected = { 
+                'article':{
+                    "title": u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+                },
+                'cited_by':[{
+                        'code': u'S0104-07072013000100023',
+                        'title': u'title en',
+                        'issn': u'0104-0707',
+                        'source': u'Texto & Contexto - Enfermagem',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                    },{
+                        'code': u'S1414-81452012000300003',
+                        'title': u'title pt',
+                        'issn': u'1414-8145',
+                        'source': u'Escola Anna Nery',
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                    }
+                ]
+            }
+
+        self.assertEqual(result, expected)
+
+    def test_query_by_meta_no_title(self):
+        mock_coll = self.mocker.mock()
+        self.mocker.replay()
+
+        result = controller.query_by_meta(mock_coll, 
+            author=u'M. Pagani',
+            year=u'1986')
+
+        self.assertEqual(result, None)
+
     def test_query_by_doi(self):
         load_document_meta_from_crossref = self.mocker.replace(controller.load_document_meta_from_crossref)
         load_document_meta_from_crossref(ANY)

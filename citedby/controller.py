@@ -98,3 +98,36 @@ def query_by_doi(coll, doi):
             citations.append(meta)
 
     return {'article': article_meta, 'cited_by': citations}
+
+def query_by_meta(coll, title='', author='', year=''):
+
+    index = 'citations_title_author_year_no_accents'
+
+    article_meta = {}
+    article_meta['title'] = title
+
+    if not title:
+        return None
+
+    title_key = title
+    
+    if author and year:
+        article_meta['author'] = author
+        article_meta['year'] = year
+        title_key += author+year
+    else:
+        index = 'citations_title_no_accents'
+
+    title_key = remove_accents(title_key)
+
+    query = coll.find({index: title_key}, {'article': 1, 'title': 1})
+
+    citations = None
+    if query:
+        citations = []
+        for doc in query:
+            citation = Article(doc)
+            meta = load_document_meta(citation)
+            citations.append(meta)
+
+    return {'article': article_meta, 'cited_by': citations}

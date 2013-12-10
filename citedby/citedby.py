@@ -36,6 +36,17 @@ def citedby_doi(request):
 
     return articles
 
+@view_config(route_name='citedby_meta', request_method='GET', renderer='json')
+def citedby_meta(request):
+    if not 'title' in request.GET or not 'author' in request.GET or not 'year' in request.GET:
+        return None
+    
+    articles = query_by_meta(request.db['articles'],
+        title=request.GET['title'],
+        author=request.GET['author'],
+        year=request.GET['year'])
+
+    return articles
 
 def main(settings, *args, **xargs):
     config_citedby = Configurator(settings=settings)
