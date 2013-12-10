@@ -96,3 +96,54 @@ Response Sample::
             }
         ]
     }
+
+---------------------------------------------------------------------------
+Retrieve "cited by" documents of a given title, author and publication year
+---------------------------------------------------------------------------
+
+    **resource:** /api/v1/meta/
+
+Mandatory Parameters
+--------------------
+
+    **title:** a string that represents title of the article
+
+Optional Parameters
+-------------------
+
+    **author:** a string that represents the **first author** of the article
+    
+    **year:** a string that represents the publication year of the article
+
+Query Sample
+------------
+
+    /api/v1/meta?title=Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog&author=M. Pagani&year=1986
+
+    /api/v1/meta?title=Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog
+
+    .. warning:: The values may be different when giving more metadata.
+
+Response Sample::
+
+    { 
+        'article':{
+            "title": u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
+            "author": u'M. Pagani',
+            "year": u"1986"
+        },
+        'cited_by':[{
+                'code': u'S0104-07072013000100023',
+                'title': u'title en',
+                'issn': u'0104-0707',
+                'source': u'Texto & Contexto - Enfermagem',
+                'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+            },{
+                'code': u'S1414-81452012000300003',
+                'title': u'title pt',
+                'issn': u'1414-8145',
+                'source': u'Escola Anna Nery',
+                'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+            }
+        ]
+    }
