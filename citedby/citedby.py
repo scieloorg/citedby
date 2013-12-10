@@ -11,7 +11,7 @@ from pyramid.config import Configurator
 from pyramid.view import view_config
 from pyramid.response import Response
 
-from controller import query_by_pid, query_by_doi
+from controller import query_by_pid, query_by_doi, query_by_meta
 
 @view_config(route_name='index', request_method='GET')
 def index(request):
@@ -38,13 +38,13 @@ def citedby_doi(request):
 
 @view_config(route_name='citedby_meta', request_method='GET', renderer='json')
 def citedby_meta(request):
-    if not 'title' in request.GET or not 'author' in request.GET or not 'year' in request.GET:
+    if not 'title' in request.GET:
         return None
     
     articles = query_by_meta(request.db['articles'],
-        title=request.GET['title'],
-        author=request.GET['author'],
-        year=request.GET['year'])
+        title=request.GET.get('title', ''),
+        author=request.GET.get('author', ''),
+        year=request.GET.get('year', ''))
 
     return articles
 
@@ -64,6 +64,7 @@ def main(settings, *args, **xargs):
     config_citedby.add_route('index', '/')
     config_citedby.add_route('citedby_pid', '/api/v1/pid/')
     config_citedby.add_route('citedby_doi', '/api/v1/doi/')
+    config_citedby.add_route('citedby_meta', '/api/v1/meta/')
     config_citedby.add_request_method(add_db, 'db', reify=True)
     config_citedby.scan()
 
