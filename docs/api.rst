@@ -112,6 +112,7 @@ Optional Parameters
 -------------------
 
     **author:** a string that represents the **first author** of the article
+    
     **year:** a string that represents the publication year of the article
 
 Query Sample
