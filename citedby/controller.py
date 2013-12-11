@@ -79,6 +79,22 @@ def load_document_meta_from_crossref(doi):
 
     return response[0]
 
+def preparing_key(title='', author='', year='', mode='title'):
+
+    if not title:
+        return None
+
+    title_key = title
+    
+    if mode == 'mixed':
+        if not (author and year):
+            return None
+        title_key += author
+        
+        return remove_accents(title_key)+year
+
+    return remove_accents(title_key)
+
 def query_by_doi(coll, doi):
     article_meta = load_document_meta_from_crossref(doi)
 
@@ -101,24 +117,22 @@ def query_by_doi(coll, doi):
 
 def query_by_meta(coll, title='', author='', year=''):
 
-    index = 'citations_title_author_year_no_accents'
+    index = 'citations_title_no_accents'
+    mode = 'title'
 
     article_meta = {}
     article_meta['title'] = title
+    article_meta['author'] = author
+    article_meta['year'] = year
 
-    if not title:
+    if author and title:
+        mode='mixed'
+        index = 'citations_title_author_year_no_accents'
+
+    title_key = preparing_key(title, author, year, mode=mode)
+
+    if not title_key:
         return None
-
-    title_key = title
-    
-    if author and year:
-        article_meta['author'] = author
-        article_meta['year'] = year
-        title_key += author+year
-    else:
-        index = 'citations_title_no_accents'
-
-    title_key = remove_accents(title_key)
 
     query = coll.find({index: title_key}, {'article': 1, 'title': 1})
 
