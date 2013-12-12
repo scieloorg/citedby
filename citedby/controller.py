@@ -11,15 +11,31 @@ from xylose.scielodocument import Article
 def remove_accents(data):
     return ''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
 
+def preparing_key(title='', author='', year='', mode='title'):
+
+    if not title:
+        return None
+
+    title_key = title
+    
+    if mode == 'mixed':
+        if not bool(author and year):
+            return None
+        title_key += author
+        
+        return remove_accents(title_key)+year
+
+    return remove_accents(title_key)
+
 def load_article_title_keys(article):
     titles = []
 
     if article.original_title():
-        titles.append(remove_accents(article.original_title()))
+        titles.append(preparing_key(title=article.original_title()))
 
     if article.translated_titles():
         for title in article.translated_titles().values():
-            titles.append(remove_accents(title))
+            titles.append(preparing_key(title=title))
 
     return titles
 
@@ -79,29 +95,13 @@ def load_document_meta_from_crossref(doi):
 
     return response[0]
 
-def preparing_key(title='', author='', year='', mode='title'):
-
-    if not title:
-        return None
-
-    title_key = title
-    
-    if mode == 'mixed':
-        if not (author and year):
-            return None
-        title_key += author
-        
-        return remove_accents(title_key)+year
-
-    return remove_accents(title_key)
-
 def query_by_doi(coll, doi):
     article_meta = load_document_meta_from_crossref(doi)
 
     if not article_meta:
         return None
 
-    title_key = remove_accents(article_meta['title'])
+    title_key = preparing_key(title=article_meta['title'])
 
     query = coll.find({'citations_title_no_accents': title_key}, {'article': 1, 'title': 1})
 
@@ -125,7 +125,7 @@ def query_by_meta(coll, title='', author='', year=''):
     article_meta['author'] = author
     article_meta['year'] = year
 
-    if author and title:
+    if bool(author and title):
         mode='mixed'
         index = 'citations_title_author_year_no_accents'
 
