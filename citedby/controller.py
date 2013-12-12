@@ -87,7 +87,7 @@ def preparing_key(title='', author='', year='', mode='title'):
     title_key = title
     
     if mode == 'mixed':
-        if not (author and year):
+        if not bool(author and year):
             return None
         title_key += author
         
@@ -125,7 +125,7 @@ def query_by_meta(coll, title='', author='', year=''):
     article_meta['author'] = author
     article_meta['year'] = year
 
-    if author and title:
+    if bool(author and title):
         mode='mixed'
         index = 'citations_title_author_year_no_accents'
 
