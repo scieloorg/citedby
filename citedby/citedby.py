@@ -1,7 +1,6 @@
 # encode: utf-8
 
 import urlparse
-import argparse
 import json
 
 import pymongo
@@ -70,19 +69,8 @@ def main(settings, *args, **xargs):
 
     return config_citedby.make_wsgi_app()
 
-
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser(description='API Cited By SciELO.')
-    parser.add_argument('--config_file', '-c', type=str, default='../config.ini')
-
-    args = parser.parse_args()
-    config = utils.Configuration.from_file(args.config_file)
-
-    settings = dict(config.items())
-
-    app = main(settings)
-
-    server = make_server(settings['http_server']['ip'], int(settings['http_server']['port']), app)
-
-    server.serve_forever()
+config = utils.Configuration.from_file('../config.ini')
+settings = dict(config.items())
+app = main(settings)
+server = make_server(settings['http_server']['ip'], int(settings['http_server']['port']), app)
+server.serve_forever()
