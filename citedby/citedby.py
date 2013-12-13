@@ -2,6 +2,7 @@
 
 import urlparse
 import json
+import os
 
 import pymongo
 import utils
@@ -69,8 +70,10 @@ def main(settings, *args, **xargs):
 
     return config_citedby.make_wsgi_app()
 
-config = utils.Configuration.from_file('../config.ini')
+config = utils.Configuration.from_file(os.environ['config_ini']
+
 settings = dict(config.items())
 app = main(settings)
-server = make_server(settings['http_server']['ip'], int(settings['http_server']['port']), app)
-server.serve_forever()
+if __name__== '__main__':
+    server = make_server(settings['http_server']['ip'], int(settings['http_server']['port']), app)
+    server.serve_forever()
