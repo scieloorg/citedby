@@ -70,7 +70,7 @@ def main(settings, *args, **xargs):
 
     return config_citedby.make_wsgi_app()
 
-config = utils.Configuration.from_file(os.environ['config_ini'])
+config = utils.Configuration.from_file(os.environ['CONFIG_INI'])
 
 settings = dict(config.items())
 app = main(settings)
