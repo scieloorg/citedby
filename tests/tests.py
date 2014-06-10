@@ -15,55 +15,50 @@ from . import fixtures
 
 class ControllerTests(MockerTestCase):
 
-    def test_preparing_key_mode_title(self):
+    def test_preparing_key_title(self):
 
         title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
-        author = u'M. Pagani'
-        year = '1986'
 
-        result = controller.preparing_key(title=title, author=author, year=year, mode='title')
+        result = controller.preparing_key(title=title)
 
         expected = u'powerspectralanalysisofheartrateandarterialpressurevariabilitiesasamarkerofsympathovagalinteractioninmanandconsciousdog'
 
         self.assertEqual(result, expected)
 
-    def test_preparing_key_mode_mixed(self):
+    def test_preparing_key_title_author(self):
+
+        title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
+        author = u'M. Pagani'
+
+        result = controller.preparing_key(title=title, author=author)
+
+        expected = u'powerspectralanalysisofheartrateandarterialpressurevariabilitiesasamarkerofsympathovagalinteractioninmanandconsciousdogmpagani'
+
+        self.assertEqual(result, expected)
+
+
+    def test_preparing_key_title_author_year(self):
 
         title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
         author = u'M. Pagani'
         year = u'1986'
 
-        result = controller.preparing_key(title=title, author=author, year=year, mode='mixed')
+        result = controller.preparing_key(title=title, author=author, year=year)
 
         expected = u'powerspectralanalysisofheartrateandarterialpressurevariabilitiesasamarkerofsympathovagalinteractioninmanandconsciousdogmpagani1986'
 
         self.assertEqual(result, expected)
 
-    def test_preparing_key_no_author_mode_mixed(self):
+    def test_preparing_key_title_year(self):
 
         title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
-        year = '1986'
+        year = u'1986'
 
-        result = controller.preparing_key(title=title, year=year, mode='mixed')
+        result = controller.preparing_key(title=title, year=year)
 
-        self.assertEqual(result, None)
+        expected = u'powerspectralanalysisofheartrateandarterialpressurevariabilitiesasamarkerofsympathovagalinteractioninmanandconsciousdog1986'
 
-    def test_preparing_key_no_year_mode_mixed(self):
-
-        title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
-        author = u'M. Pagani'
-
-        result = controller.preparing_key(title=title, author=author, mode='mixed')
-
-        self.assertEqual(result, None)
-
-    def test_preparing_key_just_title_mode_mixed(self):
-
-        title = u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog'
-
-        result = controller.preparing_key(title=title, mode='mixed')
-
-        self.assertEqual(result, None)
+        self.assertEqual(result, expected)
 
     def test_query_by_meta(self):
         mock_coll = self.mocker.mock()
@@ -166,16 +161,6 @@ class ControllerTests(MockerTestCase):
             }
 
         self.assertEqual(result, expected)
-
-    def test_query_by_meta_no_year(self):
-        mock_coll = self.mocker.mock()
-        self.mocker.replay()
-
-        result = controller.query_by_meta(mock_coll, 
-            title=u'Power spectral analysis of heart rate and arterial pressure variabilities as a marker of sympatho-vagal interaction in man and conscious dog',
-            author=u'M. Pagani')
-
-        self.assertEqual(result, None)
 
     def test_query_by_meta_no_title(self):
         mock_coll = self.mocker.mock()
@@ -344,7 +329,11 @@ class ControllerTests(MockerTestCase):
                     u'nursingfightingstrategiesintheleiladinizmaternitytowardstheimplantationofahumanizedmodelfordeliverycare',
                     u'estrategiasdeluchadelasenfermerasdelamaternidadleiladinizparalaimplantaciondeunmodelohumanizadodeasistenciaalparto']
 
-        self.assertEqual(controller.load_article_title_keys(article), expected)
+        result = controller.load_article_title_keys(article)
+
+        self.assertTrue(u'estrategiasdelutadasenfermeirasdamaternidadeleiladinizparaimplantacaodeummodelohumanizadodeassistenciaaoparto' in result)
+        self.assertTrue(u'nursingfightingstrategiesintheleiladinizmaternitytowardstheimplantationofahumanizedmodelfordeliverycare' in result)
+        self.assertTrue(u'estrategiasdeluchadelasenfermerasdelamaternidadleiladinizparalaimplantaciondeunmodelohumanizadodeasistenciaalparto' in result)
 
     def test_query_by_pid(self):
         article = Article(fixtures.article)

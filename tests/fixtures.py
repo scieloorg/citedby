@@ -45,8 +45,17 @@ article = {
             {"l": "en", "_": u"Nursing fighting strategies in the Leila Diniz Maternity towards the implantation of a humanized model for delivery care"},
             {"l": "es", "_": u"Estrategias de lucha de las enfermeras de la Maternidad Leila Diniz para la implantación de un modelo humanizado de asistencia al parto"}
         ],
-        "v880": [{"_": "S0101-31222002000100038"}]
-
+        "v880": [{"_": "S0101-31222002000100038"}],
+        "v65": [{"_": "20091200"}],
+        "v10": [
+            {u'1': u'A01', u's': u'Progianti', u'r': u'ND', u'_': u'', u'n': u'Jane Márcia'},
+            {u's': u'Porfírio', u'r': u'ND', u'_': u'', u'n': u'Aline Bastos'},
+            {u'1': u'A02', u's': u'Pereira', u'r': u'ND', u'_': u'', u'n': u'Adriana Lenho de Figueiredo'}
+        ],
+        "v70": [
+            {u'e': u'jmprogi@uol.com.br', u'i': u'A01', u'1': u'Faculdade de Enfermagem', u'p': u'BRAZIL', u's': u'Rio de Janeiro', u'_': u'Universidade do Estado do Rio de Janeiro'},
+            {u'e': u'adrianalenho.uerj@gmail.com', u'i': u'A02', u'1': u'Faculdade de Enfermagem', u'p': u'BRAZIL', u's': u'Rio de Janeiro', u'2': u'Departamento de Enfermagem Materno-Infantil', u'_': u'Universidade do Estado do Rio de Janeiro'}
+        ],
     }
 }
 
