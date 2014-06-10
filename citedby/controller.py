@@ -8,36 +8,42 @@ import json
 
 from xylose.scielodocument import Article
 
+
 def remove_accents(data):
     return ''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
 
-def preparing_key(title='', author='', year='', mode='title'):
+
+def preparing_key(title='', author='', year=''):
 
     if not title:
         return None
 
     title_key = title
-    
-    if mode == 'mixed':
-        if not bool(author and year):
-            return None
-        title_key += author
-        
-        return remove_accents(title_key)+year
+    title_key += author
 
-    return remove_accents(title_key)
+    return remove_accents(title_key)+year
+
 
 def load_article_title_keys(article):
     titles = []
 
+    data = {}
+    data['year'] = article.publication_date[0:4]
+    data['author'] = article.authors[0]['given_names']+article.authors[0]['surname']
+
     if article.original_title():
-        titles.append(preparing_key(title=article.original_title()))
+        data['title'] = article.original_title()
+        titles.append(preparing_key(article.original_title()))
+        titles.append(preparing_key(**data))
 
     if article.translated_titles():
         for title in article.translated_titles().values():
-            titles.append(preparing_key(title=title))
+            data['title'] = title
+            titles.append(preparing_key(title))
+            titles.append(preparing_key(**data))
 
     return titles
+
 
 def load_article(coll, pid):
     query = coll.find_one({'code': pid}, {'article': 1, 'title': 1})
@@ -46,6 +52,7 @@ def load_article(coll, pid):
         return None
 
     return Article(query)
+
 
 def load_document_meta(article):
 
@@ -59,6 +66,7 @@ def load_document_meta(article):
 
     return article_meta
 
+
 def query_by_pid(coll, pid):
     article = load_article(coll, pid)
 
@@ -66,8 +74,7 @@ def query_by_pid(coll, pid):
         return None
 
     title_keys = load_article_title_keys(article)
-
-    query = coll.find({'citations_title_no_accents': {'$in': title_keys}}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': {'$in': title_keys}}, {'article': 1, 'title': 1})
 
     citations = None
     if query:
@@ -78,8 +85,9 @@ def query_by_pid(coll, pid):
             citations.append(meta)
 
     article_meta = load_document_meta(article)
-    
+
     return {'article': article_meta, 'cited_by': citations}
+
 
 def load_document_meta_from_crossref(doi):
     response = json.loads(urllib2.urlopen('http://search.crossref.org/dois?q=%s' % doi).read())
@@ -95,6 +103,7 @@ def load_document_meta_from_crossref(doi):
 
     return response[0]
 
+
 def query_by_doi(coll, doi):
     article_meta = load_document_meta_from_crossref(doi)
 
@@ -103,7 +112,7 @@ def query_by_doi(coll, doi):
 
     title_key = preparing_key(title=article_meta['title'])
 
-    query = coll.find({'citations_title_no_accents': title_key}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1})
 
     citations = None
     if query:
@@ -115,26 +124,20 @@ def query_by_doi(coll, doi):
 
     return {'article': article_meta, 'cited_by': citations}
 
-def query_by_meta(coll, title='', author='', year=''):
 
-    index = 'citations_title_no_accents'
-    mode = 'title'
+def query_by_meta(coll, title='', author='', year=''):
 
     article_meta = {}
     article_meta['title'] = title
     article_meta['author'] = author
     article_meta['year'] = year
 
-    if bool(author and title):
-        mode='mixed'
-        index = 'citations_title_author_year_no_accents'
-
-    title_key = preparing_key(title, author, year, mode=mode)
+    title_key = preparing_key(title, author, year)
 
     if not title_key:
         return None
 
-    query = coll.find({index: title_key}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1})
 
     citations = None
     if query:

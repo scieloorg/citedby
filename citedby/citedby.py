@@ -10,6 +10,7 @@ from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.view import view_config, notfound_view_config
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNotFound
 
 from controller import query_by_pid, query_by_doi, query_by_meta
 
