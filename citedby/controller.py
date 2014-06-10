@@ -56,7 +56,6 @@ def load_article(coll, pid):
 
 def load_document_meta(article):
 
-    import pdb; pdb.set_trace()
     article_meta = {
         'code': article.publisher_id,
         'title': article.original_title(),
