@@ -2,4 +2,4 @@ pyramid==1.4.5
 pymongo
 paster
 nose
-git+git://github.com/scieloorg/xylose.git@v0.1#egg=xylose
+-e git+ssh://git@github.com/scieloorg/xylose.git#egg=xylose

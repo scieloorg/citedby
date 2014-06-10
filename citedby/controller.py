@@ -46,7 +46,7 @@ def load_article_title_keys(article):
 
 
 def load_article(coll, pid):
-    query = coll.find_one({'code': pid}, {'article': 1, 'title': 1})
+    query = coll.find_one({'code': pid}, {'article': 1, 'title': 1, 'collection': 1})
 
     if not query:
         return None
@@ -56,6 +56,7 @@ def load_article(coll, pid):
 
 def load_document_meta(article):
 
+    import pdb; pdb.set_trace()
     article_meta = {
         'code': article.publisher_id,
         'title': article.original_title(),
@@ -74,7 +75,7 @@ def query_by_pid(coll, pid):
         return None
 
     title_keys = load_article_title_keys(article)
-    query = coll.find({'citations_keys': {'$in': title_keys}}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': {'$in': title_keys}}, {'article': 1, 'title': 1, 'collection': 1})
 
     citations = None
     if query:
@@ -112,7 +113,7 @@ def query_by_doi(coll, doi):
 
     title_key = preparing_key(title=article_meta['title'])
 
-    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1, 'collection': 1})
 
     citations = None
     if query:
@@ -137,7 +138,7 @@ def query_by_meta(coll, title='', author='', year=''):
     if not title_key:
         return None
 
-    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1})
+    query = coll.find({'citations_keys': title_key}, {'article': 1, 'title': 1, 'collection': 1})
 
     citations = None
     if query:
