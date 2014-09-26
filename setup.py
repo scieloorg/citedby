@@ -1,29 +1,44 @@
-#!/usr/bin/env python
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+import os
 
+from setuptools import setup, find_packages
 
-setup(
-    name="citedby",
-    version='0.1',
-    description="A SciELO API to load SciELO Articles the was citing a given article",
-    author="SciELO",
-    author_email="scielo-dev@googlegroups.com",
-    license="BSD 2-clause",
-    url="http://docs.scielo.org",
-    packages=['citedby'],
-    classifiers=[
-        "Development Status :: 1 - Planning",
-        "Intended Audience :: Customer Service",
-        "License :: OSI Approved :: BSD License",
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'README.txt')) as f:
+    README = f.read()
+with open(os.path.join(here, 'CHANGES.txt')) as f:
+    CHANGES = f.read()
+
+requires = [
+    'pyramid',
+    'pyramid_chameleon',
+    'pyramid_debugtoolbar',
+    'waitress',
+    ]
+
+test_requires = requires+['mocker']
+
+setup(name='citedby',
+      version='0.0',
+      description='citedby',
+      long_description=README + '\n\n' + CHANGES,
+      classifiers=[
         "Programming Language :: Python",
-        "Operating System :: POSIX :: Linux",
-        "Topic :: System",
-        "Topic :: Utilities",
-    ],
-    setup_requires=["nose>=1.0", "coverage"],
-    tests_require=["mocker"],
-    test_suite="nose.collector",
-)
+        "Framework :: Pyramid",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        ],
+      author='',
+      author_email='',
+      url='',
+      keywords='web pyramid pylons',
+      packages=find_packages(),
+      include_package_data=True,
+      zip_safe=False,
+      install_requires=requires,
+      tests_require=test_requires,
+      test_suite="citedby",
+      entry_points="""\
+      [paste.app_factory]
+      main = citedby:main
+      """,
+      )

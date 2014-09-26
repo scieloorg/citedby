@@ -82,13 +82,13 @@ class ControllerTests(MockerTestCase):
                         'title': u'title en',
                         'issn': u'0104-0707',
                         'source': u'Texto & Contexto - Enfermagem',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023&lng=en&tlng=en'
                     },{
                         'code': u'S1414-81452012000300003',
                         'title': u'title pt',
                         'issn': u'1414-8145',
                         'source': u'Escola Anna Nery',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003&lng=en&tlng=en'
                     }
                 ]
             }
@@ -116,13 +116,13 @@ class ControllerTests(MockerTestCase):
                         'title': u'title en',
                         'issn': u'0104-0707',
                         'source': u'Texto & Contexto - Enfermagem',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023&lng=en&tlng=en'
                     },{
                         'code': u'S1414-81452012000300003',
                         'title': u'title pt',
                         'issn': u'1414-8145',
                         'source': u'Escola Anna Nery',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003&lng=en&tlng=en'
                     }
                 ]
             }
@@ -149,13 +149,13 @@ class ControllerTests(MockerTestCase):
                         'title': u'title en',
                         'issn': u'0104-0707',
                         'source': u'Texto & Contexto - Enfermagem',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023&lng=en&tlng=en'
                     },{
                         'code': u'S1414-81452012000300003',
                         'title': u'title pt',
                         'issn': u'1414-8145',
                         'source': u'Escola Anna Nery',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003&lng=en&tlng=en'
                     }
                 ]
             }
@@ -197,13 +197,13 @@ class ControllerTests(MockerTestCase):
                         'title': u'title en',
                         'issn': u'0104-0707',
                         'source': u'Texto & Contexto - Enfermagem',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023&lng=en&tlng=en'
                     },{
                         'code': u'S1414-81452012000300003',
                         'title': u'title pt',
                         'issn': u'1414-8145',
                         'source': u'Escola Anna Nery',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003&lng=en&tlng=en'
                     }
                 ]
             }
@@ -291,7 +291,7 @@ class ControllerTests(MockerTestCase):
                     'title': u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto',
                     'issn': u'0101-3122',
                     'source': u'Revista Brasileira de Sementes',
-                    'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038'}
+                    'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038&lng=en&tlng=en'}
 
         article_meta = controller.load_document_meta(article)
 
@@ -353,20 +353,20 @@ class ControllerTests(MockerTestCase):
                         'title': u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto',
                         'issn': u'0101-3122',
                         'source': u'Revista Brasileira de Sementes',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038&lng=en&tlng=en'
                 },
                 'cited_by':[{
                         'code': u'S0104-07072013000100023',
                         'title': u'title en',
                         'issn': u'0104-0707',
                         'source': u'Texto & Contexto - Enfermagem',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0104-07072013000100023&lng=en&tlng=en'
                     },{
                         'code': u'S1414-81452012000300003',
                         'title': u'title pt',
                         'issn': u'1414-8145',
                         'source': u'Escola Anna Nery',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1414-81452012000300003&lng=en&tlng=en'
                     }
                 ]
             }
@@ -400,7 +400,7 @@ class ControllerTests(MockerTestCase):
                         'title': u'Estratégias de luta das enfermeiras da Maternidade Leila Diniz para implantação de um modelo humanizado de assistência ao parto',
                         'issn': u'0101-3122',
                         'source': u'Revista Brasileira de Sementes',
-                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038'
+                        'url': u'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-31222002000100038&lng=en&tlng=en'
                 },
                 'cited_by': None
             }

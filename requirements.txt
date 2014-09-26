@@ -1,5 +1,7 @@
-pyramid==1.4.5
+pyramid
 pymongo
 paster
 nose
+waitress
+gunicorn
 -e git+ssh://git@github.com/scieloorg/xylose.git#egg=xylose

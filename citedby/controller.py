@@ -61,13 +61,14 @@ def load_document_meta(article):
         'title': article.original_title(),
         'issn': article.any_issn(),
         'source': article.journal_title,
-        'url': article.html_url
+        'url': article.html_url()
     }
 
     return article_meta
 
 
 def query_by_pid(coll, pid):
+
     article = load_article(coll, pid)
 
     if not article:
