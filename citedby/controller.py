@@ -29,7 +29,9 @@ def load_article_title_keys(article):
 
     data = {}
     data['year'] = article.publication_date[0:4]
-    data['author'] = article.authors[0]['given_names']+article.authors[0]['surname']
+
+    if article.authors:
+        data['author'] = article.authors[0].get('given_names', '')+article.authors[0].get('surname', '')
 
     if article.original_title():
         data['title'] = article.original_title()
