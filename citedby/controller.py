@@ -11,10 +11,13 @@ from xylose.scielodocument import Article
 
 def remove_accents(data):
 
+    if not isinstance(data, unicode):
+        data = unicode(data)
+
     try:
-        return ''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
+        return u''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
     except:
-        return ''
+        return u''
 
 
 def preparing_key(title='', author='', year=''):
