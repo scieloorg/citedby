@@ -10,7 +10,11 @@ from xylose.scielodocument import Article
 
 
 def remove_accents(data):
-    return ''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
+
+    try:
+        return ''.join(x for x in unicodedata.normalize('NFKD', data) if unicodedata.category(x)[0] == 'L').lower()
+    except:
+        return ''
 
 
 def preparing_key(title='', author='', year=''):
@@ -18,10 +22,19 @@ def preparing_key(title='', author='', year=''):
     if not title:
         return None
 
-    title_key = title
-    title_key += author
+    title_key = remove_accents(title)
 
-    return remove_accents(title_key)+year
+    if not title_key:
+        return None
+
+    author_key = remove_accents(author)
+
+    title = title_key+author_key
+
+    if title == '':
+        return None
+
+    return title+year
 
 
 def load_article_title_keys(article):
@@ -35,14 +48,18 @@ def load_article_title_keys(article):
 
     if article.original_title():
         data['title'] = article.original_title()
-        titles.append(preparing_key(article.original_title()))
-        titles.append(preparing_key(**data))
+        key = preparing_key(article.original_title())
+        if key: titles.append(key)
+        key = preparing_key(**data)
+        if key: titles.append(key)
 
     if article.translated_titles():
         for title in article.translated_titles().values():
             data['title'] = title
-            titles.append(preparing_key(title))
-            titles.append(preparing_key(**data))
+            key = preparing_key(title)
+            if key: titles.append(key)
+            key = preparing_key(**data)
+            if key: titles.append(key)
 
     return titles
 
