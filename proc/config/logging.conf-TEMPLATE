@@ -1,0 +1,33 @@
+[loggers]
+keys=root,index_citations
+
+[handlers]
+keys=consoleHandler, fileHandler
+
+[formatters]
+keys=Formatter
+
+[logger_root]
+level=DEBUG
+handlers=consoleHandler, fileHandler
+
+[logger_index_citations]
+level=INFO
+handlers=consoleHandler, fileHandler
+qualname=index_citations
+propagate=0
+
+[handler_fileHandler]
+class=FileHandler
+level=INFO
+formatter=Formatter
+args=('index_citations.log', 'a')
+
+[handler_consoleHandler]
+class=StreamHandler
+level=DEBUG
+formatter=Formatter
+args=(sys.stdout,)
+
+[formatter_Formatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s

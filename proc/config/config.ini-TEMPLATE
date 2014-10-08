@@ -1,0 +1,10 @@
+[endpoints]
+indexer = http://<IP>/
+identifiers = http://<IP>/api/v1/article/identifiers
+article = http://<IP>/api/v1/article
+
+[params]
+limit_offset = 1000
+
+[request]
+timeout = 5
