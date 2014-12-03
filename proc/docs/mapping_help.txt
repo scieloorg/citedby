@@ -1,0 +1,32 @@
+
+#USING SENSE:
+
+#DELETE INDEX
+DELETE /citations
+
+#CREATE INDEX
+PUT /citations
+
+#MAPPING CITATIONS DATABASE
+PUT /citations/citation/_mapping
+{"citation": {"properties": {"citations": {"properties": {"collection": {"type": "string"}, "first_author": {"properties": {"first_author": {"type": "string"}, "given_names": {"type": "string"}, "source": {"type": "string"}, "surname": {"type": "string"} } }, "issn": {"type": "string"}, "publication_year": {"type": "string"}, "source": {"type": "string"}, "title": {"type": "string", "index": "not_analyzed"} }, "type": "nested"}, "code": {"type": "string"}, "collection": {"type": "string"}, "first_author": {"properties": {"given_names": {"type": "string"}, "role": {"type": "string"}, "surname": {"type": "string"}, "xref": {"type": "string"} } }, "issn": {"type": "string"}, "publication_year": {"type": "string"}, "source": {"type": "string"}, "titles": {"type": "string"}, "url": {"type": "string"} } } }
+
+#SEE MAPPING
+GET /citations/citation/_mapping?pretty=1
+
+###############################################################################
+
+#USING CURL:
+
+#DELETE INDEX
+curl -XDELETE 'http://localhost:9200/citaitons?pretty=1'
+
+#CREATE INDEX
+curl -XPUT 'http://localhost:9200/citaitons?pretty=1'
+
+#MAPPING CITATIONS INDEX
+curl -XPUT 'http://localhost:9200/citations/citation/_mapping?pretty=1' -d
+{"citation": {"properties": {"citations": {"properties": {"collection": {"type": "string"}, "first_author": {"properties": {"first_author": {"type": "string"}, "given_names": {"type": "string"}, "source": {"type": "string"}, "surname": {"type": "string"} } }, "issn": {"type": "string"}, "publication_year": {"type": "string"}, "source": {"type": "string"}, "title": {"type": "string", "index": "not_analyzed"} }, "type": "nested"}, "code": {"type": "string"}, "collection": {"type": "string"}, "first_author": {"properties": {"given_names": {"type": "string"}, "role": {"type": "string"}, "surname": {"type": "string"}, "xref": {"type": "string"} } }, "issn": {"type": "string"}, "publication_year": {"type": "string"}, "source": {"type": "string"}, "titles": {"type": "string"}, "url": {"type": "string"} } } }
+
+#GET MAPPING
+curl -XGET 'http://localhost:9200/citations/citation/_mapping?pretty=1'

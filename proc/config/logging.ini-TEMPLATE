@@ -1,0 +1,39 @@
+[loggers]
+keys=root,pcitations,utils
+
+[handlers]
+keys=consoleHandler, timedRotatingFileHandler
+
+[formatters]
+keys=Formatter
+
+[logger_root]
+level=DEBUG
+handlers=consoleHandler, timedRotatingFileHandler
+
+[logger_pcitations]
+level=DEBUG
+handlers=consoleHandler, timedRotatingFileHandler
+qualname=pcitations
+propagate=0
+
+[logger_utils]
+level=INFO
+handlers=consoleHandler, timedRotatingFileHandler
+qualname=utils
+propagate=0
+
+[handler_timedRotatingFileHandler]
+class=handlers.TimedRotatingFileHandler
+level=DEBUG
+formatter=Formatter
+args=('log/pcitations.log', 'D', 1, 5, None, False, False)
+
+[handler_consoleHandler]
+class=StreamHandler
+level=DEBUG
+formatter=Formatter
+args=(sys.stdout,)
+
+[formatter_Formatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
