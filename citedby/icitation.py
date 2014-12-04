@@ -96,10 +96,12 @@ class ICitation(object):
         :returns:{
                   "_index":"citations",
                   "_type":"citation",
-                  "_id":"gyhX6cfOQLiGoktJ8aDjFw",
+                  "_id":"scl_S1413-81232011001000014",
                   "_version":1,
                   "created":true
                  } (Elasticsearch response)
+
+        look the ``_id`` key we know the id in ES
         """
 
         if not isinstance(doc, dict):
@@ -108,7 +110,10 @@ class ICitation(object):
         if not 'code' or not 'collection' in doc:
             raise ValueError('param doc must contain keys code and collection')
 
-        return self.es_conn.index(index=self.index, doc_type='citation', body=doc)
+        cite_id = '%s_%s' % (doc['collection'], doc['code'])
+
+        return self.es_conn.index(index=self.index, doc_type='citation',
+                                  id=cite_id, body=doc)
 
 
     def del_all_citation(self):
