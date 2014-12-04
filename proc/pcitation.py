@@ -109,7 +109,6 @@ class PCitation(object):
 
     Edit logging.ini to change logging definitions.
     """
-    default_verbosity = 1
 
     parser = optparse.OptionParser(textwrap.dedent(usage),
                                     version="%prog 0.9 - beta")
@@ -218,7 +217,7 @@ class PCitation(object):
 
         elif self.options.rebuild_index:
             logger.info('You select Rebuild Index processing, deleting %d items in Index Citation.' % cite_total)
-            logger.info('WARNING: This will  remove EVERYTHING from your search index')
+            logger.info('WARNING: This will remove EVERYTHING from your search index')
             icitation.del_all_citation()
             idents = meta_idents
 
