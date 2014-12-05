@@ -5,3 +5,6 @@ nose
 waitress
 gunicorn
 -e git+git://github.com/scieloorg/xylose.git#egg=xylose
+requests
+elasticsearch
+progressbar2

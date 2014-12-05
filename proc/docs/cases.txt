@@ -1,0 +1,263 @@
+Passo da query:
+
+1. Realizamos um pesquisa aproximada pelo título;
+
+2. Consideramos também o ano de publicação do artigo;
+
+3. Avaliamos o autor (preciso verificar o que significa avaliar o autor consideramos o sobrenome ou o nome ou o dois????)
+
+Tudo isso foi realizado em somente uma query.
+
+IMPORTANTE:
+
+Estamos utilizando o ~(til) que em uma frase representa uma busca por proximidade.
+
+###############################################################################
+Case 1:
+
+Caso em que a pesquisa é exata:
+
+Frase: The psychiatric comorbidity of epilepsy
+
+Autor: Gaitatzis
+
+Ano: 2004
+
+URL:
+curl -X GET 'http://localhost:9200/citations/_search?q=citations.first_author.surname=Gaitatzis%20AND%20citations.publication_year:2004%20AND%20citations.title:"The%20psychiatric%20comorbidity%20of%20epilepsy"~3&size=100' | pp > out_with_year.json && python pretty_result.py out_with_year.json
+
+Artigo 1: The psychiatric comorbidity of epilepsy. (Pubmed) 2004
+
+Resultado:
+
+Total de documentos retornados: 16
+
+Todos os resultados foram com o título, autor e ano de publicação exatos.
+
+IMPORTANTE:
+
+Esses artigos tem todas as palavras do título e não foram retornados o ano de publicação e o autor ajudou na eliminação desses artigos.
+
+Artigo 2: Psychiatric comorbidities in epilepsy. (Pubmed) 2008
+
+Artigo 3: Psychiatric Comorbidities of Epilepsy: A Review (Journal of Neurology & Neurophysiology) 2007
+
+###############################################################################
+
+Case 2:
+
+Caso em que a pesquisa não é exata(sem artigos e preposições):
+
+Frase: psychiatric comorbidity epilepsy
+
+Autor: Gaitatzis
+
+Ano: 2004
+
+URL:
+curl -X GET 'http://localhost:9200/citations/_search?q=citations.first_author.surname=Gaitatzis%20AND%20citations.publication_year:2004%20AND%20citations.title:"psychiatric%20comorbidity%20epilepsy"~3&size=100' | pp > out_with_year.json && python pretty_result.py out_with_year.json
+
+Resultado:
+
+Aumento no número de artigos
+
+Total de documentos retornados: 18
+
+Nesse caso aumentou o número de artigos retornados, já que fomos menos exatos na pesquisa (Remoção das preposições e artigos)
+
+Os 2 artigos a mais que foram retornados, encontram o mesmo frase na busca:
+
+Título: The epidemiology of the comorbidity of epilepsy in the general population, Ano: (2004), Autor: "Gaitatzis", Origin: Epilepsia
+
+###############################################################################
+
+Case 3:
+
+Caso em que iremos pesquisa sem a retrição da autoria.
+
+Frase: psychiatric comorbidity epilepsy (Removido as preposições e artigos)
+
+Ano: 2004
+
+URL:
+curl -X GET 'http://localhost:9200/citations/_search?q=citations.publication_year:2004%20AND%20citations.title:"psychiatric%20comorbidity%20epilepsy"~3&size=100' | pp > out_with_year.json && python pretty_result.py out_with_year.json
+
+Resultado:
+
+Aumento no número de artigos
+
+Total de documentos retornados: 27
+
+Nesse caso aumentou o número de artigos retornados, já que fomos menos exatos na pesquisa (Remoção das preposições, artigos e ano)
+
+O formato não esta legal, por que não impõe os itens (AND) da pesquisa no mesmo registro e sim na lista o que invalida a pesquisa booleana.
+
+11 artigos foram retornado mas não deveriam:
+
+1.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0004-282X2013000600385&lng=en&tlng=en
+Frase: Psychiatric comorbidity in epilepsy
+
+2.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0004-282X2011000300015&lng=en&tlng=en
+Frase: Psychiatric comorbidity in epilepsy: a population-based analysis
+
+3.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0004-282X2014000500344&lng=en&tlng=en
+Frase: sychiatric comorbidity in epilepsy: a population-based analysis
+
+4.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492012000200005&lng=en&tlng=en
+Frase: The epidemiology of the comorbidity of epilepsy in the general population
+
+5.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0004-282X2013001200852&lng=en&tlng=en
+Frase: Comorbidity psychiatric disorders in epilepsy: a review of literature
+
+6.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492010000200003&lng=en&tlng=en
+Frase: Psychiatric comorbidity in juvenile myoclonic epilepsy
+
+7.
+url:http://scielo.sld.cu/scielo.php?script=sci_arttext&pid=S0138-600X2014000200006&lng=en&tlng=en
+Frase:Psychiatric comorbidity in epilepsy: a study comparing patients with mesial temporal sclerosisand juvenile myoclonic epilepsy
+
+8.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492011000200004&lng=en&tlng=en
+Frase: Psychiatric comorbidity in epilepsy: a population-based analysis
+
+9.
+url:http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492009000400010&lng=en&tlng=en
+Frase: Psychiatric comorbidity in patients with epilepsy: implications for diagnosis and treatment
+
+10.
+url: http://www.scielo.org.co/scielo.php?script=sci_arttext&pid=S0120-87482012000300003&lng=en&tlng=en
+Frase: Psychiatric comorbidity in children with new onset epilepsy
+
+11.
+url: http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-60832005000300009&lng=en&tlng=en
+Frase: Epilepsy, Psychiatry Morbidity, and Clinic Patients and Social Dysfunction in General Practice: Comparison Between Hospital Clinic Patients and Clinic Nonattenders
+
+###############################################################################
+
+Case 4:
+
+Caso em que iremos pesquisa somente utilizando o título exato.
+
+Frase: The psychiatric comorbidity of epilepsy (Título exato)
+
+URL:
+curl -X GET 'http://localhost:9200/citations/_search?q=citations.title:"The%20psychiatric%20comorbidity%20of%20epilepsy"~3&size=100' | pp > out_with_year.json && python pretty_result.py out_with_year.json
+
+Resultado:
+
+Total de documentos retornados: 16
+
+###############################################################################
+
+Conclusão:
+
+O formato não esta bom, pois não conseguimos retornar as citações considerando uma busca boleana no campo autor, ano de publicação e título.
+
+Outra coisa que enviabiliza o uso desse formato é o resultado está retornando citações que não deveriam de ser retornadas. A frase sem ou com preposições/artigos é ineficiente.
+
+
+###############################################################################
+
+Case 5:
+
+Nessa caso iremos indexar os registros como objectos alinhados
+
+Frase: The psychiatric comorbidity of epilepsy (Título exato)
+
+Resultado:
+
+Total de documentos retornados: 16
+
+Conclusão:
+
+Obtivemos o mesmo resutado do case 1
+
+###############################################################################
+
+Case 6 (Indexado como objetos alinhados, sem param not_analyzed no título e pesquisando com phrase search):
+
+Nessa caso iremos indexar os registros como objetos alinhados
+
+Frase: The psychiatric comorbidity of epilepsy
+
+Ano: 2004
+
+Resultado:
+
+Total de documentos retornados: 16
+
+Conclusão:
+
+Obtivemos o mesmo resultado do case 1 (sem alinhamento)
+
+###############################################################################
+
+Case 7 (Indexado como objetos alinhados, sem param not_analyzed no título):
+
+Frase: The psychiatric comorbidity of epilepsy
+
+Ano: 2004
+
+Resultado:
+
+Retorna vários >13911 registro pois cada termo do título é pesquisado.
+
+###############################################################################
+
+Case 8 (Indexado como objetos alinhados, sem param not_analyzed no título):
+
+Frase: The psychiatric comorbidity of epilepsy (exato)
+
+Ano: 2004 (exato)
+
+Autor: Gaitatzis (exato)
+
+Resultado:
+
+
+###############################################################################
+
+Case 9 (Indexado como objetos alinhados, sem param not_analyzed no título):
+
+Frase: The psychiatric comorbidity of epilepsy
+
+Resultado:
+
+> 47754
+
+###############################################################################
+
+Case 10 (Indexado como objetos alinhados, sem param not_analyzed no título):
+
+Frase: The psychiatric comorbidity of epilepsy (com fuzzy)
+
+Resultado:
+
+###############################################################################
+
+Case 11 (Indexado como objetos alinhados, com param not_analyzed no título):
+
+Frase: The psychiatric comorbidity of epilepsy (com fuzzy)
+
+Resultado:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
