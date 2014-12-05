@@ -1,5 +1,5 @@
 [loggers]
-keys=root,pcitations,utils
+keys=root,pcitations,articlemeta
 
 [handlers]
 keys=consoleHandler, timedRotatingFileHandler
@@ -17,10 +17,10 @@ handlers=consoleHandler, timedRotatingFileHandler
 qualname=pcitations
 propagate=0
 
-[logger_utils]
+[logger_articlemeta]
 level=INFO
 handlers=consoleHandler, timedRotatingFileHandler
-qualname=utils
+qualname=articlemeta
 propagate=0
 
 [handler_timedRotatingFileHandler]

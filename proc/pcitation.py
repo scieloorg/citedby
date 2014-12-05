@@ -186,7 +186,7 @@ class PCitation(object):
 
         logger.info('Get identifiers from Article Meta...')
 
-        with ProgressBar(maxval=articlemeta.get_identifiers_count()) as progress:
+        with ProgressBar(maxval=meta_total) as progress:
             for ident in articlemeta.get_all_identifiers():
                 meta_idents = []
                 meta_idents.append(ident)
