@@ -7,7 +7,7 @@ from pyramid.view import view_config, notfound_view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound
 
-from controller import query_by_pid, query_by_doi, query_by_meta
+from icontroller import query_by_pid, query_by_doi, query_by_meta
 
 
 @notfound_view_config(append_slash=True)
@@ -25,7 +25,7 @@ def citedby_pid(request):
     if not 'q' in request.GET:
         return None
 
-    articles = query_by_pid(request.db['articles'], request.GET['q'])
+    articles = query_by_pid(request.index, request.GET['q'])
 
     return articles
 
@@ -35,7 +35,7 @@ def citedby_doi(request):
     if not 'q' in request.GET:
         return None
 
-    articles = query_by_doi(request.db['articles'], request.GET['q'])
+    articles = query_by_doi(request.index, request.GET['q'])
 
     return articles
 
@@ -46,9 +46,9 @@ def citedby_meta(request):
         return None
 
     articles = query_by_meta(
-        request.db['articles'],
+        request.index,
         title=request.GET.get('title', ''),
-        author=request.GET.get('author', ''),
+        author_surname=request.GET.get('author', ''),
         year=request.GET.get('year', '')
     )
 

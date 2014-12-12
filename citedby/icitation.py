@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch
 class ICitation(object):
 
 
-    def __init__(self, hosts=None, **kwargs):
+    def __init__(self, hosts=None, index="citations", **kwargs):
         """
         On class initialization is created a connection to ES and
         verify if is up with citation index, raise except otherwise.
@@ -14,15 +14,14 @@ class ICitation(object):
         :param kwargs: elasticsearch params, see:
         http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
         """
-
-        self.index = "citations"
+        self.index = index
         self.es_conn = Elasticsearch(hosts, **kwargs)
 
         if not self._ping():
             raise Exception("The Elasticsearch is down!")
 
         if not self._exists():
-            raise Exception("The Elasticsearch dont have index 'citations'")
+            raise Exception("The Elasticsearch dont have index %s" % self.index)
 
 
     def _ping(self):
@@ -48,6 +47,18 @@ class ICitation(object):
         :returns: Interger.
         """
         return int(self.es_conn.count(index=self.index)['count'])
+
+
+    def get_by_code(self, code, **kwargs):
+        """
+        Get article by code
+        """
+        return self.es_conn.search(index=self.index,
+            body={
+                  "query": {"match_phrase": {
+                    "code": code
+                  }}
+                }, **kwargs)
 
 
     def get_all(self, size=1000):
@@ -155,13 +166,74 @@ class ICitation(object):
 
         if self._exists():
             return self.es_conn.delete_by_query(index=self.index,
-                body="""{
-                          "query": {
-                            "bool": {
-                              "must": [
-                                {"match_phrase": {"code": %s}},
-                                {"match_phrase": {"collection": %s}}
-                              ]
+                body={
+                      "query": {
+                        "bool": {
+                          "must": [
+                            {"match_phrase": {"code": ident[1]}},
+                            {"match_phrase": {"collection": ident[0]}}
+                          ]
+                        }
+                      }
+                    })
+
+
+    def search_citation(self, titles, author_surname=None, year=None):
+        """
+        Search citations by ``title``, ``author`` and ``year``.
+        """
+
+        should_param = []
+        must_param = []
+
+        if not titles or not isinstance(titles, list):
+            None
+
+        for title in titles:
+            should_param.append({
+                            "fuzzy_like_this_field" : {
+                                "citations.title" : {
+                                    "like_text" : title,
+                                    "max_query_terms" : 25,
+                                    "prefix_length": 3
+                                }
                             }
+                        })
+
+        if author_surname:
+            must_param.append({
+                        "match": {
+                          "citations.first_author.surname": author_surname
+                            }
+                        })
+
+        if year:
+            must_param.append({
+                          "match": {
+                            "citations.publication_year": year
                           }
-                        }""" % (str(ident[1]), str(ident[0])))
+                        })
+
+        return self.es_conn.search(index=self.index,
+            body={
+                  "query":
+                  {
+                    "nested" : {
+                      "path" : "citations",
+                      "query" : {
+                          "bool" : {
+                            "must": must_param,
+                            "should": should_param,
+                            "minimum_number_should_match": 1
+                          }
+                      }
+                    }
+                  }
+                })
+
+
+
+
+
+
+
