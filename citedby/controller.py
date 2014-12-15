@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import utils
 import unicodedata
 import string
 import urllib2
