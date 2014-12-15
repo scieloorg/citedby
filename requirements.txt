@@ -7,4 +7,4 @@ gunicorn
 -e git+git://github.com/scieloorg/xylose.git#egg=xylose
 requests
 elasticsearch
-progressbar2
+progressbar2==2.6.7
