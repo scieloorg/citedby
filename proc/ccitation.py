@@ -1,11 +1,15 @@
 #!/usr/bin/python
 #coding: utf-8
 
+import os.path
 import sys
+import csv
+import json
 import textwrap
 import optparse
 import logging.config
 from datetime import datetime
+from progressbar import ProgressBar
 
 import requests
 from citedby.icitation import ICitation
@@ -13,27 +17,24 @@ from citedby.icitation import ICitation
 
 class CCitation(object):
     """
-    Cheking Citation against SciELO Site
+    Count citation
     """
 
     usage = """\
-    %prog this script search the citation on Elasticsearch and verify if the
-    citation exists in OnLine Site http://www.scielo.br
+    %prog this count how many articles have citation in SciELO
     """
 
     parser = optparse.OptionParser(textwrap.dedent(usage),
                                     version="%prog 0.9 - beta")
-    parser.add_option('-p', '--phrase', action="append",
-                        help='phrase to be search on citation index (multiple -p args accepted)')
-    parser.add_option('-a', '--author_surname', action='store',
-                        help='the author surname')
-    parser.add_option('-y', '--publication_year', action='store',
-                        help='publication year of the article')
+    parser.add_option('-o', '--output_file', action="store", type="string",
+                        help='path to output csv file content result of process')
+
 
     def __init__(self, argv):
         self.started = None
         self.finished = None
         self.options, self.args = self.parser.parse_args(argv)
+
 
     def _duration(self):
         """
@@ -47,34 +48,11 @@ class CCitation(object):
         Return a Boolean checking the params
         """
 
-        if not (self.options.phrase or self.options.author_surname or self.options.publication_year):
-            self.parser.error('One of params -p (phrase), -a (author surname) or -y (publication year) must be used.')
+        if not self.options.output_file:
+            self.parser.error('parm -o (output_file) must be used.')
             return False
 
         return True
-
-
-    def _format_citation(self, citations):
-        """
-        Format the citation like:
-            [{
-                url: "http://www.scielo.cl/scielo.php?script=sci_arttext&pid=S0716-10182009000100012&lng=en&tlng=en",
-                source: "Revista chilena de infectología",
-                issn: "0716-1018",
-                code: "S0716-10182009000100012",
-                title: "Fiebre tifoidea en Santiago, Chile y su control"
-            }]
-        """
-        l = []
-
-        for citation in citations['hits']['hits']:
-            l.append({
-                    'titles': citation['_source']['titles'],
-                    'url': citation['_source']['url'],
-                    'code': citation['_source']['code'],
-                    'source': citation['_source']['source'],
-                    'issn': citation['_source']['issn']})
-        return l
 
 
     def _fetch_data(self, resource):
@@ -94,6 +72,25 @@ class CCitation(object):
             return response
 
 
+    def _file_identifiers(self, filename, idents):
+        """
+        This method will generate a file system content all identifiers
+        provide from ES citation index.
+        """
+
+        fp = open(filename, 'a')
+
+        writer = csv.writer(fp, delimiter='|', quotechar='"')
+
+
+        logger.info('Get identifiers from ES Index Citation...this will take a while!')
+
+        for ident in idents:
+            writer.writerow([ident[1], ident[0]])
+
+        fp.close()
+
+
     def run(self):
 
         self.started = datetime.now()
@@ -101,36 +98,49 @@ class CCitation(object):
         if not self._checkparam():
             return None
 
-        logger.info('Start Check Citation Script\n')
+        logger.info('Start Count Citation Script')
 
-        icitation = ICitation()
+        icitation = ICitation(hosts='homolog-citedby.scielo.org')
 
-        citations = self._format_citation(icitation.search_citation(
-                                          titles=self.options.phrase,
-                                          author_surname=self.options.author_surname,
-                                          year=self.options.publication_year))
+        total_citation = icitation.count_citation()
 
-        print u"Encontrado %s artigo(s) que citam o(s) título(s): %s\n" % (len(citations), self.options.phrase)
+        logger.info('Total of article in ES Citation: %s' % total_citation)
 
-        error_list = []
-        for citation in citations:
+        #if identifiers dont exists create and read to get all identifiers
+        if os.path.exists('identifiers.txt'):
+            fp = open('identifiers.txt', 'r')
+            es_idents = fp.readlines()
+        else:
+            self._file_identifiers('identifiers.txt', icitation.get_identifiers())
+            fp = open('identifiers.txt', 'r')
+            es_idents = csv.reader(fp, delimiter='|', quotechar='"')
 
-            print "#" * 80
+        #create a csv file with result
+        f = open(self.options.output_file, 'ab')
 
-            f_data = self._fetch_data(citation['url'])
+        writer = csv.writer(f, delimiter='|', quotechar='"')
+        count = 0
 
-            if unicode(self.options.phrase) in f_data.text:
-                print u"Existe title: %s in %s" % (self.options.phrase, citation['url'])
-            else:
-                error_list.append(citation['url'])
+        #loop all identifiers from ES
+        for row in es_idents:
+            ident = row.split('|')[0]
+ 
+            response_new = self._fetch_data('http://homolog-citedby.scielo.org/api/v1/pid/?q=%s' % ident)
+            response_current = self._fetch_data('http://citedby.scielo.org/api/v1/pid/?q=%s' % ident)
 
-            print "#" * 80 + "\n"
+            if response_new.status_code == 200 and response_current.status_code == 200:
 
-        if error_list:
-            print u"%d iten(s) não foram encontrado para a frase: '%s', verifique manualmente:\n" % (len(error_list), self.options.phrase)
+                citation_new = json.loads(response_new.text)
+                citation_current = json.loads(response_current.text)
 
-            print 'Frases: %s\n' % '\n\t'.join(self.options.phrase)
-            print 'URL(s): %s\n' % '\n\t'.join(error_list)
+                #add in csv file only articles with citations
+                if len(citation_new['citedby']) > 0 and len(citation_current['cited_by']) > 0:
+                    writer.writerow([ident, str(len(citation_new['citedby'])), str(len(response_current['cited_by']))])
+                    count +=1 
+
+        writer.writerow(['Total of articles with current citation', str(count_current)])
+
+        f.close()
 
         self.finished = datetime.now()
 
@@ -150,7 +160,7 @@ if __name__ == "__main__":
     logging.config.fileConfig('logging.ini')
 
     # set logger
-    logger = logging.getLogger('pcitations')
+    logger = logging.getLogger('ccitations')
 
     # command line
     sys.exit(main() or 0)
