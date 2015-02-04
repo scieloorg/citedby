@@ -182,7 +182,7 @@ class ICitation(object):
                     })
 
 
-    def search_citation(self, titles, author_surname, year):
+    def search_citation(self, titles, author_surname, year, size=1000):
         """
         Search citations by ``title``, ``author`` and ``year``.
 
@@ -240,5 +240,5 @@ class ICitation(object):
                       }
                     }
                   }
-                })
+                }, size=size)
 

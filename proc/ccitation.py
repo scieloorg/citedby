@@ -132,13 +132,12 @@ class CCitation(object):
 
                 citation_new = json.loads(response_new.text)
                 citation_current = json.loads(response_current.text)
-
                 #add in csv file only articles with citations
                 if len(citation_new['citedby']) > 0 and len(citation_current['cited_by']) > 0:
-                    writer.writerow([ident, str(len(citation_new['citedby'])), str(len(response_current['cited_by']))])
+                    writer.writerow([ident, str(len(citation_new['citedby'])), str(len(citation_current['cited_by']))])
                     count +=1 
 
-        writer.writerow(['Total of articles with current citation', str(count_current)])
+        writer.writerow(['Total of articles with current citation', str(count)])
 
         f.close()
 
