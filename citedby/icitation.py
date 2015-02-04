@@ -61,20 +61,24 @@ class ICitation(object):
                 }, **kwargs)
 
 
-    def get_all(self, size=1000):
+    def get_all(self, query=None, size=1000):
         """
-        Get all citation in citation index.
+        Get all using query from the SciELO citation index.
 
         :param size: Number of hits to return (default: 1000).
+        :param query(DSL): get by param DSL query or it will use DSL match_all query
 
         :returns: A generator with citation data structure.
         """
         from_ = 0
 
+        if not query:
+            query = {"query": {"match_all": {}}}
+
         while True:
 
             resp = self.es_conn.search(index=self.index, from_=from_,
-                                       size=size, body={"query": {"match_all": {}}})
+                                       size=size, body=query)
 
             for citation in resp['hits']['hits']:
                 yield citation
@@ -178,9 +182,16 @@ class ICitation(object):
                     })
 
 
-    def search_citation(self, titles, author_surname=None, year=None):
+    def search_citation(self, titles, author_surname, year, size=1000):
         """
         Search citations by ``title``, ``author`` and ``year``.
+
+        :param titles: Titles of article in any language
+        :param author_surname: The surname of first author
+        :param year: Is the publication year 
+
+        This method will search for citations that have smilarity titles and
+        exact first author surname and exact publication_year 
         """
 
         should_param = []
@@ -194,7 +205,7 @@ class ICitation(object):
                             "fuzzy_like_this_field" : {
                                 "citations.title" : {
                                     "like_text" : title,
-                                    "max_query_terms" : 25,
+                                    "max_query_terms" : 10,
                                     "prefix_length": 3
                                 }
                             }
@@ -229,11 +240,5 @@ class ICitation(object):
                       }
                     }
                   }
-                })
-
-
-
-
-
-
+                }, size=size)
 

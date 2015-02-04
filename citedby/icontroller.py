@@ -47,17 +47,16 @@ def query_by_pid(index, pid):
 
     article = index.get_by_code(pid, _source_include=src_fields)['hits']['hits'][0]['_source']
 
-    if not 'titles' in article:
-        return None
+    if ('titles' in article and 'first_author' in article and 'publication_year' in article):
 
-    if 'first_author' in article:
+        filters['titles'] = article['titles']
         filters['author_surname'] = article['first_author']['surname']
+        filters['year'] = article['publication_year']
 
-    if 'year' in article:
-        filters['year'] = article['year']
-
-
-    citations = format_citation(index.search_citation(titles=article['titles'], **filters))
+        citations = format_citation(index.search_citation(**filters))
+        
+    else:
+        citations = []
 
     return {'article': article, 'citedby':citations}
 
