@@ -1,4 +1,7 @@
 #coding: utf-8
+import os
+import json
+
 from elasticsearch import Elasticsearch
 
 
@@ -20,8 +23,12 @@ class ICitation(object):
         if not self._ping():
             raise Exception("The Elasticsearch is down!")
 
+        #If index dont exists create it!
         if not self._exists():
-            raise Exception("The Elasticsearch dont have index %s" % self.index)
+            mapping = os.path.dirname(os.path.abspath(__file__)) + '/mapping/citation.json'
+
+            self.es_conn.indices.create(index=self.index,
+                body=json.loads(open(mapping).read()))
 
 
     def _ping(self):
@@ -91,13 +98,15 @@ class ICitation(object):
 
     def get_identifiers(self):
         """
-        Get all identifiers in index citation.
+        Get all identifiers in index citation. This method configure the query
+        to not get any field just identifiers and increase the size param.
 
         :returns: a list content tuple, like: ('acronym of collection', SciELO PID).
         """
-        all_citations = self.get_all()
+        all_citations = self.get_all(query={"query" : {"match_all" : {} }, "fields": ["collection", "code"] },
+                                    size=10000)
 
-        return [(i['_source']['collection'],i['_source']['code'])
+        return [(i['fields']['collection'],i['fields']['code'])
                 for i in all_citations]
 
 

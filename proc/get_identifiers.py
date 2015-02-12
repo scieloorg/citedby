@@ -26,7 +26,7 @@ def _fetch_data(self, resource):
 
 def main():
 
-    icitation = ICitation(hosts='homolog-citedby.scielo.org')
+    icitation = ICitation()
 
     total = icitation.count_citation()
 

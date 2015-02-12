@@ -26,8 +26,13 @@ class CCitation(object):
 
     parser = optparse.OptionParser(textwrap.dedent(usage),
                                     version="%prog 0.9 - beta")
+
     parser.add_option('-o', '--output_file', action="store", type="string",
                         help='path to output csv file content result of process')
+
+    parser.add_option('-l', '--list_hosts', action="store",
+                        help='list of ES hosts, Ex.: esa.scielo.org esb.scielo.org,\
+                        default is localhost')
 
 
     def __init__(self, argv):
@@ -100,7 +105,7 @@ class CCitation(object):
 
         logger.info('Start Count Citation Script')
 
-        icitation = ICitation(hosts='homolog-citedby.scielo.org')
+        icitation = ICitation(hosts=self.options.list_hosts)
 
         total_citation = icitation.count_citation()
 

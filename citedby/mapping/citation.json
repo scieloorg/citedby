@@ -1,0 +1,87 @@
+{
+   "citations": {
+      "mappings": {
+         "citation": {
+            "properties": {
+               "citations": {
+                  "type": "nested",
+                  "properties": {
+                     "collection": {
+                        "type": "string"
+                     },
+                     "first_author": {
+                        "properties": {
+                           "first_author": {
+                              "type": "string"
+                           },
+                           "given_names": {
+                              "type": "string"
+                           },
+                           "source": {
+                              "type": "string"
+                           },
+                           "surname": {
+                              "type": "string"
+                           }
+                        }
+                     },
+                     "issn": {
+                        "type": "string"
+                     },
+                     "publication_year": {
+                        "type": "string"
+                     },
+                     "source": {
+                        "type": "string"
+                     },
+                     "title": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                     }
+                  }
+               },
+               "code": {
+                  "type": "string"
+               },
+               "collection": {
+                  "type": "string"
+               },
+               "first_author": {
+                  "properties": {
+                     "given_names": {
+                        "type": "string"
+                     },
+                     "role": {
+                        "type": "string"
+                     },
+                     "surname": {
+                        "type": "string"
+                     },
+                     "xref": {
+                        "type": "string"
+                     }
+                  }
+               },
+               "id": {
+                  "type": "string"
+               },
+               "issn": {
+                  "type": "string"
+               },
+               "publication_year": {
+                  "type": "string"
+               },
+               "source": {
+                  "type": "string"
+               },
+               "titles": {
+                  "type": "string"
+               },
+               "url": {
+                  "type": "string"
+               }
+            }
+         }
+      }
+   }  
+}
