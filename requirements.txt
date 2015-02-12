@@ -1,5 +1,4 @@
 pyramid
-pymongo
 paster
 nose
 waitress

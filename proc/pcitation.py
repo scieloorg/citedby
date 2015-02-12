@@ -13,6 +13,13 @@ from xylose.scielodocument import Article
 import articlemeta
 from citedby.icitation import ICitation
 
+# config logger file
+logging.config.fileConfig('logging.ini')
+
+# set logger
+logger = logging.getLogger('pcitations')
+
+
 def citation_meta(art_meta_json):
     """
     This function receives a article meta JSON, transform it in an citation
@@ -124,6 +131,10 @@ class PCitation(object):
                         help='this will remove all data in ES and\
                              index all documents')
 
+    parser.add_option('-l', '--list_hosts', nargs='+',
+                        help='list of ES hosts, Ex.: esa.scielo.org esb.scielo.org,\
+                        default is localhost')
+
     def __init__(self, argv):
         self.started = None
         self.finished = None
@@ -178,7 +189,7 @@ class PCitation(object):
 
         logger.info('Total of items in Article Meta: %d' % meta_total)
 
-        icitation = ICitation()
+        icitation = ICitation(hosts=self.options.list_hosts)
 
         cite_total = icitation.count_citation()
 
@@ -199,11 +210,11 @@ class PCitation(object):
             es_idents = icitation.get_identifiers()
 
             #Itens that will be index (A-B)
-            idents = self.difflist(meta_idents, es_idents)
+            idents = self._difflist(meta_idents, es_idents)
             logger.info('Total itens that will be index: %s' % len(idents))
 
             #Remove itens (B-A)
-            remove_idents = self.difflist(es_idents, meta_idents)
+            remove_idents = self._difflist(es_idents, meta_idents)
             logger.info('Total of items that will be remove from ES: %s' % len(remove_idents))
             if remove_idents: # if exists itens to remove
                 with ProgressBar(maxval=len(remove_idents)) as progress:
@@ -243,12 +254,6 @@ def main(argv=sys.argv[1:]):
 
 
 if __name__ == "__main__":
-
-    # config logger file
-    logging.config.fileConfig('logging.ini')
-
-    # set logger
-    logger = logging.getLogger('pcitations')
 
     # command line
     sys.exit(main() or 0)
