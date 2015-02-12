@@ -131,7 +131,7 @@ class PCitation(object):
                         help='this will remove all data in ES and\
                              index all documents')
 
-    parser.add_option('-l', '--list_hosts', nargs='+',
+    parser.add_option('-l', '--list_hosts', action='store',
                         help='list of ES hosts, Ex.: esa.scielo.org esb.scielo.org,\
                         default is localhost')
 
