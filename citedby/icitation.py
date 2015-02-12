@@ -103,10 +103,10 @@ class ICitation(object):
 
         :returns: a list content tuple, like: ('acronym of collection', SciELO PID).
         """
-        all_citations = self.get_all(query={"query" : {"match_all" : {} }, "fields": ["collection", "code"] },
+        all_citations = self.get_all(query={"query" : {"match_all" : {} }, "_source": ["collection", "code"] },
                                     size=10000)
 
-        return [(i['fields']['collection'],i['fields']['code'])
+        return [(i['_source']['collection'],i['_source']['code'])
                 for i in all_citations]
 
 
