@@ -164,7 +164,7 @@ if __name__ == "__main__":
     logging.config.fileConfig('logging.ini')
 
     # set logger
-    logger = logging.getLogger('ccitations')
+    logger = logging.getLogger('ccitation')
 
     # command line
     sys.exit(main() or 0)
