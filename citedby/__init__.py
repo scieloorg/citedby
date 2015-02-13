@@ -7,8 +7,15 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
 
+    hosts = [
+        {
+            'host': settings['elasticsearch_host'],
+            'port': settings['elasticsearch_port']
+        }
+    ]
+
     def add_index(request):
-        return ICitation()
+        return ICitation(hosts=hosts)
 
     config.add_route('index', '/')
     config.add_route('citedby_pid', '/api/v1/pid/')

@@ -45,6 +45,7 @@ def query_by_pid(index, pid):
     filters = {}
     src_fields = ['url', 'source', 'issn', 'collection', 'titles', 'code', 'first_author.surname', 'publication_year']
 
+    #precisa evitar o index exception
     article = index.get_by_code(pid, _source_include=src_fields)['hits']['hits'][0]['_source']
 
     if ('titles' in article and 'first_author' in article and 'publication_year' in article):
