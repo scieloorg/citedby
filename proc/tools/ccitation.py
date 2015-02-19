@@ -32,7 +32,7 @@ class CCitation(object):
 
     parser.add_option('-l', '--list_hosts', action="store",
                         help='list of ES hosts, Ex.: esa.scielo.org esb.scielo.org,\
-                        default is localhost')
+                        default is localhost, it use to create the identifiers.txt file.')
 
 
     def __init__(self, argv):
@@ -62,7 +62,8 @@ class CCitation(object):
 
     def _fetch_data(self, resource):
         """
-        Fetches any resource.
+        Fetches any resource, this will try to get the resource if doesnt work
+        it will try infinitely sleep 10 seconds between attempts
 
         :param resource: any resource
         :returns: requests.response object
@@ -70,7 +71,16 @@ class CCitation(object):
         try:
             response = requests.get(resource)
         except requests.exceptions.RequestException as e:
-            logger.error('%s. Unable to connect to resource.' % e)
+            logger.error('Unable to connect to resource. %s' % e)
+
+            while True:
+                try:
+                    log.info('Try to get the resource again: {0}'.format(resource))
+                    return requests.get(resource)
+                except requests.exceptions.RequestException as e:
+                    log.error('Sleep for 10 second to try again: {0}'.format(resource))
+                    time.sleep(10)
+
         else:
             logger.debug('Get resource: %s' % resource)
 
