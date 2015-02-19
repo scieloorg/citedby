@@ -53,8 +53,8 @@ class CCitation(object):
         Return a Boolean checking the params
         """
 
-        if not self.options.output_file:
-            self.parser.error('parm -o (output_file) must be used.')
+        if not self.options.output_file or not self.options.list_hosts:
+            self.parser.error('parm -o (output_file) must be used and -l list of ES hosts')
             return False
 
         return True
@@ -96,7 +96,6 @@ class CCitation(object):
         fp = open(filename, 'a')
 
         writer = csv.writer(fp, delimiter='|', quotechar='"')
-
 
         logger.info('Get identifiers from ES Index Citation...this will take a while!')
 
@@ -140,16 +139,15 @@ class CCitation(object):
         for row in es_idents:
             ident = row.split('|')[0]
  
-            response_new = self._fetch_data('http://homolog-citedby.scielo.org/api/v1/pid/?q=%s' % ident)
-            response_current = self._fetch_data('http://citedby.scielo.org/api/v1/pid/?q=%s' % ident)
+            response = self._fetch_data('http://citedby.scielo.org/api/v1/pid/?q=%s' % ident)
 
-            if response_new.status_code == 200 and response_current.status_code == 200:
+            if response.status_code == 200:
 
-                citation_new = json.loads(response_new.text)
-                citation_current = json.loads(response_current.text)
+                citation = json.loads(response.text)
+
                 #add in csv file only articles with citations
-                if len(citation_new['citedby']) > 0 and len(citation_current['cited_by']) > 0:
-                    writer.writerow([ident, str(len(citation_new['citedby'])), str(len(citation_current['cited_by']))])
+                if len(citation['cited_by']) > 0:
+                    writer.writerow([ident, str(len(citation['cited_by']))])
                     count +=1 
 
         writer.writerow(['Total of articles with current citation', str(count)])
