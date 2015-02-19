@@ -4,7 +4,7 @@ import urlparse
 
 from pyramid.view import view_config
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPBadRequest
 
 from icontroller import query_by_pid, query_by_doi, query_by_meta
 
@@ -18,7 +18,7 @@ def index(request):
 def citedby_pid(request):
 
     if not 'q' in request.GET:
-        return "Sorry, add '?q=' to the URL"
+        raise HTTPBadRequest("parameter 'q' is required")
 
     articles = query_by_pid(request.index, request.GET['q'])
 
@@ -29,7 +29,7 @@ def citedby_pid(request):
 def citedby_doi(request):
 
     if not 'q' in request.GET:
-        return "Sorry, add '?q=' to the URL"
+        raise HTTPBadRequest("parameter 'q' is required")
 
     articles = query_by_doi(request.index, request.GET['q'])
 
@@ -40,7 +40,7 @@ def citedby_doi(request):
 def citedby_meta(request):
 
     if not 'title' in request.GET:
-        return "Sorry, add '?title=' to the URL"
+        raise HTTPBadRequest("at least the parameter 'title' is required")
 
     articles = query_by_meta(
         request.index,
