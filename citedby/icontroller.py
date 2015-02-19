@@ -1,17 +1,14 @@
 # coding: utf-8
-import urllib2
-import json
+import requests
 
-def load_document_meta_from_crossref(doi):
-    response = json.loads(urllib2.urlopen('http://search.crossref.org/dois?q=%s' % doi).read())
 
-    if not len(response) > 0:
+def load_from_crossref(doi):
+    response = requests.get('http://search.crossref.org/dois?q=%s' % doi).json()
+
+    if len(response) == 0:
         return None
 
     if not 'title' in response[0]:
-        return None
-
-    if not response[0]['title']:
         return None
 
     return response[0]
@@ -45,8 +42,12 @@ def query_by_pid(index, pid):
     filters = {}
     src_fields = ['url', 'source', 'issn', 'collection', 'titles', 'code', 'first_author.surname', 'publication_year']
 
-    #precisa evitar o index exception
-    article = index.get_by_code(pid, _source_include=src_fields)['hits']['hits'][0]['_source']
+    es_response = index.get_by_code(pid, _source_include=src_fields)
+
+    if es_response['hits']['total'] == 0:
+        return []
+
+    article = es_response['hits']['hits'][0]['_source']
 
     if ('titles' in article and 'first_author' in article and 'publication_year' in article):
 
@@ -59,14 +60,19 @@ def query_by_pid(index, pid):
     else:
         citations = []
 
-    return {'article': article, 'citedby':citations}
+    return {'article': article, 'cited_by':citations}
 
 
 def query_by_doi(index, doi):
-    article_meta = load_document_meta_from_crossref(doi)
+    meta = load_from_crossref(doi)
 
-    if not article_meta:
-        return None
+    if not meta:
+        return []
+
+    article_meta = {}
+    article_meta['title'] = [meta['title']]
+    article_meta['author'] = ''
+    article_meta['year'] = meta['year']
 
     citations = format_citation(index.search_citation(titles=[article_meta['title']], year=article_meta['year']))
 
@@ -74,9 +80,6 @@ def query_by_doi(index, doi):
 
 
 def query_by_meta(index, title='', author_surname='', year=''):
-
-    if not title:
-        return None
 
     article_meta = {}
     article_meta['title'] = title

@@ -1,7 +1,4 @@
 #coding: utf-8
-import os
-import json
-
 from elasticsearch import Elasticsearch
 
 
@@ -23,12 +20,9 @@ class ICitation(object):
         if not self._ping():
             raise Exception("The Elasticsearch is down!")
 
-        #If index dont exists create it!
+        #Verify if index exists 
         if not self._exists():
-            mapping = os.path.dirname(os.path.abspath(__file__)) + '/mapping/citation.json'
-
-            self.es_conn.indices.create(index=self.index,
-                body=json.loads(open(mapping).read()))
+            raise Exception("The index doesnt exist!")
 
 
     def _ping(self):
@@ -191,7 +185,7 @@ class ICitation(object):
                     })
 
 
-    def search_citation(self, titles, author_surname, year, size=1000):
+    def search_citation(self, titles, author_surname=None, year=None, size=1000):
         """
         Search citations by ``title``, ``author`` and ``year``.
 
