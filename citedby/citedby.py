@@ -1,4 +1,5 @@
 # encode: utf-8
+import ast
 import json
 import urlparse
 
@@ -20,7 +21,14 @@ def citedby_pid(request):
     if not 'q' in request.GET:
         raise HTTPBadRequest("parameter 'q' is required")
 
-    articles = query_by_pid(request.index, request.GET['q'])
+    if 'metaonly' in request.GET:
+        if not request.GET.get('metaonly') in ['true', 'false']:
+            raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
+
+    #Using Abstract Syntax Trees module to get the boolean value of literal 
+    metaonly = ast.literal_eval(request.GET.get('metaonly', 'False').capitalize())
+
+    articles = query_by_pid(request.index, request.GET.get('q'), metaonly)
 
     return articles
 
@@ -31,7 +39,14 @@ def citedby_doi(request):
     if not 'q' in request.GET:
         raise HTTPBadRequest("parameter 'q' is required")
 
-    articles = query_by_doi(request.index, request.GET['q'])
+    if 'metaonly' in request.GET:
+        if not request.GET.get('metaonly') in ['true', 'false']:
+            raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
+
+    #Using Abstract Syntax Trees module to get the boolean value of literal 
+    metaonly = ast.literal_eval(request.GET.get('metaonly', 'False').capitalize())
+
+    articles = query_by_doi(request.index, request.GET.get('q'), metaonly)
 
     return articles
 
@@ -42,11 +57,19 @@ def citedby_meta(request):
     if not 'title' in request.GET:
         raise HTTPBadRequest("at least the parameter 'title' is required")
 
+    if 'metaonly' in request.GET:
+        if not request.GET.get('metaonly') in ['true', 'false']:
+            raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
+
+    #Using Abstract Syntax Trees module to get the boolean value of literal 
+    metaonly = ast.literal_eval(request.GET.get('metaonly', 'False').capitalize())
+
     articles = query_by_meta(
         request.index,
         title=request.GET.get('title', ''),
         author_surname=request.GET.get('author', ''),
-        year=request.GET.get('year', '')
+        year=request.GET.get('year', ''),
+        metaonly=metaonly
     )
 
     return articles
