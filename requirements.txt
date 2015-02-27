@@ -7,3 +7,5 @@ gunicorn
 requests
 elasticsearch
 progressbar2==2.6.7
+dogpile
+pylibmc
