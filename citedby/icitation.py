@@ -17,12 +17,14 @@ class ICitation(object):
         self.index = index
         self.es_conn = Elasticsearch(hosts, **kwargs)
 
-        if not self._ping():
-            raise Exception("The Elasticsearch is down!")
+        if kwargs.get('check_es', None):
+            if not self._ping():
+                raise Exception("The Elasticsearch is down!")
 
-        #Verify if index exists 
-        if not self._exists():
-            raise Exception("The index doesnt exist!")
+        if kwargs.get('check_index', None):
+            #Verify if index exists
+            if not self._exists():
+                raise Exception("The index doesnt exist!")
 
 
     def _ping(self):
@@ -191,10 +193,10 @@ class ICitation(object):
 
         :param titles: Titles of article in any language
         :param author_surname: The surname of first author
-        :param year: Is the publication year 
+        :param year: Is the publication year
 
         This method will search for citations that have smilarity titles and
-        exact first author surname and exact publication_year 
+        exact first author surname and exact publication_year
         """
 
         should_param = []
