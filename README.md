@@ -10,7 +10,7 @@ The API will only work for:
 
 Example:
 
-http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002
+`http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002`
 
 Will return the following result:
 
@@ -45,7 +45,7 @@ Will return the following result:
     }
 
 
-List of endpoints:
+##List of endpoints:
 
 | resource      | description                       |
 |:--------------|:----------------------------------|
@@ -53,6 +53,34 @@ List of endpoints:
 | `/doi/?q=DOI`    | get the article meta from crossref and search the citations in citedby, its  returns the same above struture |
 | `/meta/?title=TITLE&author=AUTHOR&year=YEAR` | get the article by title, author and year and return the same above metadada(article and your received citations) |
 
+##Parameters
+
+Parameters can be used to query, filter and control the results returned by the SciELO API. This param can be passed in URI parameters.
+
+Yet we have just the param `metaonly` that return just the article metadata.
+
+Look the same above example with the `metaonly` param: 
+
+  `http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002&metaonly=true`  
+
+    {
+        article: {
+        code: "S0124-41082008000200002",
+        first_author: {
+            surname: "Velásquez Rodríguez"
+        },
+        issn: "0124-4108",
+        publication_year: "2008",
+        source: "Perspectivas en Nutrición Humana",
+        titles: [
+            "Inflammatory response in children with severe acute malnutrition and anemia",
+            "Respuesta inflamatoria en niños con desnutrición aguda grave y anemia"
+        ],
+        collection: "col",
+        url: "http://www.scielo.org.co/scielo.php?script=sci_arttext&pid=S0124-41082008000200002&lng=en&tlng=en",
+        total_cited_by: 1
+        }
+    }
 
 
 ## Version history
