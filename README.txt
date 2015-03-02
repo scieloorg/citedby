@@ -1,4 +1,5 @@
-# CitedBy
+CitedBy
+=======
 
 The API is generally RESTFUL and returns results in JSON.
 
@@ -8,15 +9,15 @@ Example: `http://citedby.scielo.org/api/v1/pid/?q=S0718-10432002002200002`
 
 Will return the follow result:
 
-## Resource Components
+Resource Components
 Major resource components supported by the CitedBy API are:
 
-- /pid/
-- /meta/
-- /doi/
+* /pid/
+* /meta/
+* /doi/
 
-## Version History
+Version History
 
-- V1: 02/03/2015, first version.
+* V1: 02/03/2015, first version.
 
 See the documentation at: http://docs.scielo.org/projects/citedby/en/latest/
