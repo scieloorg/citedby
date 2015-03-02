@@ -1,7 +1,6 @@
 # coding: utf-8
 import requests
 
-
 def load_from_crossref(doi):
     response = requests.get('http://search.crossref.org/dois?q=%s' % doi).json()
 
@@ -12,7 +11,6 @@ def load_from_crossref(doi):
         return None
 
     return response[0]
-
 
 def format_citation(citations):
     """
@@ -36,7 +34,6 @@ def format_citation(citations):
                 'issn': citation['_source']['issn']})
     return l
 
-
 def query_by_pid(index, pid, metaonly=False):
 
     filters = {}
@@ -58,14 +55,13 @@ def query_by_pid(index, pid, metaonly=False):
         filters['year'] = article_meta['publication_year']
 
         citations = format_citation(index.search_citation(**filters))
-        
+
     article_meta['total_cited_by'] = len(citations)
 
     if metaonly:
         return {'article': article_meta}
     else:
         return {'article': article_meta, 'cited_by':citations}
-
 
 def query_by_doi(index, doi, metaonly=False):
     meta = load_from_crossref(doi)
@@ -86,7 +82,6 @@ def query_by_doi(index, doi, metaonly=False):
         return {'article': article_meta}
     else:
         return {'article': article_meta, 'cited_by':citations}
-
 
 def query_by_meta(index, title='', author_surname='', year='', metaonly=False):
 
