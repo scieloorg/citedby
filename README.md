@@ -10,7 +10,7 @@ The API will only work for:
 
 Example:
 
-`http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002`
+http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002
 
 Will return the following result:
 
