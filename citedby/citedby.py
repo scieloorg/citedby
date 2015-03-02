@@ -48,7 +48,7 @@ def stats(request):
 
     return {'health':
                 {'is_alive_es_cluster': request.index._ping(),
-                 'is_alive_memcacheds': memcacheds
+                 'is_alive_memcached': memcacheds
                 }
             }
 
