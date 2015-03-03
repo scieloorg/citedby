@@ -1,12 +1,12 @@
 # CitedBy
 
-The API is generally RESTFUL and returns results in JSON.
+API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFUL and returns results in JSON.
 
 The API will only work for:
 
-* SciELO PID(SciELO Publisher Identifier)
-* DOI
-* Some meta data: title, first_author and publisher_year
+* SciELO ID colled PID(Publisher Identifier)
+* DOI (Digital Object Identifier) - `http://www.doi.org/`
+* And some article meta data: title, first_author and publisher_year
 
 Example:
 
@@ -50,14 +50,14 @@ Will return the following result:
 | resource      | description                       |
 |:--------------|:----------------------------------|
 | `/pid/?q=PID`      | return article and your citations like the above example |
-| `/doi/?q=DOI`    | get the article meta from crossref and search the citations in citedby, its  returns the same above struture |
+| `/doi/?q=DOI`    | get the article meta from crossref and search the citations in citedby, its returns the same above struture |
 | `/meta/?title=TITLE&author=AUTHOR&year=YEAR` | get the article by title, author and year and return the same above metadada(article and your received citations) |
 
 ##Parameters
 
 Parameters can be used to query, filter and control the results returned by the SciELO API. This param can be passed in URI parameters.
 
-Yet we have just the param `metaonly` that return just the article metadata.
+Yet we have just the param `metaonly` return just the article metadata.
 
 Look the same above example with the `metaonly` param: 
 
