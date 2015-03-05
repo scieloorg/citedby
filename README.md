@@ -85,4 +85,4 @@ Look the same above example with the `metaonly` param:
 
 ## Version history
 
-* V1 2015-03-02, first stable version
+* V1.0 2015-03-02, first stable version https://github.com/scieloorg/citedby/releases/tag/stable-v1.0
