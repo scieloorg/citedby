@@ -27,7 +27,7 @@ propagate=0
 class=handlers.TimedRotatingFileHandler
 level=DEBUG
 formatter=Formatter
-args=('log/pcitations.log', 'D', 1, 5, None, False, False)
+args=('../log/pcitations.log', 'D', 1, 5, None, False, False)
 
 [handler_consoleHandler]
 class=StreamHandler

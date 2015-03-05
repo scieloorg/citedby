@@ -65,7 +65,7 @@ def citation_meta(art_meta_json):
     c_dict['id'] = '%s_%s' % (art.collection_acronym, art.publisher_id)
 
     if art.translated_titles():
-        c_dict['titles'] = [t for l, t in art.translated_titles().items()]
+        c_dict['titles'] = [t for l, t in art.translated_titles().items() if t != None]
 
     c_dict['titles'].append(art.original_title())
     c_dict['collection'] = art.collection_acronym
