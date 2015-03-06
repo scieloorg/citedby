@@ -2,6 +2,9 @@
 
 API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFUL and returns results in JSON.
 
+Usage documentation are available on-line: [SciELO CitedBy RESTful API](http://docs.scielo.org/projects/citedby/en/latest/)
+
+
 The API will only work for:
 
 * SciELO ID colled PID(Publisher Identifier)
@@ -59,9 +62,9 @@ Parameters can be used to query, filter and control the results returned by the 
 
 Yet we have just the param `metaonly` return just the article metadata.
 
-Look the same above example with the `metaonly` param: 
+Look the same above example with the `metaonly` param:
 
-  `http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002&metaonly=true`  
+  `http://citedby.scielo.org/api/v1/pid/?q=S0124-41082008000200002&metaonly=true`
 
     {
         article: {
