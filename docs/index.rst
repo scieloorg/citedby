@@ -25,7 +25,7 @@ Endpoints:
     Note that requesting a version of the API is indicate by query string,
     so use /api/API_VERSION/ENDPOINT.
 .. attention::
-    v1, v2 this must be explicit on query string.
+    v1 this must be explicit on query string.
 
 /
 -
@@ -120,7 +120,7 @@ Parameters:
 +============+=====================================================+
 | **q**      | PID (SciELO) or any article unique code, required   |
 +------------+-----------------------------------------------------+
-| metaonly   | get only the article meta data withouy the citaitons|
+| metaonly   | get only the article meta data without the citaitons|
 +------------+-----------------------------------------------------+
 
 ``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011``
