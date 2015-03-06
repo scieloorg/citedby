@@ -3,21 +3,252 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Cited By SciELO's documentation!
-===========================================
+CitedBy RESTful API
+----------------------------
 
-About
+API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID.
+
+API URL: http://citedby.scielo.org
+
+API Versioning:
+
++------------+---------+-----------------+
+| Date       | Version | Changes         |
++============+=========+=================+
+| 2015-03-02 | v1      | Initial Version |
++------------+---------+-----------------+
+
+
+Endpoints:
+
+.. attention::
+    Note that requesting a version of the API is indicate by query string,
+    so use /api/API_VERSION/ENDPOINT.
+.. attention::
+    v1 this must be explicit on query string.
+
+/
+-
+
+"Cited by SciELO API".
+
+/pid/
 -----
 
-"Cited by SciELO" is an API that allow users to retrive citations given for a specific article.
+Retrieve “cited by” documents of a given PID (SciELO ID)
 
-Contents:
+Parameters:
 
-.. toctree::
-   :maxdepth: 2
++------------+-----------------------------------------------------+
+| Paremeter  | Description                                         |
++============+=====================================================+
+| **q**      | PID (SciELO) or any article unique code, required   |
++------------+-----------------------------------------------------+
+| metaonly   | get only the article meta data without the citaitons|
++------------+-----------------------------------------------------+
 
-   api.rst
-   api_samples.rst
+Mandatory Parameters: *q* PID (SciELO) or any article unique code
+
+``GET /api/v1/pid/?q=S0074-02761936000400003``
+
+Response::
+
+
+    {
+        "article": {
+            "code": "S0074-02761936000400003",
+            "first_author": {
+                "surname": "Freitas"
+            },
+            "issn": "0074-0276",
+            "publication_year": "1936",
+            "source": "Memórias do Instituto Oswaldo Cruz",
+            "titles": [
+                "O genero Monopetalonema Diesing, 1861: (Nematoda: Filarioidea)"
+            ],
+            "collection": "scl",
+            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02761936000400003&lng=en&tlng=en",
+            "total_cited_by": 1
+        },
+        "cited_by": [
+            {
+                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-81751995000500001&lng=en&tlng=en",
+                "source": "Revista Brasileira de Zoologia",
+                "issn": "0101-8175",
+                "titles": [
+                    "Brazilian nematodes. Part IV: Nematodes of birds",
+                    "Nematóides do Brasil. Parte IV: nematóides de aves"
+                ],
+                "code": "S0101-81751995000500001"
+            }
+        ]
+    }
+
+``GET /api/v1/pid/?q=S0074-02761936000400003&metaonly=true``
+
+Response::
+
+
+    {
+        "article": {
+            "code": "S0074-02761936000400003",
+            "first_author": {
+                "surname": "Freitas"
+            },
+            "issn": "0074-0276",
+            "publication_year": "1936",
+            "source": "Memórias do Instituto Oswaldo Cruz",
+            "titles": [
+                "O genero Monopetalonema Diesing, 1861: (Nematoda: Filarioidea)"
+            ],
+            "collection": "scl",
+            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02761936000400003&lng=en&tlng=en",
+            "total_cited_by": 1
+        }
+    }
+
+
+/doi/
+-----
+
+Retrieve “cited by” documents of a given DOI (Document Objects Identifier)
+
+Parameters:
+
++------------+-----------------------------------------------------+
+| Paremeter  | Description                                         |
++============+=====================================================+
+| **q**      | PID (SciELO) or any article unique code, required   |
++------------+-----------------------------------------------------+
+| metaonly   | get only the article meta data without the citaitons|
++------------+-----------------------------------------------------+
+
+``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011``
+
+
+Response::
+
+    {
+        "article": {
+            "total_cited_by": 2,
+            "author": "",
+            "year": "2007",
+            "title": [
+                "Tecnologia Social de Mobilização para Arranjos Produtivos Locais: uma proposta de aplicabilidade"
+            ]
+        },
+        "cited_by": [
+            {
+                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1679-39512009000400001&lng=en&tlng=en",
+                "source": "Cadernos EBAPE.BR",
+                "issn": "1679-3951",
+                "titles": [
+                    "Environment, people and work, clusters beyond economic development in the opal mining in Pedro II, Piauí",
+                    "Ambiente, pessoas e labor: APLs além do desenvolvimento econômico na mineração de opalas em Pedro II, no Piauí"
+                ],
+                "code": "S1679-39512009000400001"
+            },
+            {
+                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1984-92302011000200004&lng=en&tlng=en",
+                "source": "Organização & Sociedade",
+                "issn": "1984-9230",
+                "titles": [
+                    "Identification of the challenges to the local productive arrangement of information technology in Fortaleza-CE",
+                    "Identificação dos desafios do arranjo produtivo local de tecnologia da informação de Fortaleza-CE"
+                ],
+                "code": "S1984-92302011000200004"
+            }
+        ]
+    }
+
+``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011&metaonly=true``
+
+
+Response::
+
+    {
+        "article": {
+            "total_cited_by": 2,
+            "author": "",
+            "year": "2007",
+            "title": [
+                "Tecnologia Social de Mobilização para Arranjos Produtivos Locais: uma proposta de aplicabilidade"
+            ]
+        }
+    }
+
+/meta/
+-----
+
+Retrieve “cited by” documents of a given parameter
+
+Parameters:
+
++------------+-----------------------------------------------------+
+| Paremeter  | Description                                         |
++============+=====================================================+
+| **title**  | Title of the article required                       |
++------------+-----------------------------------------------------+
+| author     | Name of the first author                            |
++------------+-----------------------------------------------------+
+| year       | Year of the article publication                     |
++------------+-----------------------------------------------------+
+
+``GET /api/v1/meta/?title=The psychiatric comorbidity of epilepsy``
+
+.. attention::
+    research in this endpoint is more accurate when used with all parameters
+
+
+Response::
+
+    {
+        "article": {
+            "title": "The psychiatric comorbidity of epilepsy",
+            "total_cited_by": 31,
+            "year": "",
+            "author": ""
+        },
+        "cited_by": [
+            {
+                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492011000200006&lng=en&tlng=en",
+                "source": "Journal of Epilepsy and Clinical Neurophysiology",
+                "issn": "1676-2649",
+                "titles": [
+                    "Psychiatric and behavioral effects of the antiepileptic drugs and their action as mood stabilizers",
+                    "Efeitos psiqui\u00e1tricos e comportamentais das drogas antiepil\u00e9pticas e sua a\u00e7\u00e3o como moduladores de humor"
+                ],
+                "code": "S1676-26492011000200006"
+            },
+            {
+                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492010000400007&lng=en&tlng=en",
+                "source": "Journal of Epilepsy and Clinical Neurophysiology",
+                "issn": "1676-2649",
+                "titles": [
+                    "Translation and cross-cultural adaptation of the Interictal Dysphoric Disorder Inventory (IDDI)",
+                    "Tradu\u00e7\u00e3o e adapta\u00e7\u00e3o transcultural do Interictal Dysphoric Disorder Inventory (IDDI) para o Brasil"
+                ],
+                "code": "S1676-26492010000400007"
+            } .....
+
+    }
+
+
+``GET /api/v1/meta/?title=The psychiatric comorbidity of epilepsy&metaonly=true``
+
+
+Response::
+
+    {
+        "article": {
+            "title": "The psychiatric comorbidity of epilepsy",
+            "total_cited_by": 31,
+            "year": "",
+            "author": ""
+        }
+
+    }
+
 
 Indices and tables
 ==================
