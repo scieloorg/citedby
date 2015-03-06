@@ -1,6 +1,6 @@
 # CitedBy
 
-API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFUL and returns results in JSON.
+API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFUL and returns results in JSON.
 
 Usage documentation are available on-line: [SciELO CitedBy RESTful API](http://docs.scielo.org/projects/citedby/en/latest/)
 
