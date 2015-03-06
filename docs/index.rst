@@ -250,10 +250,5 @@ Response::
     }
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Last update of this page: May 3, 2015
 
