@@ -16,7 +16,7 @@ from icontroller import query_by_pid, query_by_doi, query_by_meta
 def key_generator(namespace, fn, **kw):
     fname = fn.__name__
     def generate_key(*arg):
-        key_str = namespace + fname + "_" + "_".join(str(s) for s in arg)
+        key_str = namespace + fname + "_" + "_".join(s.encode('ascii', 'ignore') for s in arg)
         return key_str[0:250]
     return generate_key
 
