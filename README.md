@@ -7,7 +7,7 @@ Usage documentation are available on-line: [SciELO CitedBy RESTFul API](http://d
 
 The API will only work for:
 
-* SciELO ID colled PID(Publisher Identifier)
+* SciELO ID called PID (Publisher Identifier)
 * DOI (Digital Object Identifier) - `http://www.doi.org/`
 * And some article meta data: title, first_author and publisher_year
 
