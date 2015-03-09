@@ -16,7 +16,8 @@ def main(global_config, **settings):
     hosts = aslist(settings['elasticsearch_host'])
 
     def add_index(request):
-        return ICitation(hosts=hosts)
+        return ICitation(hosts=hosts, sniff_on_start=True,
+                         sniff_on_connection_fail=True)
 
     cache_region.configure('dogpile.cache.pylibmc',
             expiration_time=int(settings['memcached_expiration_time']),

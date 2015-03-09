@@ -3,10 +3,12 @@ paster
 nose
 waitress
 gunicorn
--e git+git://github.com/scieloorg/xylose.git#egg=xylose
 requests
 elasticsearch
-progressbar2==2.6.7
+progressbar2
+python-memcached
 dogpile
 dogpile.cache
 pylibmc
+pyramid_debugtoolbar
+-e git+git://github.com/scieloorg/xylose.git#egg=xylose
