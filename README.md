@@ -86,6 +86,28 @@ Look the same above example with the `metaonly` param:
     }
 
 
+## Install
+
+`git clone https://github.com/scieloorg/citedby.git`
+
+`cd citedby`
+
+`python setup.py install` 
+
+
+## Test
+
+`python setup.py test`
+
+
+## Trobleshooting
+
+If you have any problem installing pylibmc, "it doesnt find lib memcached :-(", use: 
+
+Example: 
+
+`pip install pylibmc --install-option="--with-libmemcached=/usr/local/"`
+
 ## Version history
 
 * V1.0 2015-03-02, first stable version https://github.com/scieloorg/citedby/releases/tag/stable-v1.0
