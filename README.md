@@ -102,7 +102,7 @@ Look the same above example with the `metaonly` param:
 
 ## Trobleshooting
 
-If you have any problem installing pylibmc, "its dont find lib memcached :-(", use: 
+If you have any problem installing pylibmc, "it doesnt find lib memcached :-(", use: 
 
 Example: 
 
