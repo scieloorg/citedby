@@ -86,6 +86,14 @@ Look the same above example with the `metaonly` param:
     }
 
 
+## Install
+
+`git clone https://github.com/scieloorg/citedby.git`
+
+`cd citedby`
+
+`python setup.py install` 
+
 ## Version history
 
 * V1.0 2015-03-02, first stable version https://github.com/scieloorg/citedby/releases/tag/stable-v1.0
