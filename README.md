@@ -1,13 +1,13 @@
 # CitedBy
 
-API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFUL and returns results in JSON.
+API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID, this is RESTFul and returns results in JSON.
 
-Usage documentation are available on-line: [SciELO CitedBy RESTful API](http://docs.scielo.org/projects/citedby/en/latest/)
+Usage documentation are available on-line: [SciELO CitedBy RESTFul API](http://docs.scielo.org/projects/citedby/en/latest/)
 
 
 The API will only work for:
 
-* SciELO ID colled PID(Publisher Identifier)
+* SciELO ID called PID (Publisher Identifier)
 * DOI (Digital Object Identifier) - `http://www.doi.org/`
 * And some article meta data: title, first_author and publisher_year
 
