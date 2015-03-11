@@ -1,5 +1,5 @@
-# encode: utf-8
-import ast
+# coding: utf-8
+
 import json
 import urlparse
 
