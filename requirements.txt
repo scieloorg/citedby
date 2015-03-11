@@ -12,3 +12,4 @@ dogpile.cache
 pylibmc
 pyramid_debugtoolbar
 -e git+git://github.com/scieloorg/xylose.git#egg=xylose
+fabric
