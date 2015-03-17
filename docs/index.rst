@@ -25,7 +25,7 @@ Endpoints:
     Note that requesting a version of the API is indicate by query string,
     so use /api/API_VERSION/ENDPOINT.
 .. attention::
-    v1 this must be explicit on query string.
+    v1 must be explicit on query string.
 
 /
 -
@@ -39,17 +39,21 @@ Retrieve “cited by” documents of a given PID (SciELO ID)
 
 Parameters:
 
-+------------+-----------------------------------------------------+
-| Paremeter  | Description                                         |
-+============+=====================================================+
-| **q**      | PID (SciELO) or any article unique code, required   |
-+------------+-----------------------------------------------------+
-| metaonly   | get only the article meta data without the citaitons|
-+------------+-----------------------------------------------------+
++------------+-----------------------------------------------------+-------------+
+| Paremeter  | Description                                         | Mandatory   |
++============+=====================================================+=============+
+| **q**      | PID (SciELO) or any article unique code, required   | yes         |
++------------+-----------------------------------------------------+-------------+
+| metaonly   | get only the article meta data without the citaitons| No          |
++------------+-----------------------------------------------------+-------------+
+| callback   | JSONP callback method                               | No          |
++------------+-----------------------------------------------------+-------------+
 
 Mandatory Parameters: *q* PID (SciELO) or any article unique code
 
+
 ``GET /api/v1/pid/?q=S0074-02761936000400003``
+
 
 Response::
 
@@ -84,6 +88,7 @@ Response::
         ]
     }
 
+
 ``GET /api/v1/pid/?q=S0074-02761936000400003&metaonly=true``
 
 Response::
@@ -115,18 +120,22 @@ Retrieve “cited by” documents of a given DOI (Document Objects Identifier)
 
 Parameters:
 
-+------------+-----------------------------------------------------+
-| Paremeter  | Description                                         |
-+============+=====================================================+
-| **q**      | PID (SciELO) or any article unique code, required   |
-+------------+-----------------------------------------------------+
-| metaonly   | get only the article meta data without the citaitons|
-+------------+-----------------------------------------------------+
++------------+-----------------------------------------------------+-------------+
+| Paremeter  | Description                                         | Mandatory   |
++============+=====================================================+=============+
+| **q**      | PID (SciELO) or any article unique code, required   |yes          |
++------------+-----------------------------------------------------+-------------+
+| metaonly   | get only the article meta data without the citaitons| No          |
++------------+-----------------------------------------------------+-------------+
+| callback   | JSONP callback method                               | No          |
++------------+-----------------------------------------------------+-------------+
+
 
 ``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011``
 
 
 Response::
+
 
     {
         "article": {
@@ -161,10 +170,12 @@ Response::
         ]
     }
 
+
 ``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011&metaonly=true``
 
 
 Response::
+
 
     {
         "article": {
@@ -178,21 +189,23 @@ Response::
     }
 
 /meta/
------
+------
 
 Retrieve “cited by” documents of a given parameter
 
 Parameters:
 
-+------------+-----------------------------------------------------+
-| Paremeter  | Description                                         |
-+============+=====================================================+
-| **title**  | Title of the article required                       |
-+------------+-----------------------------------------------------+
-| author     | Name of the first author                            |
-+------------+-----------------------------------------------------+
-| year       | Year of the article publication                     |
-+------------+-----------------------------------------------------+
++------------+-----------------------------------------------------+-------------+
+| Paremeter  | Description                                         | Mandatory   |
++============+=====================================================+=============+
+| **title**  | Title of the article required                       | Yes         |
++------------+-----------------------------------------------------+-------------+
+| author     | Name of the first author                            | No          |
++------------+-----------------------------------------------------+-------------+
+| year       | Year of the article publication                     | No          |
++------------+-----------------------------------------------------+-------------+
+| callback   | JSONP callback method                               | No          |
++------------+-----------------------------------------------------+-------------+
 
 ``GET /api/v1/meta/?title=The psychiatric comorbidity of epilepsy``
 
@@ -201,6 +214,7 @@ Parameters:
 
 
 Response::
+
 
     {
         "article": {
@@ -229,8 +243,8 @@ Response::
                     "Tradu\u00e7\u00e3o e adapta\u00e7\u00e3o transcultural do Interictal Dysphoric Disorder Inventory (IDDI) para o Brasil"
                 ],
                 "code": "S1676-26492010000400007"
-            } .....
-
+            }
+        ]
     }
 
 
@@ -238,6 +252,7 @@ Response::
 
 
 Response::
+
 
     {
         "article": {
@@ -250,5 +265,5 @@ Response::
     }
 
 
-Last update of this page: May 3, 2015
+Last update of this page: May 17, 2015
 
