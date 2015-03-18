@@ -63,7 +63,7 @@ def citedby_pid(request):
         if not request.GET.get('metaonly') in ['true', 'false']:
             raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
 
-    @cache_region.cache_on_arguments(namespace="citedby_pid")
+    @cache_region.cache_on_arguments(namespace=request.registry.settings.get('memcached_prefix', None))
     def _citedby_pid(q, metaonly):
 
         metaonly = asbool(metaonly)
@@ -85,7 +85,7 @@ def citedby_doi(request):
         if not request.GET.get('metaonly') in ['true', 'false']:
             raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
 
-    @cache_region.cache_on_arguments(namespace="citedby_doi")
+    @cache_region.cache_on_arguments(namespace=request.registry.settings.get('memcached_prefix', None))
     def _citedby_doi(q, metaonly):
 
         metaonly = asbool(metaonly)
@@ -107,7 +107,7 @@ def citedby_meta(request):
         if not request.GET.get('metaonly') in ['true', 'false']:
             raise HTTPBadRequest("parameter 'metaonly' must be 'true' or 'false'")
 
-    @cache_region.cache_on_arguments(namespace="citedby_meta")
+    @cache_region.cache_on_arguments(namespace=request.registry.settings.get('memcached_prefix', None))
     def _citedby_meta(title, author_surname, year, metaonly):
 
         metaonly = asbool(metaonly)

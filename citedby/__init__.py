@@ -23,7 +23,12 @@ def main(global_config, **settings):
             expiration_time=int(settings['memcached_expiration_time']),
             arguments= {
                         'url': aslist(settings['memcached_arguments_url']),
-                        'binary': asbool(settings['memcached_binary'])
+                        'binary': asbool(settings['memcached_binary']),
+                        'behaviors':{"tcp_nodelay": True,
+                                     "ketama":True,
+                                     "remove_failed": 2,
+                                     "dead_timeout": 10,
+                                     "num_replicas": 2}
                         },
             _config_prefix=settings['memcached_prefix'])
 
