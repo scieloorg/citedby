@@ -19,12 +19,9 @@ def main(global_config, **settings):
         return ICitation(hosts=hosts, sniff_on_start=True,
                          sniff_on_connection_fail=True)
 
-    cache_region.configure('dogpile.cache.pylibmc',
+    cache_region.configure('dogpile.cache.bmemcached',
             expiration_time=int(settings['memcached_expiration_time']),
-            arguments= {
-                        'url': aslist(settings['memcached_arguments_url']),
-                        'binary': asbool(settings['memcached_binary'])
-                        },
+            arguments= {'url': aslist(settings['memcached_arguments_url'])},
             _config_prefix=settings['memcached_prefix'])
 
     config.add_route('index', '/')
