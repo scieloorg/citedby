@@ -76,7 +76,7 @@ class ICitation(object):
         from_ = 0
 
         if not query:
-            query = {"query": {"match_all": {}}}
+            query = {"query": {"match_all": {}, "fields": []}}
 
         while True:
 
@@ -99,8 +99,9 @@ class ICitation(object):
 
         :returns: a list content tuple, like: ('acronym of collection', SciELO PID).
         """
-        all_citations = self.get_all(query={"query" : {"match_all" : {} }, "_source": ["collection", "code"] },
-                                    size=10000)
+        all_citations = self.get_all(query={"query" : {"match_all" : {} },
+                                            "_source": ["collection", "code"]},
+                                     size=10000)
 
         return [(i['_source']['collection'],i['_source']['code'])
                 for i in all_citations]
