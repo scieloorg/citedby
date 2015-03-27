@@ -132,8 +132,8 @@ class PCitation(object):
                              index all documents')
 
     parser.add_option('-l', '--list_hosts', action='store',
-                        help='list of ES hosts, Ex.: esa.scielo.org esb.scielo.org,\
-                        default is localhost')
+                        help='list of ES hosts where data will indexed, \
+                        Ex.: esa.scielo.org esb.scielo.org, default is localhost')
 
     def __init__(self, argv):
         self.started = None
