@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 #coding: utf-8
 
+import os
 import thriftpy
+
 
 from thriftpy.rpc import make_client
 
-citedby_thrift = thriftpy.load("citedby.thrift")
+citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
+                               os.path.abspath(__file__)), 'citedby.thrift'))
 
 client = make_client(citedby_thrift.Citedby, '127.0.0.1', 11610)
 

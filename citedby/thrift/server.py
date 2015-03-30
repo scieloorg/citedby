@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 #coding: utf-8
 
+import os
 import json
 import thriftpy
 from ConfigParser import SafeConfigParser
@@ -14,7 +15,8 @@ from citedby.icontroller import (
                                 query_by_meta
                                 )
 
-citedby_thrift = thriftpy.load('citedby.thrift')
+citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
+                               os.path.abspath(__file__)), 'citedby.thrift'))
 
 
 class Dispatcher(object):
