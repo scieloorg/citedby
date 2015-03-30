@@ -26,7 +26,8 @@ class Dispatcher(object):
         #Get the config file at now, only production.ini
 
         config = SafeConfigParser()
-        config.readfp(open('../../production.ini'))
+        config.readfp(os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), '../../production.ini'))
 
         settings = dict(config.items('app:main'))
 
