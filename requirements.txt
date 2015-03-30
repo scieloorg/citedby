@@ -15,3 +15,4 @@ pyramid_debugtoolbar
 -e git+git://github.com/scieloorg/xylose.git#egg=xylose
 fabric
 thriftpy
+gunicorn_thrift
