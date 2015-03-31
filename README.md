@@ -104,10 +104,9 @@ Look the same above example with the `metaonly` param:
 
 If you have any problem installing pylibmc, "it doesnt find lib memcached :-(", use: 
 
-Example: 
-
 `pip install pylibmc --install-option="--with-libmemcached=/usr/local/"`
 
 ## Version history
 
 * V1.0 2015-03-02, first stable version https://github.com/scieloorg/citedby/releases/tag/stable-v1.0
+* V1.1 2015-03-09, https://github.com/scieloorg/citedby/releases/tag/stable-v1.1
