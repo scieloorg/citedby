@@ -44,7 +44,7 @@ def stats(request):
             alive = bool(make_test_client(host=addr, port=port))
             memcacheds[mem] = alive
         except NotAliveError:
-             memcacheds[mem] = False
+            memcacheds[mem] = False
 
     return {'health':
                 {'is_alive_es_cluster': request.index._ping(),
