@@ -1,12 +1,12 @@
 #!/usr/bin/python
 #coding: utf-8
 
+import json
 import sys
 import textwrap
 import optparse
 import logging.config
 from datetime import datetime
-from progressbar import ProgressBar
 
 from xylose.scielodocument import Article
 
@@ -51,13 +51,13 @@ def citation_meta(art_meta_json):
            }]
         }
     """
+
     art = Article(art_meta_json)
 
     c_dict = {}
 
     #List of titles
     c_dict['titles'] = []
-
     c_dict['url'] = art.html_url()
     c_dict['source'] = art.journal.title
     c_dict['issn'] = art.journal.scielo_issn
@@ -131,14 +131,20 @@ class PCitation(object):
                         help='this will remove all data in ES and\
                              index all documents')
 
-    parser.add_option('-l', '--list_hosts', action='store',
+    parser.add_option('-c', '--collection', default=None,
+                        help='Acronym of the collection')
+
+    parser.add_option('-i', '--index_hosts', action='store',
                         help='list of ES hosts where data will indexed, \
                         Ex.: esa.scielo.org esb.scielo.org, default is localhost')
+
 
     def __init__(self, argv):
         self.started = None
         self.finished = None
         self.options, self.args = self.parser.parse_args(argv)
+
+        self.icitation = ICitation(hosts=self.options.index_hosts)
 
     def _duration(self):
         """
@@ -150,19 +156,31 @@ class PCitation(object):
         """
         Return a Boolean checking the params
         """
-        ret = True
 
         if not (self.options.full or self.options.distiction or self.options.rebuild_index):
             self.parser.error('One of params -f (full), -d (distiction) or -r (rebuild_index) must be used.')
-            ret = False
+            return False
 
         if self.options.full and self.options.distiction:
             self.parser.error("options -d and -f are mutually exclusive.")
-            ret = False
+            return False
 
-        return ret
+        return True
 
-    def _difflist(first_list, second_list):
+    def _get_identifiers(self, limit=10000, offset_range=10000):
+        """
+        Return all Article Meta Identifier
+        """
+
+        logger.info('Get identifiers from Article Meta...')
+
+        idents = []
+        for ident in articlemeta.get_all_identifiers(self.options.collection, limit, offset_range):
+            idents.append(ident)
+
+        return idents
+
+    def _difflist(self, first_list, second_list):
         """
         Difference between two list
 
@@ -172,6 +190,34 @@ class PCitation(object):
         :returns: list of difference
         """
         return list(set(first_list) - set(second_list))
+
+    def _string_json(self, data):
+        """
+        Method convert string to json handler some errors.
+
+        :param data: string
+
+        :returns: json
+        """
+
+        try:
+            jdata = json.loads(data)
+        except ValueError as e:
+            logger.error(e)
+        else:
+            return jdata
+
+    def _index(self, idents):
+        """
+        Index by identifiers
+        """
+        logger.info('Index citations...')
+
+        for ident in idents:
+            citatation_meta = citation_meta(
+                self._string_json(articlemeta.get_article(*ident)))
+
+            self.icitation.index_citation(citatation_meta)
 
     def run(self):
         """
@@ -185,61 +231,47 @@ class PCitation(object):
 
         logger.info('Start PCitation Script (Index citation)')
 
-        meta_total = articlemeta.get_identifiers_count()
+        articlemeta_ids = self._get_identifiers()
 
-        logger.info('Total of items in Article Meta: %d' % meta_total)
+        cite_total = self.icitation.count_citation()
 
-        icitation = ICitation(hosts=self.options.list_hosts)
-
-        cite_total = icitation.count_citation()
+        logger.info('Total of items in Article Meta: %d' % len(articlemeta_ids))
 
         logger.info('Total of items indexed in ES Index Citation: %d' % cite_total)
-
-        logger.info('Get identifiers from Article Meta...')
-
-        meta_idents = []
-        with ProgressBar(maxval=meta_total) as progress:
-            for ident in articlemeta.get_all_identifiers():
-                meta_idents.append(ident)
-                progress.update(len(meta_idents))
 
         if self.options.distiction:
 
             logger.info('You select distinct processing, get identifiers from ES Index Citation...')
 
-            es_idents = icitation.get_identifiers()
+            elasticsearch_ids = self.icitation.get_identifiers()
 
             #Itens that will be index (A-B)
-            idents = self._difflist(meta_idents, es_idents)
+            idents = self._difflist(articlemeta_ids, elasticsearch_ids)
             logger.info('Total itens that will be index: %s' % len(idents))
 
             #Remove itens (B-A)
-            remove_idents = self._difflist(es_idents, meta_idents)
+            remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)
             logger.info('Total of items that will be remove from ES: %s' % len(remove_idents))
+
             if remove_idents: # if exists itens to remove
-                with ProgressBar(maxval=len(remove_idents)) as progress:
-                    for i, ident in enumerate(remove_idents):
-                        icitation.del_citation(ident)
-                        progress.update(i)
+                logger.info('Remove some itens from ES: %d' % len(remove_idents))
+                for ident in remove_idents:
+                    self.icitation.del_citation(ident)
+
+            self._index(idents)
 
         elif self.options.full:
             logger.info('You select full processing... this will take a while')
-            idents = meta_idents
+
+            self._index(articlemeta_ids)
 
         elif self.options.rebuild_index:
             logger.info('You select Rebuild Index processing, deleting %d items in Index Citation.' % cite_total)
-            logger.info('WARNING: This will remove EVERYTHING from your search index')
-            icitation.del_all_citation()
-            idents = meta_idents
+            logger.info('This will remove EVERYTHING from your search index')
 
-        logger.info('Index citations...')
+            self.icitation.del_all_citation()
 
-        if idents:
-            with ProgressBar(maxval=len(idents)) as progress:
-                for i, ident in enumerate(idents):
-                    c_meta_dict = citation_meta(articlemeta.get_article(*ident))
-                    icitation.index_citation(c_meta_dict)
-                    progress.update(i)
+            self._index(articlemeta_ids)
 
         self.finished = datetime.now()
 
