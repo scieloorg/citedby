@@ -39,3 +39,20 @@ def format_citation(citations):
                 'source': citation['_source']['source'],
                 'issn': citation['_source']['issn']})
     return l
+
+
+def key_generator(namespace, fn, **kw):
+    """
+    Function to generate the keys of memcached.
+
+    Truncate the key in 250 caracters
+    """
+    fname = fn.__name__
+
+    def generate_key(*arg):
+
+        key_str = namespace + fname + "_" + "_".join(str(s).encode('ascii', 'ignore') for s in arg)
+
+        return key_str[0:250]
+
+    return generate_key
