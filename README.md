@@ -111,4 +111,4 @@ If you have any problem installing pylibmc, "it doesnt find lib memcached :-(", 
 * V1.0 2015-03-02, https://github.com/scieloorg/citedby/releases/tag/stable-v1.0 (first stable version)
 * V1.1 2015-03-09, https://github.com/scieloorg/citedby/releases/tag/stable-v1.1
 * V1.2 2015-03-20, https://github.com/scieloorg/citedby/releases/tag/stable-v1.2
-* V1.3 2015-03-05, https://github.com/scieloorg/citedby/releases/tag/stable-v1.3
+* V1.3 2015-04-05, https://github.com/scieloorg/citedby/releases/tag/stable-v1.3
