@@ -1,60 +1,29 @@
 #coding: utf-8
-
-import requests
+import os
 import logging
+
+import thriftpy
+from thriftpy.rpc import make_client
 
 logger = logging.getLogger(__name__)
 
 logger.addHandler(logging.NullHandler())
 
-URL = 'http://articlemeta.scielo.org'
-IDENT_ENDPOINT = '/api/v1/article/identifiers'
-ARTICLE_ENDPOINT = '/api/v1/article'
 
-def fetch_data(resource):
+articlemeta_thrift = thriftpy.load(os.path.join(os.path.dirname(
+                               os.path.abspath(__file__)), 'thrift/articlemeta.thrift'))
+
+client = make_client(articlemeta_thrift.ArticleMeta, 'articlemeta.scielo.org', 11720)
+
+
+def get_all_identifiers(collection=None, limit=1000, offset_range=1000):
     """
-    Fetches any resource.
+    Get all identifiers by Article Meta Thrift
 
-    :param resource: any resource
-    :returns: requests.response object
-
-    The param resource must be a valid URL
-    example: ``/api/v1/article?code=S2238-10312012000300006``
-    """
-    try:
-        response = requests.get(resource)
-    except requests.exceptions.RequestException as e:
-        logger.error('%s. Unable to connect to resource.' % e)
-    else:
-        logger.debug('Get resource: %s' % resource)
-        return response
-
-def get_identifiers_count(endpoint=None):
-    """
-    Get total of identifiers in Article Meta API.
-
-    :param endpoint: the endpoint of identifiers in Article Meta.
-
-    Endpoint: ``/api/v1/article/identifiers``
-
-    :returns: integer
-    """
-
-    if not endpoint:
-        endpoint = URL + IDENT_ENDPOINT
-
-    return int(fetch_data(endpoint).json()['meta']['total'])
-
-def get_all_identifiers(offset_range=1000):
-    """
-    Get all identifiers by Article Meta API
-
-    :param offset_range: paging through API result, default:1000.
-
-    Endpoint: ``api/v1/article/identifiers?offset=1000``
+    :param offset_range: paging through RCP result, default:1000.
 
     :returns: return a generator with a tuple ``(collection, PID)``,
-    ex.: mexS0036-36342014000100009
+    ex.: (mex, S0036-36342014000100009)
     """
 
     offset = 0
@@ -62,20 +31,21 @@ def get_all_identifiers(offset_range=1000):
     logger.debug('Get all identifiers from Article Meta, please wait... this while take while!')
 
     while True:
+        idents = client.get_article_identifiers(collection=collection, limit=limit, offset=offset)
 
-        resp = fetch_data(URL + IDENT_ENDPOINT + '?offset=%d' % offset).json()
+        if not idents:
+            raise StopIteration
 
-        for identifier in resp['objects']:
+        for ident in idents:
             logger.debug('Get article with code: %s from: %s' %
-                (identifier['code'], identifier['collection']))
-            yield (identifier['collection'], identifier['code'])
+                (ident.code, ident.collection))
+
+            yield (ident.collection, ident.code)
 
         offset += offset_range
 
-        if offset > resp['meta']['total']:
-            raise StopIteration
 
-def get_article(collection, code):
+def get_article(code, collection):
     """
     Get article meta data by code
 
@@ -88,5 +58,4 @@ def get_article(collection, code):
     """
     logger.debug('Get article with code: %s by collection %s' % (code, collection))
 
-    return fetch_data(URL + ARTICLE_ENDPOINT +
-        '?code=%s&collection=%s' % (code, collection)).json()
+    return client.get_article(collection, code, True)
