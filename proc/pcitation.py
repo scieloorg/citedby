@@ -1,8 +1,9 @@
 #!/usr/bin/python
 #coding: utf-8
 
-import json
+import os
 import sys
+import json
 import textwrap
 import optparse
 import logging.config
@@ -10,11 +11,14 @@ from datetime import datetime
 
 from xylose.scielodocument import Article
 
+
 import articlemeta
+from citedby import utils
 from citedby.icitation import ICitation
 
 # config logger file
-logging.config.fileConfig('logging.ini')
+logging.config.fileConfig(os.path.join(os.path.dirname(
+                               os.path.abspath(__file__)), 'logging.ini'))
 
 # set logger
 logger = logging.getLogger('pcitations')
@@ -156,6 +160,9 @@ class PCitation(object):
         """
         Return a Boolean checking the params
         """
+
+        if self.options.warm_up:
+            return True
 
         if not (self.options.full or self.options.distiction or self.options.rebuild_index):
             self.parser.error('One of params -f (full), -d (distiction) or -r (rebuild_index) must be used.')

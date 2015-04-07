@@ -1,16 +1,25 @@
 import os
-import pip
-from pip.req import parse_requirements
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-install_reqs = parse_requirements('requirements.txt',
-                                  session=pip.download.PipSession())
+requires = [
+            'pyramid',
+            'paster',
+            'requests',
+            'elasticsearch',
+            'python-memcached',
+            'python-binary-memcached',
+            'dogpile',
+            'dogpile.cache',
+            'pylibmc',
+            'thriftpy',
+            'fabric',
+            'pyramid_debugtoolbar',
+           ]
 
-requires = [str(ir.req) for ir in install_reqs]
+test_requires = requires+['nose']
 
-test_requires = requires+['mocker']
 
 setup(name='citedby',
       version='1.0',
@@ -38,7 +47,10 @@ setup(name='citedby',
       tests_require=test_requires,
       test_suite="citedby",
       entry_points="""\
-      [paste.app_factory]
-      main = citedby:main
-      """,
+        [paste.app_factory]
+         main = citedby:main
+        [console_scripts]
+         citedby_thriftserver = citedby.thrift.server:main
+         pcitation = proc.pcitation:main
+        """,
       )

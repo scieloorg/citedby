@@ -1,7 +1,11 @@
 # coding: utf-8
 
 import requests
+import logging
 
+logger = logging.getLogger(__name__)
+
+logger.addHandler(logging.NullHandler())
 
 def load_from_crossref(doi):
     """
@@ -56,3 +60,22 @@ def key_generator(namespace, fn, **kw):
         return key_str[0:250]
 
     return generate_key
+
+
+def fetch_data(resource):
+    """
+    Fetches any resource.
+
+    :param resource: any resource
+    :returns: requests.response object
+
+    The param resource must be a valid URL
+    example: ``http:///api/v1/article?code=S2238-10312012000300006``
+    """
+    try:
+        response = requests.get(resource)
+    except requests.exceptions.RequestException as e:
+        logger.error('%s. Unable to connect to resource.' % e)
+    else:
+        logger.debug('Get resource: %s' % resource)
+        return response
