@@ -1,4 +1,6 @@
-#coding: utf-8
+#!/usr/bin/python
+#!coding: utf-8
+
 import os
 import logging
 
@@ -16,11 +18,14 @@ articlemeta_thrift = thriftpy.load(os.path.join(os.path.dirname(
 client = make_client(articlemeta_thrift.ArticleMeta, 'articlemeta.scielo.org', 11720)
 
 
-def get_all_identifiers(collection=None, limit=1000, offset_range=1000):
+def get_all_identifiers(collection=None, limit=1000, offset_range=1000, onlyid=False):
     """
     Get all identifiers by Article Meta Thrift
 
-    :param offset_range: paging through RCP result, default:1000.
+    :param collection: it`s acronym of collection, ex.: scl, cub, mex
+    :param limit: limit of the slice
+    :param offset_range: paging through RCP result, default:1000
+    :param onlyid: default=False returns only SciELO ID
 
     :returns: return a generator with a tuple ``(collection, PID)``,
     ex.: (mex, S0036-36342014000100009)
@@ -31,16 +36,20 @@ def get_all_identifiers(collection=None, limit=1000, offset_range=1000):
     logger.debug('Get all identifiers from Article Meta, please wait... this while take while!')
 
     while True:
-        idents = client.get_article_identifiers(collection=collection, limit=limit, offset=offset)
+        idents = client.get_article_identifiers(collection=collection,
+                                                limit=limit, offset=offset)
 
         if not idents:
             raise StopIteration
 
         for ident in idents:
             logger.debug('Get article with code: %s from: %s' %
-                (ident.code, ident.collection))
+                         (ident.code, ident.collection))
 
-            yield (ident.collection, ident.code)
+            if onlyid:
+                yield ident.code
+            else:
+                yield (ident.collection, ident.code)
 
         offset += offset_range
 

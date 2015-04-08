@@ -51,6 +51,7 @@ setup(name='citedby',
          main = citedby:main
         [console_scripts]
          citedby_thriftserver = citedby.thrift.server:main
-         pcitation = proc.pcitation:main
+         citedby_pcitation = proc.pcitation:main
+         citedby_warmup = proc.warmup:main
         """,
       )
