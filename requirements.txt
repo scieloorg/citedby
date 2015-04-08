@@ -1,18 +1,14 @@
-pyramid
-paster
-nose
-waitress
-gunicorn
-requests
-elasticsearch
-progressbar2
-python-memcached
-python-binary-memcached
-dogpile
-dogpile.cache
-pylibmc
-pyramid_debugtoolbar
+pyramid==1.5.4
+paster==0.8
+waitress==0.8.9
+requests==2.6.0
+elasticsearch==1.4.0
+python-memcached==1.54
+python-binary-memcached==0.24.3
+dogpile==0.2.2
+dogpile.cache==0.5.6
+thriftpy==0.2.0
+chaussette==1.2
+gevent==1.0.1
 -e git+git://github.com/scieloorg/xylose.git#egg=xylose
-fabric
-thriftpy
-gunicorn_thrift
+-e git+git://github.com/scieloorg/citedby@stable-v1.4#egg=citedby

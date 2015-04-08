@@ -3,8 +3,9 @@
 
 import os
 import json
+import argparse
 import thriftpy
-from thriftpy.thrift import TProcessor
+from thriftpy.rpc import make_server
 from ConfigParser import SafeConfigParser
 
 
@@ -16,6 +17,8 @@ from citedby.icontroller import (query_by_pid,
 
 from citedby.utils import key_generator
 
+ADDRESS = '0.0.0.0'
+PORT = '11610'
 
 citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
                                os.path.abspath(__file__)), 'citedby.thrift'))
@@ -26,13 +29,10 @@ cache_region = make_region(name="citedby_trhift",
 
 class Dispatcher(object):
 
-    def __init__(self):
-
-        #Get the config file at now, only production.ini
+    def __init__(self, config_path):
 
         config = SafeConfigParser()
-        config.readfp(open(
-            os.path.dirname(__file__) + '/../../production.ini'))
+        config.readfp(open(config_path))
 
         self.settings = dict(config.items('app:main'))
 
@@ -86,4 +86,36 @@ class Dispatcher(object):
         return _citedby_meta(title, author_surname, year, metaonly)
 
 
-app = TProcessor(citedby_thrift.Citedby, Dispatcher())
+def main():
+
+    parser = argparse.ArgumentParser(
+        description="Citedby Thrift Server."
+    )
+
+    parser.add_argument(
+        '--address',
+        '-a',
+        default=ADDRESS,
+        help='Binding Address'
+    )
+
+
+    parser.add_argument(
+        '--port',
+        '-p',
+        default=PORT,
+        help='Binding Port'
+    )
+
+    parser.add_argument(
+        '--config_path',
+        '-c',
+        default='production.ini',
+        help='Config file path, default: production.ini'
+    )
+
+    args = parser.parse_args()
+
+    server = make_server(citedby_thrift.Citedby,
+        Dispatcher(args.config_path), args.address, args.port)
+    server.serve()

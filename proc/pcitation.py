@@ -1,20 +1,21 @@
 #!/usr/bin/python
-#coding: utf-8
+#!coding: utf-8
 
-import json
+import os
 import sys
+import json
 import textwrap
 import optparse
 import logging.config
 from datetime import datetime
 
-from xylose.scielodocument import Article
-
 import articlemeta
+from citedby import utils
 from citedby.icitation import ICitation
 
 # config logger file
-logging.config.fileConfig('logging.ini')
+logging.config.fileConfig(os.path.join(os.path.dirname(
+                               os.path.abspath(__file__)), 'logging.ini'))
 
 # set logger
 logger = logging.getLogger('pcitations')
@@ -118,26 +119,25 @@ class PCitation(object):
     """
 
     parser = optparse.OptionParser(textwrap.dedent(usage),
-                                    version="%prog 0.9 - beta")
+                                   version="%prog 0.9 - beta")
 
     parser.add_option('-f', '--full', action='store_true',
-                        help='update all documents and insert the difference')
+                      help='update all documents and insert the difference')
 
     parser.add_option('-d', '--distiction', action='store_true',
-                        help='index only difference between endpoints\
+                      help='index only difference between endpoints\
                              (Article Meta and Elasticsearch Citation)')
 
     parser.add_option('-r', '--rebuild_index', action='store_true',
-                        help='this will remove all data in ES and\
+                      help='this will remove all data in ES and\
                              index all documents')
 
     parser.add_option('-c', '--collection', default=None,
-                        help='Acronym of the collection')
+                      help='Acronym of the collection')
 
     parser.add_option('-i', '--index_hosts', action='store',
-                        help='list of ES hosts where data will indexed, \
-                        Ex.: esa.scielo.org esb.scielo.org, default is localhost')
-
+                      help='list of ES hosts where data will indexed, \
+                      Ex.: esa.scielo.org esb.scielo.org, default is localhost')
 
     def __init__(self, argv):
         self.started = None
@@ -156,6 +156,8 @@ class PCitation(object):
         """
         Return a Boolean checking the params
         """
+        if self.options.warm_up:
+            return True
 
         if not (self.options.full or self.options.distiction or self.options.rebuild_index):
             self.parser.error('One of params -f (full), -d (distiction) or -r (rebuild_index) must be used.')
@@ -229,7 +231,7 @@ class PCitation(object):
         if not self._checkparam():
             return None
 
-        logger.info('Start PCitation Script (Index citation)')
+        logger.info('PCitation Script (Index citation)')
 
         articlemeta_ids = self._get_identifiers()
 
@@ -253,7 +255,7 @@ class PCitation(object):
             remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)
             logger.info('Total of items that will be remove from ES: %s' % len(remove_idents))
 
-            if remove_idents: # if exists itens to remove
+            if remove_idents:# if exists itens to remove
                 logger.info('Remove some itens from ES: %d' % len(remove_idents))
                 for ident in remove_idents:
                     self.icitation.del_citation(ident)
