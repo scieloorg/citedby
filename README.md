@@ -100,12 +100,6 @@ Look the same above example with the `metaonly` param:
 `python setup.py test`
 
 
-## Trobleshooting
-
-If you have any problem installing pylibmc, "it doesnt find lib memcached :-(", use: 
-
-`pip install pylibmc --install-option="--with-libmemcached=/usr/local/"`
-
 ## Version history
 
 * V1.0 2015-03-02, https://github.com/scieloorg/citedby/releases/tag/stable-v1.0 (first stable version)
