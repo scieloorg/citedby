@@ -18,7 +18,8 @@ articlemeta_thrift = thriftpy.load(os.path.join(os.path.dirname(
 client = make_client(articlemeta_thrift.ArticleMeta, 'articlemeta.scielo.org', 11720)
 
 
-def get_all_identifiers(collection=None, limit=1000, offset_range=1000, onlyid=False):
+def get_all_identifiers(collection=None, limit=1000, offset_range=1000,
+                        onlyid=False):
     """
     Get all identifiers by Article Meta Thrift
 

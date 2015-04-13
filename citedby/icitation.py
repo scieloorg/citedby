@@ -4,7 +4,6 @@ from elasticsearch import Elasticsearch
 
 class ICitation(object):
 
-
     def __init__(self, hosts=None, index="citations", **kwargs):
         """
         On class initialization is created a connection to ES and
@@ -26,13 +25,11 @@ class ICitation(object):
             if not self._exists():
                 raise Exception("The index doesnt exist!")
 
-
     def _ping(self):
         """
         :returns: Boolean ``True`` if ES is up, ``False`` otherwise
         """
         return bool(self.es_conn.ping())
-
 
     def _exists(self):
         """
@@ -42,7 +39,6 @@ class ICitation(object):
         """
         return bool(self.es_conn.indices.exists(index=self.index))
 
-
     def count_citation(self):
         """
         Count the total of citation in citation index.
@@ -50,7 +46,6 @@ class ICitation(object):
         :returns: Interger.
         """
         return int(self.es_conn.count(index=self.index)['count'])
-
 
     def get_by_code(self, code, **kwargs):
         """
@@ -62,7 +57,6 @@ class ICitation(object):
                     "code": code
                   }}
                 }, **kwargs)
-
 
     def get_all(self, query=None, size=1000):
         """
@@ -91,7 +85,6 @@ class ICitation(object):
             if from_ > resp['hits']['total']:
                 raise StopIteration
 
-
     def get_identifiers(self):
         """
         Get all identifiers in index citation. This method configure the query
@@ -99,13 +92,12 @@ class ICitation(object):
 
         :returns: a list content tuple, like: ('acronym of collection', SciELO PID).
         """
-        all_citations = self.get_all(query={"query" : {"match_all" : {} },
+        all_citations = self.get_all(query={"query": {"match_all": {}},
                                             "_source": ["collection", "code"]},
                                      size=10000)
 
-        return [(i['_source']['collection'],i['_source']['code'])
+        return [(i['_source']['collection'], i['_source']['code'])
                 for i in all_citations]
-
 
     def index_citation(self, doc):
         """
@@ -136,7 +128,6 @@ class ICitation(object):
         return self.es_conn.index(index=self.index, doc_type='citation',
                                   id=cite_id, body=doc)
 
-
     def del_all_citation(self):
         """
         Delete all documents from index citations, try to delete index only if
@@ -159,7 +150,6 @@ class ICitation(object):
             return self.es_conn.delete_by_query(index=self.index,
                                                 body={"query": {"match_all": {}}})
 
-
     def del_citation(self, ident):
         """
         Remove citation by identifier, (u'S0898-9081938912378', u'scl').
@@ -176,17 +166,16 @@ class ICitation(object):
 
         if self._exists():
             return self.es_conn.delete_by_query(index=self.index,
-                body={
-                      "query": {
-                        "bool": {
-                          "must": [
-                            {"match_phrase": {"code": ident[1]}},
-                            {"match_phrase": {"collection": ident[0]}}
-                          ]
-                        }
-                      }
-                    })
-
+                                                body={
+                                                      "query": {
+                                                        "bool": {
+                                                          "must": [
+                                                            {"match_phrase": {"code": ident[1]}},
+                                                            {"match_phrase": {"collection": ident[0]}}
+                                                          ]
+                                                        }
+                                                      }
+                                                    })
 
     def search_citation(self, titles, author_surname=None, year=None, size=1000):
         """
@@ -208,10 +197,10 @@ class ICitation(object):
 
         for title in titles:
             should_param.append({
-                            "fuzzy_like_this_field" : {
-                                "citations.title" : {
-                                    "like_text" : title,
-                                    "max_query_terms" : 10,
+                            "fuzzy_like_this_field": {
+                                "citations.title": {
+                                    "like_text": title,
+                                    "max_query_terms": 10,
                                     "prefix_length": 3
                                 }
                             }
@@ -232,19 +221,18 @@ class ICitation(object):
                         })
 
         return self.es_conn.search(index=self.index,
-            body={
-                  "query":
-                  {
-                    "nested" : {
-                      "path" : "citations",
-                      "query" : {
-                          "bool" : {
-                            "must": must_param,
-                            "should": should_param,
-                            "minimum_number_should_match": 1
-                          }
-                      }
-                    }
-                  }
-                }, size=size)
-
+                                   body={
+                                      "query":
+                                      {
+                                        "nested": {
+                                          "path": "citations",
+                                          "query": {
+                                              "bool": {
+                                                "must": must_param,
+                                                "should": should_param,
+                                                "minimum_number_should_match": 1
+                                              }
+                                          }
+                                        }
+                                      }
+                                    }, size=size)

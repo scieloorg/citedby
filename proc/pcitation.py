@@ -156,8 +156,6 @@ class PCitation(object):
         """
         Return a Boolean checking the params
         """
-        if self.options.warm_up:
-            return True
 
         if not (self.options.full or self.options.distiction or self.options.rebuild_index):
             self.parser.error('One of params -f (full), -d (distiction) or -r (rebuild_index) must be used.')
@@ -169,18 +167,6 @@ class PCitation(object):
 
         return True
 
-    def _get_identifiers(self, limit=10000, offset_range=10000):
-        """
-        Return all Article Meta Identifier
-        """
-
-        logger.info('Get identifiers from Article Meta...')
-
-        idents = []
-        for ident in articlemeta.get_all_identifiers(self.options.collection, limit, offset_range):
-            idents.append(ident)
-
-        return idents
 
     def _difflist(self, first_list, second_list):
         """
@@ -233,11 +219,11 @@ class PCitation(object):
 
         logger.info('PCitation Script (Index citation)')
 
-        articlemeta_ids = self._get_identifiers()
+        articlemeta_ids = articlemeta.get_all_identifiers(limit=10000,
+                                                          offset_range=10000,
+                                                          onlyid=True)
 
         cite_total = self.icitation.count_citation()
-
-        logger.info('Total of items in Article Meta: %d' % len(articlemeta_ids))
 
         logger.info('Total of items indexed in ES Index Citation: %d' % cite_total)
 
@@ -250,6 +236,8 @@ class PCitation(object):
             #Itens that will be index (A-B)
             idents = self._difflist(articlemeta_ids, elasticsearch_ids)
             logger.info('Total itens that will be index: %s' % len(idents))
+
+            self._index(idents)
 
             #Remove itens (B-A)
             remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)

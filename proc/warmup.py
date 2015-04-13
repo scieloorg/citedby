@@ -23,32 +23,43 @@ class WarmCitedby(object):
 
     def fetch(self, id):
         start = time.time()
-        resp = urllib2.urlopen(self.url + 'api/v1/pid/?q=%s' % id).read()
+        url = self.url + 'api/v1/pid/?q=%s' % id
+        resp = urllib2.urlopen(url).read()
         end = time.time()
-        return id, len(resp), end-start
+        return id, len(resp), end-start, url
+
+    def get_idents(self):
+        """
+        Get all ids.
+        """
+        ids = []
+
+        for id in articlemeta.get_all_identifiers(onlyid=True):
+            ids.append(id)
+
+        return ids
 
     def run(self, itens=10, limit=10):
         print('Warm-up Citedby cache from url %s' % self.url)
 
         offset = 0
-        limit = limit
-        itens = itens
 
-        ids = articlemeta.get_all_identifiers(limit=10000, offset_range=10000,
-                                              onlyid=True)
+        ids = self.get_idents()
 
         while True:
 
-            id_slice = itertools.islice(ids, offset, limit)
+            _slice = itertools.islice(ids, offset, limit)
+            lst_slice = list(_slice)
 
             print('From %d to %d' % (offset, limit))
+            print('Slice: ' + str(lst_slice))
 
-            if not id_slice:
+            if not lst_slice:
                 break
 
-            jobs = [gevent.spawn(self.fetch, id) for id in id_slice]
+            jobs = [gevent.spawn(self.fetch, id) for id in lst_slice]
 
-            gevent.joinall(jobs)
+            gevent.joinall(jobs, timeout=10)
 
             [print(job.value) for job in jobs]
 
@@ -76,7 +87,7 @@ def main():
     WarmCitedby(args.url).run(itens=20, limit=20)
     end = time.time()
 
-    print('Ducration: %d' (end-start))
+    print('Ducration: %f' % (end-start))
 
 
 if __name__ == '__main__':
