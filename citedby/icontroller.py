@@ -8,7 +8,10 @@ from utils import (
 def query_by_pid(index, pid, metaonly=False):
 
     filters = {}
-    src_fields = ['url', 'source', 'issn', 'collection', 'titles', 'code', 'first_author.surname', 'publication_year']
+    src_fields = ['url', 'source', 'issn', 'collection', 'titles', 'code',
+                  'first_author.surname', 'publication_year', 'authors',
+                  'start_page', 'end_page', 'translated_titles', 'citations',
+                  'doi']
 
     es_response = index.get_by_code(pid, _source_include=src_fields)
 
@@ -27,12 +30,15 @@ def query_by_pid(index, pid, metaonly=False):
 
         citations = format_citation(index.search_citation(**filters))
 
-    article_meta['total_cited_by'] = len(citations)
+    article_meta['total_received'] = len(citations)
+    article_meta['total_granted'] = len(article_meta['citations'])
+
+    del(article_meta['citations'])
 
     if metaonly:
         return {'article': article_meta}
     else:
-        return {'article': article_meta, 'cited_by':citations}
+        return {'article': article_meta, 'cited_by': citations}
 
 
 def query_by_doi(index, doi, metaonly=False):
@@ -46,14 +52,15 @@ def query_by_doi(index, doi, metaonly=False):
     article_meta['author'] = ''
     article_meta['year'] = meta['year']
 
-    citations = format_citation(index.search_citation(titles=[article_meta['title']], year=article_meta['year']))
+    citations = format_citation(index.search_citation(
+                    titles=[article_meta['title']], year=article_meta['year']))
 
     article_meta['total_cited_by'] = len(citations)
 
     if metaonly:
         return {'article': article_meta}
     else:
-        return {'article': article_meta, 'cited_by':citations}
+        return {'article': article_meta, 'cited_by': citations}
 
 
 def query_by_meta(index, title='', author_surname='', year='', metaonly=False):
@@ -63,11 +70,12 @@ def query_by_meta(index, title='', author_surname='', year='', metaonly=False):
     article_meta['author'] = author_surname
     article_meta['year'] = year
 
-    citations = format_citation(index.search_citation(titles=[title], author_surname=author_surname, year=year))
+    citations = format_citation(index.search_citation(
+                    titles=[title], author_surname=author_surname, year=year))
 
     article_meta['total_cited_by'] = len(citations)
 
     if metaonly:
         return {'article': article_meta}
     else:
-        return {'article': article_meta, 'cited_by':citations}
+        return {'article': article_meta, 'cited_by': citations}

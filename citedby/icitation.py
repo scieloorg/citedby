@@ -52,18 +52,19 @@ class ICitation(object):
         Get article by code
         """
         return self.es_conn.search(index=self.index,
-            body={
-                  "query": {"match_phrase": {
-                    "code": code
-                  }}
-                }, **kwargs)
+                                   body={
+                                      "query": {"match_phrase": {
+                                        "code": code
+                                      }}
+                                    }, **kwargs)
 
     def get_all(self, query=None, size=1000):
         """
         Get all using query from the SciELO citation index.
 
         :param size: Number of hits to return (default: 1000).
-        :param query(DSL): get by param DSL query or it will use DSL match_all query
+        :param query(DSL): get by param DSL query or it will use DSL match_all
+        query
 
         :returns: A generator with citation data structure.
         """
@@ -109,24 +110,20 @@ class ICitation(object):
         :returns:{
                   "_index":"citations",
                   "_type":"citation",
-                  "_id":"scl_S1413-81232011001000014",
+                  "_id":"8987192749387913"
                   "_version":1,
                   "created":true
                  } (Elasticsearch response)
-
-        look the ``_id`` key we know the id in ES
         """
 
         if not isinstance(doc, dict):
             raise TypeError('param doc must be a dicionary!')
 
-        if not 'code' or not 'collection' in doc:
+        if not ('code' or 'collection') in doc:
             raise ValueError('param doc must contain keys code and collection')
 
-        cite_id = '%s_%s' % (doc['collection'], doc['code'])
-
         return self.es_conn.index(index=self.index, doc_type='citation',
-                                  id=cite_id, body=doc)
+                                  body=doc)
 
     def del_all_citation(self):
         """
