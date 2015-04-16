@@ -87,18 +87,28 @@ Response::
         },
         "cited_by": [
             {
-                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-81751995000500001&lng=en&tlng=en",
-                "source": "Revista Brasileira de Zoologia",
-                "issn": "0101-8175",
-                "titles": [
-                    "Brazilian nematodes. Part IV: Nematodes of birds",
-                    "Nematóides do Brasil. Parte IV: nematóides de aves"
+                "start_page": "2684",
+                "title": "Activation of rabbit muscle phosphofructokinase by F-actin and reconstituted thin filaments",
+                "first_author": {
+                    "surname": "Liou",
+                    "given_names": "R-S"
+                },
+                "publication_year": "1980",
+                "source": "Biochemistry",
+                "authors": [
+                    {
+                        "surname": "Liou",
+                        "given_names": "R-S"
+                    },
+                    {
+                        "surname": "Anderson",
+                        "given_names": "S"
+                    }
                 ],
-                "code": "S0101-81751995000500001"
+                "end_page": "2688"
             }
         ]
     }
-
 
 ``GET /api/v1/pid/?q=S0074-02761936000400003&metaonly=true``
 
