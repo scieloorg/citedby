@@ -12,6 +12,7 @@ from datetime import datetime
 import articlemeta
 from citedby import utils
 from citedby.icitation import ICitation
+from xylose.scielodocument import Article
 
 # config logger file
 logging.config.fileConfig(os.path.join(os.path.dirname(
@@ -57,20 +58,36 @@ def citation_meta(art_meta_json):
 
     c_dict = {}
 
-    #List of titles
     c_dict['titles'] = []
     c_dict['url'] = art.html_url()
-    c_dict['source'] = art.journal.title
     c_dict['issn'] = art.journal.scielo_issn
     c_dict['code'] = art.publisher_id
-    c_dict['id'] = '%s_%s' % (art.collection_acronym, art.publisher_id)
+    c_dict['collection'] = art.collection_acronym
+
+    if art.doi:
+        c_dict['doi'] = art.doi
+
+    if art.journal.title:
+        c_dict['source'] = art.journal.title
 
     if art.translated_titles():
         c_dict['titles'] = [t for l, t in art.translated_titles().items() if t != None]
+        c_dict['translated_titles'] = {l: t for (l, t) in art.translated_titles().items()}
 
-    c_dict['titles'].append(art.original_title())
-    c_dict['collection'] = art.collection_acronym
-    c_dict['first_author'] = art.first_author
+    if art.original_title():
+        c_dict['titles'].append(art.original_title())
+
+    if art.authors:
+        c_dict['authors'] = art.authors
+
+    if art.first_author:
+        c_dict['first_author'] = art.first_author
+
+    if art.start_page:
+        c_dict['start_page'] = art.start_page
+
+    if art.end_page:
+        c_dict['end_page'] = art.end_page
 
     if art.publication_date:
         c_dict['publication_year'] = art.publication_date[:4]
@@ -81,7 +98,9 @@ def citation_meta(art_meta_json):
 
         for cit in art.citations:
             ac_dict = {}
-            ac_dict['source'] = cit.source
+
+            if cit.source:
+                ac_dict['source'] = cit.source
 
             if cit.title():
                 ac_dict['title'] = cit.title()
@@ -91,7 +110,17 @@ def citation_meta(art_meta_json):
             if cit.date:
                 ac_dict['publication_year'] = cit.date[:4]
 
-            ac_dict['first_author'] = cit.first_author
+            if cit.authors:
+                ac_dict['authors'] = cit.authors
+
+            if cit.first_author:
+                ac_dict['first_author'] = cit.first_author
+
+            if cit.start_page:
+                ac_dict['start_page'] = cit.start_page
+
+            if cit.end_page:
+                ac_dict['end_page'] = cit.end_page
 
             art_citations.append(ac_dict)
 
@@ -131,9 +160,6 @@ class PCitation(object):
     parser.add_option('-r', '--rebuild_index', action='store_true',
                       help='this will remove all data in ES and\
                              index all documents')
-
-    parser.add_option('-c', '--collection', default=None,
-                      help='Acronym of the collection')
 
     parser.add_option('-i', '--index_hosts', action='store',
                       help='list of ES hosts where data will indexed, \
@@ -221,7 +247,7 @@ class PCitation(object):
 
         articlemeta_ids = articlemeta.get_all_identifiers(limit=10000,
                                                           offset_range=10000,
-                                                          onlyid=True)
+                                                          onlyid=False)
 
         cite_total = self.icitation.count_citation()
 

@@ -52,7 +52,7 @@ Parameters:
 Mandatory Parameters: *q* PID (SciELO) or any article unique code
 
 
-``GET /api/v1/pid/?q=S0074-02761936000400003``
+``GET /api/v1/pid/?q=S0100-84551997000100001``
 
 
 Response::
@@ -60,19 +60,30 @@ Response::
 
     {
         "article": {
-            "code": "S0074-02761936000400003",
+            "total_received": 1,
+            "code": "S0100-84551997000100001",
+            "titles": [
+                "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
+            ],
             "first_author": {
                 "surname": "Freitas"
             },
-            "issn": "0074-0276",
-            "publication_year": "1936",
-            "source": "Memórias do Instituto Oswaldo Cruz",
-            "titles": [
-                "O genero Monopetalonema Diesing, 1861: (Nematoda: Filarioidea)"
-            ],
+            "issn": "0100-8455",
             "collection": "scl",
-            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02761936000400003&lng=en&tlng=en",
-            "total_cited_by": 1
+            "total_granted": 26,
+            "source": "Brazilian Journal of Genetics",
+            "publication_year": "1997",
+            "authors": [
+                {
+                    "surname": "Freitas",
+                    "given_names": "Thales Renato O. de"
+                }
+            ],
+            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0100-84551997000100001&lng=en&tlng=en",
+            "translated_titles": {
+                "en": "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
+            },
+            "doi": "10.1590/S0100-84551997000100001"
         },
         "cited_by": [
             {
@@ -96,19 +107,30 @@ Response::
 
     {
         "article": {
-            "code": "S0074-02761936000400003",
+            "total_received": 1,
+            "code": "S0100-84551997000100001",
+            "titles": [
+                "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
+            ],
             "first_author": {
                 "surname": "Freitas"
             },
-            "issn": "0074-0276",
-            "publication_year": "1936",
-            "source": "Memórias do Instituto Oswaldo Cruz",
-            "titles": [
-                "O genero Monopetalonema Diesing, 1861: (Nematoda: Filarioidea)"
-            ],
+            "issn": "0100-8455",
             "collection": "scl",
-            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02761936000400003&lng=en&tlng=en",
-            "total_cited_by": 1
+            "total_granted": 26,
+            "source": "Brazilian Journal of Genetics",
+            "publication_year": "1997",
+            "authors": [
+                {
+                    "surname": "Freitas",
+                    "given_names": "Thales Renato O. de"
+                }
+            ],
+            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0100-84551997000100001&lng=en&tlng=en",
+            "translated_titles": {
+                "en": "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
+            },
+            "doi": "10.1590/S0100-84551997000100001"
         }
     }
 
@@ -265,5 +287,5 @@ Response::
     }
 
 
-Last update of this page: March 17, 2015
+Last update of this page: Abril 16, 2015
 
