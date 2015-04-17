@@ -41,16 +41,14 @@ def stats(request):
             memcacheds[mem] = False
 
     return {'health':
-                {'is_alive_es_cluster': request.index._ping(),
-                 'is_alive_memcached': memcacheds
-                }
-            }
+            {'is_alive_es_cluster': request.index._ping(),
+             'is_alive_memcached': memcacheds}}
 
 
 @view_config(route_name='citedby_pid', request_method='GET', renderer='jsonp')
 def citedby_pid(request):
 
-    if not 'q' in request.GET:
+    if 'q' not in request.GET:
         raise HTTPBadRequest("parameter 'q' is required")
 
     if 'metaonly' in request.GET:
@@ -72,7 +70,7 @@ def citedby_pid(request):
 @view_config(route_name='citedby_doi', request_method='GET', renderer='jsonp')
 def citedby_doi(request):
 
-    if not 'q' in request.GET:
+    if 'q' not in request.GET:
         raise HTTPBadRequest("parameter 'q' is required")
 
     if 'metaonly' in request.GET:
@@ -94,7 +92,7 @@ def citedby_doi(request):
 @view_config(route_name='citedby_meta', request_method='GET', renderer='jsonp')
 def citedby_meta(request):
 
-    if not 'title' in request.GET:
+    if 'title' not in request.GET:
         raise HTTPBadRequest("at least the parameter 'title' is required")
 
     if 'metaonly' in request.GET:
