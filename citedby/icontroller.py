@@ -31,7 +31,9 @@ def query_by_pid(index, pid, metaonly=False):
         citations = format_citation(index.search_citation(**filters))
 
     article_meta['total_received'] = len(citations)
-    article_meta['total_granted'] = len(article_meta['citations'])
+
+    if article_meta['citations']:
+        article_meta['total_granted'] = len(article_meta['citations'])
 
     del(article_meta['citations'])
 

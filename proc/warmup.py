@@ -66,7 +66,7 @@ class WarmCitedby(object):
             offset += itens
             limit += itens
 
-            gevent.sleep(0)
+            gevent.sleep(2)
 
 
 def main():
@@ -84,7 +84,7 @@ def main():
     args = parser.parse_args()
 
     start = time.time()
-    WarmCitedby(args.url).run(itens=20, limit=20)
+    WarmCitedby(args.url).run(itens=10, limit=10)
     end = time.time()
 
     print('Ducration: %f' % (end-start))

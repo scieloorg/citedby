@@ -43,7 +43,6 @@ class Dispatcher(object):
             expiration_time=int(self.settings['memcached_expiration_time']),
             arguments={'url':self.settings['memcached_arguments_url'].split()})
 
-
     def citedby_pid(self, q, metaonly):
 
         @cache_region.cache_on_arguments(namespace=self.settings['memcached_prefix_thrift'])
@@ -57,7 +56,6 @@ class Dispatcher(object):
 
         return _citedby_pid(q, metaonly)
 
-
     def citedby_doi(self, q, metaonly):
 
         @cache_region.cache_on_arguments(namespace=self.settings['memcached_prefix_thrift'])
@@ -70,7 +68,6 @@ class Dispatcher(object):
                                 % (self.index, q, metaonly)).message
 
         return _citedby_doi(q, metaonly)
-
 
     def citedby_meta(self, title, author_surname, year, metaonly):
 

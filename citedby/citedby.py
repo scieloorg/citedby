@@ -40,9 +40,8 @@ def stats(request):
         except NotAliveError:
             memcacheds[mem] = False
 
-    return {'health':
-            {'is_alive_es_cluster': request.index._ping(),
-             'is_alive_memcached': memcacheds}}
+    return {'health': {'is_alive_es_cluster': request.index._ping(),
+            'is_alive_memcached': memcacheds}}
 
 
 @view_config(route_name='citedby_pid', request_method='GET', renderer='jsonp')
