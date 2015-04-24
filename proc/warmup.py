@@ -1,32 +1,47 @@
 #!/usr/bin/python
-#coding: utf-8
+# coding: utf-8
 
 from __future__ import print_function
 
+import os
 import time
 import gevent
 import urllib2
 import argparse
 import itertools
 import gevent.monkey
+import thriftpy
+from thriftpy.rpc import make_client
+
 
 import articlemeta
 
-#change to gevent.socket.socket
+# change to gevent.socket.socket
 gevent.monkey.patch_socket()
+
+THRIFT_SERVER = 'localhost'
+THRIFT_PORT = 11610
+THRIFT_FILE = os.path.join(os.path.dirname(
+                           os.path.abspath(__file__)),
+                           '../citedby/thrift/citedby.thrift')
 
 
 class WarmCitedby(object):
 
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+
+        citedby_thrift = thriftpy.load(THRIFT_FILE)
+
+        self.client = make_client(citedby_thrift.Citedby,
+                                  THRIFT_SERVER, THRIFT_PORT)
 
     def fetch(self, id):
         start = time.time()
-        url = self.url + 'api/v1/pid/?q=%s' % id
-        resp = urllib2.urlopen(url).read()
+
+        resp = self.client.citedby_pid(id, False)
+
         end = time.time()
-        return id, len(resp), end-start, url
+        return id, len(resp), end-start
 
     def get_idents(self):
         """
@@ -40,7 +55,6 @@ class WarmCitedby(object):
         return ids
 
     def run(self, itens=10, limit=10):
-        print('Warm-up Citedby cache from url %s' % self.url)
 
         offset = 0
 
@@ -66,28 +80,25 @@ class WarmCitedby(object):
             offset += itens
             limit += itens
 
-            gevent.sleep(0)
+            gevent.sleep(2)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Warm-up Citedby Web."
-    )
-
-    parser.add_argument(
-        '--url',
-        '-u',
-        default='http://citedby.scielo.org/',
-        help='URL of Citedby, default: http://citedby.scielo.org/'
+        description="Warm-up Citedby"
     )
 
     args = parser.parse_args()
 
     start = time.time()
-    WarmCitedby(args.url).run(itens=20, limit=20)
+
+    print('Warm-up Citedby cache from %s:%s' % (THRIFT_SERVER, THRIFT_PORT))
+
+    WarmCitedby().run()
+
     end = time.time()
 
-    print('Ducration: %f' % (end-start))
+    print('Duration: %f' % (end-start))
 
 
 if __name__ == '__main__':
