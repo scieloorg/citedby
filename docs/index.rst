@@ -10,6 +10,8 @@ API to retrieve citations from SciELO articles to a given DOI, Article Title or 
 
 API URL: http://citedby.scielo.org
 
+Last update of this page: May 04, 2015
+
 API Versioning:
 
 +------------+---------+-----------------+
@@ -29,9 +31,6 @@ Endpoints:
 
 /
 -
-
-
-Last update of this page: May 04, 2015
 
 
 "Cited by SciELO API".
