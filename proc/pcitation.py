@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#!coding: utf-8
+# !coding: utf-8
 
 import os
 import sys
@@ -193,7 +193,6 @@ class PCitation(object):
 
         return True
 
-
     def _difflist(self, first_list, second_list):
         """
         Difference between two list
@@ -228,10 +227,10 @@ class PCitation(object):
         logger.info('Index citations...')
 
         for ident in idents:
-            citatation_meta = citation_meta(
+            citation = citation_meta(
                 self._string_json(articlemeta.get_article(*ident)))
 
-            self.icitation.index_citation(citatation_meta)
+            self.icitation.index_citation(citation)
 
     def run(self):
         """

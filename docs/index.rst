@@ -30,6 +30,10 @@ Endpoints:
 /
 -
 
+
+Last update of this page: May 04, 2015
+
+
 "Cited by SciELO API".
 
 /pid/
@@ -156,7 +160,7 @@ Parameters:
 +------------+-----------------------------------------------------+-------------+
 | Paremeter  | Description                                         | Mandatory   |
 +============+=====================================================+=============+
-| **q**      | PID (SciELO) or any article unique code, required   |yes          |
+| **q**      | DOI(Document Objects Identifier), required          |yes          |
 +------------+-----------------------------------------------------+-------------+
 | metaonly   | get only the article meta data without the citaitons| No          |
 +------------+-----------------------------------------------------+-------------+
@@ -296,7 +300,3 @@ Response::
         }
 
     }
-
-
-Last update of this page: Abril 16, 2015
-

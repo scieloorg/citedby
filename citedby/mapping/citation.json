@@ -1,130 +1,129 @@
-PUT citations/citation/_mapping
+PUT citations/citaiton/_mapping
 {
-    "properties": {
-       "citations": {
-          "type": "nested",
-          "properties": {
-             "collection": {
-                "type": "string"
-             },
-             "authors": {
-                "properties": {
-                   "given_names": {
-                      "type": "string"
-                   },
-                   "role": {
-                      "type": "string"
-                   },
-                   "surname": {
-                      "type": "string"
-                   },
-                   "xref": {
-                      "type": "string"
-                   }
-                }
-             },
-             "first_author": {
-                "properties": {
-                   "first_author": {
-                      "type": "string"
-                   },
-                   "given_names": {
-                      "type": "string"
-                   },
-                   "source": {
-                      "type": "string"
-                   },
-                   "surname": {
-                      "type": "string"
-                   }
-                }
-             },
-             "issn": {
-                "type": "string"
-             },
-             "publication_year": {
-                "type": "string"
-             },
-             "source": {
-                "type": "string"
-             },
-             "title": {
-                "type": "string",
-                "index": "not_analyzed"
-             },
-             "pages": {
-                "type": "string"
-             }
-          }
-       },
-       "code": {
-          "type": "string"
-       },
-       "collection": {
-          "type": "string"
-       },
-       "authors": {
-          "properties": {
-             "given_names": {
-                "type": "string"
-             },
-             "role": {
-                "type": "string"
-             },
-             "surname": {
-                "type": "string"
-             },
-             "xref": {
-                "type": "string"
-             }
-          }
-       },
-       "first_author": {
-          "properties": {
-             "given_names": {
-                "type": "string"
-             },
-             "role": {
-                "type": "string"
-             },
-             "surname": {
-                "type": "string"
-             },
-             "xref": {
-                "type": "string"
-             }
-          }
-       },
-       "id": {
-          "type": "string"
-       },
-       "issn": {
-          "type": "string"
-       },
-       "publication_year": {
-          "type": "string"
-       },
-       "source": {
-          "type": "string"
-       },
-      "translated_titles": {
+  "properties": {
+     "authors": {
         "properties": {
-          "lang":  {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          }
+           "given_names": {
+              "type": "string"
+           },
+           "role": {
+              "type": "string"
+           },
+           "surname": {
+              "type": "string"
+           },
+           "xref": {
+              "type": "string"
+           }
         }
-      },
-       "titles": {
-          "type": "string"
-       },
-       "url": {
-          "type": "string"
-       },
-       "pages": {
-          "type": "string"
-       }
-    }
+     },
+     "citations": {
+        "type": "nested",
+        "properties": {
+           "authors": {
+              "properties": {
+                 "given_names": {
+                    "type": "string"
+                 },
+                 "role": {
+                    "type": "string"
+                 },
+                 "surname": {
+                    "type": "string"
+                 },
+                 "xref": {
+                    "type": "string"
+                 }
+              }
+           },
+           "collection": {
+              "type": "string"
+           },
+           "end_page": {
+              "type": "string"
+           },
+           "first_author": {
+              "properties": {
+                 "given_names": {
+                    "type": "string"
+                 },
+                 "surname": {
+                    "type": "string"
+                 }
+              }
+           },
+           "issn": {
+              "type": "string"
+           },
+           "pages": {
+              "type": "string"
+           },
+           "publication_year": {
+              "type": "string"
+           },
+           "source": {
+              "type": "string"
+           },
+           "start_page": {
+              "type": "string"
+           },
+           "title": {
+              "type": "string",
+              "index": "not_analyzed"
+           }
+        }
+     },
+     "code": {
+        "type": "string"
+     },
+     "collection": {
+        "type": "string"
+     },
+     "doi": {
+        "type": "string"
+     },
+     "end_page": {
+        "type": "string"
+     },
+     "first_author": {
+        "properties": {
+           "given_names": {
+              "type": "string"
+           },
+           "role": {
+              "type": "string"
+           },
+           "surname": {
+              "type": "string"
+           },
+           "xref": {
+              "type": "string"
+           }
+        }
+     },
+     "id": {
+        "type": "string"
+     },
+     "issn": {
+        "type": "string"
+     },
+     "pages": {
+        "type": "string"
+     },
+     "publication_year": {
+        "type": "string"
+     },
+     "source": {
+        "type": "string"
+     },
+     "start_page": {
+        "type": "string"
+     },
+     "titles": {
+        "type": "string"
+     },
+     "url": {
+        "type": "string"
+     }
+  }
 }
