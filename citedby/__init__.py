@@ -22,7 +22,7 @@ def main(global_config, **settings):
         arguments={'url': aslist(settings['memcached_arguments_url'])})
 
     config.add_route('index', '/')
-    config.add_route('stats', '/_stats/')
+    config.add_route('status', '/_status/')
     config.add_route('citedby_pid', '/api/v1/pid/')
     config.add_route('citedby_doi', '/api/v1/doi/')
     config.add_route('citedby_meta', '/api/v1/meta/')

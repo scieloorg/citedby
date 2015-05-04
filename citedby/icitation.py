@@ -21,7 +21,7 @@ class ICitation(object):
                 raise Exception("The Elasticsearch is down!")
 
         if kwargs.get('check_index', None):
-            #Verify if index exists
+            # Verify if index exists
             if not self._exists():
                 raise Exception("The index doesnt exist!")
 
@@ -121,7 +121,7 @@ class ICitation(object):
 
         if not ('code' or 'collection') in doc:
             raise ValueError('param doc must contain keys code and collection')
-
+        # import pdb; pdb.set_trace()
         return self.es_conn.index(index=self.index, doc_type='citation',
                                   body=doc)
 
