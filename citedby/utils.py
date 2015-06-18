@@ -65,16 +65,19 @@ def format_citation(citations):
     l = []
 
     for citation in citations['hits']['hits']:
+
+        citation_source = citation['_source']
+
         l.append({
-                'titles': citation['_source']['titles'],
-                'url': citation['_source']['url'],
-                'code': citation['_source']['code'],
-                'source': citation['_source']['source'],
-                'issn': citation['_source']['issn'],
-                'authors': citation['_source']['authors'],
-                'end_page': citation['_source']['end_page'],
-                'start_page': citation['_source']['start_page'],
-                'first_author': citation['_source']['first_author']})
+                'titles': citation_source.get('titles', ''),
+                'url': citation_source.get('url', ''),
+                'code': citation_source.get('code', ''),
+                'source': citation_source.get('source', ''),
+                'issn': citation_source.get('issn', ''),
+                'authors': citation_source.get('authors', ''),
+                'end_page': citation_source.get('end_page', ''),
+                'start_page': citation_source.get('start_page', ''),
+                'first_author': citation_source.get('first_author', '')})
     return l
 
 

@@ -1,18 +1,17 @@
 # coding: utf-8
 
 from dogpile.cache import make_region
+from pylibmc.test import make_test_client, NotAliveError
 
 from icitation import ICitation
-from utils import (
-                   load_from_crossref,
+from utils import (load_from_crossref,
                    format_citation,
-                   key_generator
-                   )
+                   key_generator)
 
 cache_region = make_region(name="citedby",
                            function_key_generator=key_generator)
 
-# it`s must be set on settings file
+# it`s must be on .ini file
 es_hosts = ['esa.scielo.org:9200', 'esb.scielo.org:9200', 'esc.scielo.org:9200']
 
 icindex = ICitation(hosts=es_hosts,
@@ -48,10 +47,9 @@ def query_by_pid(pid, metaonly=False):
 
     article_meta['total_received'] = len(citations)
 
-    if article_meta['citations']:
+    if 'citations' in article_meta:
         article_meta['total_granted'] = len(article_meta['citations'])
-
-    del(article_meta['citations'])
+        del(article_meta['citations'])
 
     if metaonly:
         return {'article': article_meta}
@@ -100,3 +98,31 @@ def query_by_meta(title='', author_surname='', year='', metaonly=False):
         return {'article': article_meta}
     else:
         return {'article': article_meta, 'cited_by': citations}
+
+
+def get_status_memcached(mems_addr=None):
+    '''
+    Get the status of caches.
+
+    :param mems_addr: list of memcached address IP:PORT.
+    '''
+    memcacheds = {}
+
+    for mem in mems_addr:
+
+        addr, port = mem.split(':')
+
+        try:
+            alive = bool(make_test_client(host=addr, port=port))
+            memcacheds[mem] = alive
+        except NotAliveError:
+            memcacheds[mem] = False
+
+    return memcacheds
+
+
+def get_status_cluster():
+    '''
+    Get the status of cluster.
+    '''
+    return icindex._ping()

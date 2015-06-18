@@ -1,15 +1,15 @@
 # coding: utf-8
 
-import json
-import urlparse
-
 from pyramid.view import view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.settings import asbool, aslist
-from pylibmc.test import make_test_client, NotAliveError
 
-from icontroller import query_by_pid, query_by_doi, query_by_meta
+from icontroller import (query_by_pid,
+                         query_by_doi,
+                         query_by_meta,
+                         get_status_memcached,
+                         get_status_cluster)
 
 
 @view_config(route_name='index', request_method='GET')
@@ -17,25 +17,14 @@ def index(request):
     return Response('Cited by SciELO API')
 
 
-@view_config(route_name='stats', request_method='GET', renderer='jsonp')
-def stats(request):
-    memcacheds = {}
+@view_config(route_name='status', request_method='GET', renderer='jsonp')
+def status(request):
 
     mems_addr = aslist(
         request.registry.settings.get('memcached_arguments_url', None))
 
-    for mem in mems_addr:
-
-        addr, port = mem.split(':')
-
-        try:
-            alive = bool(make_test_client(host=addr, port=port))
-            memcacheds[mem] = alive
-        except NotAliveError:
-            memcacheds[mem] = False
-
-    return {'health': {'is_alive_es_cluster': request.index._ping(),
-            'is_alive_memcached': memcacheds}}
+    return {'health': {'is_alive_es_cluster': get_status_cluster(),
+            'is_alive_memcached': get_status_memcached(mems_addr)}}
 
 
 @view_config(route_name='citedby_pid', request_method='GET', renderer='jsonp')
@@ -84,8 +73,8 @@ def citedby_meta(request):
 
     metaonly = asbool(request.GET.get('metaonly'))
 
-    articles = query_by_meta(title=request.GET.get('title', ''),
-                             author_surname=request.GET.get('author', ''),
-                             year=request.GET.get('year', ''),
-                             metaonly=metaonly)
+    articles = query_by_meta(request.GET.get('title', ''),
+                             request.GET.get('author', ''),
+                             request.GET.get('year', ''),
+                             metaonly)
     return articles

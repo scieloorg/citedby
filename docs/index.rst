@@ -10,6 +10,8 @@ API to retrieve citations from SciELO articles to a given DOI, Article Title or 
 
 API URL: http://citedby.scielo.org
 
+Last update of this page: May 04, 2015
+
 API Versioning:
 
 +------------+---------+-----------------+
@@ -29,6 +31,7 @@ Endpoints:
 
 /
 -
+
 
 "Cited by SciELO API".
 
@@ -156,7 +159,7 @@ Parameters:
 +------------+-----------------------------------------------------+-------------+
 | Paremeter  | Description                                         | Mandatory   |
 +============+=====================================================+=============+
-| **q**      | PID (SciELO) or any article unique code, required   |yes          |
+| **q**      | DOI(Document Objects Identifier), required          |yes          |
 +------------+-----------------------------------------------------+-------------+
 | metaonly   | get only the article meta data without the citaitons| No          |
 +------------+-----------------------------------------------------+-------------+
@@ -296,7 +299,3 @@ Response::
         }
 
     }
-
-
-Last update of this page: Abril 16, 2015
-
