@@ -88,8 +88,8 @@ def key_generator(namespace, fn, **kw):
 
     def generate_key(*arg):
 
-        key_str = namespace + fname + "_" + "_".join(str(s).encode(
-                  'ascii', 'ignore') for s in arg)
+        key_str = namespace + fname + "_" + "_".join(unicode(s).encode(
+                  'utf-8', 'ignore') for s in arg)
 
         return key_str[0:250]
 
