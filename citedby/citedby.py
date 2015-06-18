@@ -73,8 +73,8 @@ def citedby_meta(request):
 
     metaonly = asbool(request.GET.get('metaonly'))
 
-    articles = query_by_meta(title=request.GET.get('title', ''),
-                             author_surname=request.GET.get('author', ''),
-                             year=request.GET.get('year', ''),
-                             metaonly=metaonly)
+    articles = query_by_meta(request.GET.get('title', ''),
+                             request.GET.get('author', ''),
+                             request.GET.get('year', ''),
+                             metaonly)
     return articles
