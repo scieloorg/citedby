@@ -49,6 +49,8 @@ class WarmCitedby(object):
         """
         ids = []
 
+        print('Get all ids from articlemeta')
+
         for id in articlemeta.get_all_identifiers(onlyid=True):
             ids.append(id)
 

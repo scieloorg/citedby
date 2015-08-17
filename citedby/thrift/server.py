@@ -23,31 +23,30 @@ citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
 class Dispatcher(object):
 
     def citedby_pid(self, q, metaonly):
-
         try:
             return json.dumps(query_by_pid(q, metaonly))
-        except:
-            return citedby_thrift.ServerError(
-                            'Server Error: icontroller.query_by_pid(%s, %s, %s)'
-                            % (q, metaonly)).message
+        except Exception as e:
+            print(str(e))
+            raise citedby_thrift.ServerError(
+                            'Server Error: icontroller.query_by_pid(%s, %s)'
+                            % (q, metaonly))
 
     def citedby_doi(self, q, metaonly):
         try:
             return json.dumps(query_by_doi(q, metaonly))
         except:
-            return citedby_thrift.ServerError(
-                            'Server Error: icontroller.query_by_doi(%s, %s, %s)'
-                            % (q, metaonly)).message
+            raise citedby_thrift.ServerError(
+                            'Server Error: icontroller.query_by_doi(%s, %s)'
+                            % (q, metaonly))
 
     def citedby_meta(self, title, author_surname, year, metaonly):
-
-            try:
-                return json.dumps(
-                    query_by_meta(title, author_surname, year, metaonly))
-            except:
-                return citedby_thrift.ServerError(
-                       'Server Error: icontroller.citedbymeta(%s, %s, %s, %s, %s)'
-                       % (title, author_surname, year, metaonly)).message
+        try:
+            return json.dumps(
+                query_by_meta(title, author_surname, year, metaonly))
+        except:
+            raise citedby_thrift.ServerError(
+                   'Server Error: icontroller.citedbymeta(%s, %s, %s, %s)'
+                   % (title, author_surname, year, metaonly))
 
 
 def main():

@@ -258,13 +258,13 @@ class PCitation(object):
 
             elasticsearch_ids = self.icitation.get_identifiers()
 
-            #Itens that will be index (A-B)
+            # Itens that will be index (A-B)
             idents = self._difflist(articlemeta_ids, elasticsearch_ids)
             logger.info('Total itens that will be index: %s' % len(idents))
 
             self._index(idents)
 
-            #Remove itens (B-A)
+            # Remove itens (B-A)
             remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)
             logger.info('Total of items that will be remove from ES: %s' % len(remove_idents))
 
