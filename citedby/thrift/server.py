@@ -1,17 +1,21 @@
 #! /usr/bin/env python
 # coding: utf-8
 
-from __future__ import print_function
-
 import os
 import json
 import argparse
 import thriftpy
 from thriftpy.rpc import make_server
+from ConfigParser import SafeConfigParser
 
+
+from citedby.icitation import ICitation
+from dogpile.cache import make_region
 from citedby.icontroller import (query_by_pid,
                                  query_by_doi,
                                  query_by_meta)
+
+from citedby.utils import key_generator
 
 ADDRESS = '0.0.0.0'
 PORT = '11610'
@@ -26,7 +30,6 @@ class Dispatcher(object):
         try:
             return json.dumps(query_by_pid(q, metaonly))
         except Exception as e:
-            print(str(e))
             raise citedby_thrift.ServerError(
                             'Server Error: icontroller.query_by_pid(%s, %s)'
                             % (q, metaonly))
