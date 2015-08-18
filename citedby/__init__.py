@@ -14,13 +14,6 @@ def main(global_config, **settings):
 
     config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
 
-    hosts = aslist(settings['elasticsearch_host'])
-
-    cache_region.configure(
-        'dogpile.cache.bmemcached',
-        expiration_time=int(settings['memcached_expiration_time']),
-        arguments={'url': aslist(settings['memcached_arguments_url'])})
-
     config.add_route('index', '/')
     config.add_route('status', '/_status/')
     config.add_route('citedby_pid', '/api/v1/pid/')

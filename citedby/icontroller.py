@@ -11,6 +11,10 @@ from utils import (load_from_crossref,
 cache_region = make_region(name="citedby",
                            function_key_generator=key_generator)
 
+cache_region.configure('dogpile.cache.bmemcached',
+                       expiration_time=2592000,
+                       arguments={'url': ['aquiles.scielo.org']})
+
 # it`s must be on .ini file
 es_hosts = ['esa.scielo.org:9200', 'esb.scielo.org:9200', 'esc.scielo.org:9200']
 

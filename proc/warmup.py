@@ -3,104 +3,80 @@
 
 from __future__ import print_function
 
-import os
 import time
 import gevent
 import urllib2
 import argparse
 import itertools
 import gevent.monkey
-import thriftpy
-from thriftpy.rpc import make_client
-
 
 import articlemeta
 
-# change to gevent.socket.socket
+#change to gevent.socket.socket
 gevent.monkey.patch_socket()
-
-THRIFT_SERVER = 'localhost'
-THRIFT_PORT = 11610
-THRIFT_FILE = os.path.join(os.path.dirname(
-                           os.path.abspath(__file__)),
-                           '../citedby/thrift/citedby.thrift')
 
 
 class WarmCitedby(object):
 
-    def __init__(self):
-
-        citedby_thrift = thriftpy.load(THRIFT_FILE)
-
-        self.client = make_client(citedby_thrift.Citedby,
-                                  THRIFT_SERVER, THRIFT_PORT)
+    def __init__(self, url):
+        self.url = url
 
     def fetch(self, id):
         start = time.time()
-
-        resp = self.client.citedby_pid(id, False)
-
+        resp = urllib2.urlopen(self.url + 'api/v1/pid/?q=%s' % id).read()
         end = time.time()
         return id, len(resp), end-start
 
-    def get_idents(self):
-        """
-        Get all ids.
-        """
-        ids = []
-
-        print('Get all ids from articlemeta')
-
-        for id in articlemeta.get_all_identifiers(onlyid=True):
-            ids.append(id)
-
-        return ids
-
     def run(self, itens=10, limit=10):
+        print('Warm-up Citedby cache from url %s' % self.url)
 
         offset = 0
+        limit = limit
+        itens = itens
 
-        ids = self.get_idents()
+        ids = articlemeta.get_all_identifiers(limit=10000, offset_range=10000,
+                                              onlyid=True)
 
         while True:
 
-            _slice = itertools.islice(ids, offset, limit)
-            lst_slice = list(_slice)
+            id_slice = itertools.islice(ids, offset, limit)
 
             print('From %d to %d' % (offset, limit))
-            print('Slice: ' + str(lst_slice))
 
-            if not lst_slice:
+            if not id_slice:
                 break
 
-            jobs = [gevent.spawn(self.fetch, id) for id in lst_slice]
+            jobs = [gevent.spawn(self.fetch, id) for id in id_slice]
 
-            gevent.joinall(jobs, timeout=10)
+            gevent.joinall(jobs)
 
             [print(job.value) for job in jobs]
 
             offset += itens
             limit += itens
 
-            gevent.sleep(2)
+            gevent.sleep(0)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Warm-up Citedby"
+        description="Warm-up Citedby by Web."
+    )
+
+    parser.add_argument(
+        '--url',
+        '-u',
+        default='http://citedby.scielo.org/',
+        help='URL of Citedby, default: http://citedby.scielo.org/'
     )
 
     args = parser.parse_args()
 
     start = time.time()
-
-    print('Warm-up Citedby cache from %s:%s' % (THRIFT_SERVER, THRIFT_PORT))
-
-    WarmCitedby().run()
-
+    WarmCitedby(args.url).run(itens=20, limit=20)
     end = time.time()
 
-    print('Duration: %f' % (end-start))
+    print('Ducration: %d' (end-start))
 
 
 if __name__ == '__main__':
