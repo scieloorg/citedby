@@ -12,7 +12,7 @@ import gevent.monkey
 
 import articlemeta
 
-#change to gevent.socket.socket
+# change to gevent.socket.socket
 gevent.monkey.patch_socket()
 
 

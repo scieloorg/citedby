@@ -244,9 +244,11 @@ class PCitation(object):
 
         logger.info('PCitation Script (Index citation)')
 
-        articlemeta_ids = articlemeta.get_all_identifiers(limit=10000,
-                                                          offset_range=10000,
-                                                          onlyid=False)
+        logger.info('Get all ids of articlemeta')
+
+        articlemeta_ids = [id for id in articlemeta.get_all_identifiers(limit=10000,
+                                                                 offset_range=10000,
+                                                                 onlyid=False)]
 
         cite_total = self.icitation.count_citation()
 
@@ -257,6 +259,9 @@ class PCitation(object):
             logger.info('You select distinct processing, get identifiers from ES Index Citation...')
 
             elasticsearch_ids = self.icitation.get_identifiers()
+
+            logger.info('Total of ids in elasticsearch: %s' % len(elasticsearch_ids))
+            logger.info('Total of ids in articlemeta: %s' % len(articlemeta_ids))
 
             # Itens that will be index (A-B)
             idents = self._difflist(articlemeta_ids, elasticsearch_ids)
@@ -272,8 +277,6 @@ class PCitation(object):
                 logger.info('Remove some itens from ES: %d' % len(remove_idents))
                 for ident in remove_idents:
                     self.icitation.del_citation(ident)
-
-            self._index(idents)
 
         elif self.options.full:
             logger.info('You select full processing... this will take a while')
