@@ -31,28 +31,28 @@ class WarmCitedby(object):
         print('Warm-up Citedby cache from url %s' % self.url)
 
         offset = 0
-        limit = limit
-        itens = itens
 
-        ids = articlemeta.get_all_identifiers(limit=10000, offset_range=10000,
-                                              onlyid=True)
+        print('Get all ids of articlemeta...')
 
+        ids = [id for id in articlemeta.get_all_identifiers(limit=10000,
+                                                            offset_range=10000,
+                                                            onlyid=True)]
         while True:
-
             id_slice = itertools.islice(ids, offset, limit)
 
             print('From %d to %d' % (offset, limit))
 
-            if not id_slice:
-                break
+            jobs = [gevent.spawn(self.fetch, id) for id in id_slice if id]
 
-            jobs = [gevent.spawn(self.fetch, id) for id in id_slice]
+            if not jobs:
+                break
 
             gevent.joinall(jobs)
 
             [print(job.value) for job in jobs]
 
             offset += itens
+
             limit += itens
 
             gevent.sleep(0)
@@ -73,10 +73,10 @@ def main():
     args = parser.parse_args()
 
     start = time.time()
-    WarmCitedby(args.url).run(itens=20, limit=20)
+    WarmCitedby(args.url).run(itens=10, limit=10)
     end = time.time()
 
-    print('Ducration: %d' (end-start))
+    print('Duration: %d' (end-start))
 
 
 if __name__ == '__main__':
