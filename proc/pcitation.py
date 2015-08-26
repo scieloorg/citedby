@@ -220,17 +220,27 @@ class PCitation(object):
         else:
             return jdata
 
-    def _index(self, idents):
+    def _index(self, idents, types=['research-article', 'review-article']):
         """
-        Index by identifiers
+        Index by identifiers, only if ``document_type`` is in types
         """
         logger.info('Index citations...')
 
         for ident in idents:
-            citation = citation_meta(
-                self._string_json(articlemeta.get_article(*ident)))
 
-            self.icitation.index_citation(citation)
+            article = self._string_json(articlemeta.get_article(*ident))
+
+            if article['document_type'] in types:
+
+                citation = citation_meta(article)
+
+                article_id = '%s-%s' % (article['code'], article['collection'])
+
+                self.icitation.index_citation(citation, article_id=article_id)
+
+                logger.info('INDEXED: %s' % article['code'])
+            else:
+                logger.info('NOTINDEXED:%s its a %s' % (article['code'], article['document_type']))
 
     def run(self):
         """
@@ -273,7 +283,7 @@ class PCitation(object):
             remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)
             logger.info('Total of items that will be remove from ES: %s' % len(remove_idents))
 
-            if remove_idents:# if exists itens to remove
+            if remove_idents:
                 logger.info('Remove some itens from ES: %d' % len(remove_idents))
                 for ident in remove_idents:
                     self.icitation.del_citation(ident)

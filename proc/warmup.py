@@ -76,7 +76,7 @@ def main():
     WarmCitedby(args.url).run(itens=10, limit=10)
     end = time.time()
 
-    print('Duration: %d' (end-start))
+    print('Duration: %d' % (end-start))
 
 
 if __name__ == '__main__':

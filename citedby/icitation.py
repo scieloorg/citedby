@@ -100,7 +100,7 @@ class ICitation(object):
         return [(i['_source']['collection'], i['_source']['code'])
                 for i in all_citations]
 
-    def index_citation(self, doc):
+    def index_citation(self, doc, article_id):
         """
         Index article and validate if have some attributes.
 
@@ -110,7 +110,7 @@ class ICitation(object):
         :returns:{
                   "_index":"citations",
                   "_type":"citation",
-                  "_id":"8987192749387913"
+                  "_id":"S0120-53072010000300001-scl"
                   "_version":1,
                   "created":true
                  } (Elasticsearch response)
@@ -121,8 +121,8 @@ class ICitation(object):
 
         if not ('code' or 'collection') in doc:
             raise ValueError('param doc must contain keys code and collection')
-        # import pdb; pdb.set_trace()
-        return self.es_conn.index(index=self.index, doc_type='citation',
+
+        return self.es_conn.index(index=self.index, id=article_id, doc_type='citation',
                                   body=doc)
 
     def del_all_citation(self):
