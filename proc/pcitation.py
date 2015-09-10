@@ -63,6 +63,7 @@ def citation_meta(art_meta_json):
     c_dict['issn'] = art.journal.scielo_issn
     c_dict['code'] = art.publisher_id
     c_dict['collection'] = art.collection_acronym
+    c_dict['document_type'] = art.document_type
 
     if art.doi:
         c_dict['doi'] = art.doi
@@ -126,7 +127,9 @@ def citation_meta(art_meta_json):
 
         c_dict['citations'] = art_citations
 
-    return c_dict
+    return {'_index': 'citations', '_type': 'citation',
+            '_id': '%s-%s' % (art.publisher_id, art.collection_acronym),
+            '_source': c_dict}
 
 
 class PCitation(object):
@@ -165,12 +168,15 @@ class PCitation(object):
                       help='list of ES hosts where data will indexed, \
                       Ex.: esa.scielo.org esb.scielo.org, default is localhost')
 
+    parser.add_option('-o', '--offset', action='store', default=5000,
+                      help='Bulk offset, default= 5000')
+
     def __init__(self, argv):
         self.started = None
         self.finished = None
         self.options, self.args = self.parser.parse_args(argv)
 
-        self.icitation = ICitation(hosts=self.options.index_hosts)
+        self.icitation = ICitation(hosts=self.options.index_hosts, index='citations')
 
     def _duration(self):
         """
@@ -220,27 +226,31 @@ class PCitation(object):
         else:
             return jdata
 
-    def _index(self, idents, types=['research-article', 'review-article']):
-        """
-        Index by identifiers, only if ``document_type`` is in types
-        """
-        logger.info('Index citations...')
+    def _bulk(self, idents, allowed_types=['research-article', 'review-article']):
+        start = 0
+        stop = int(self.options.offset)
+        offset = int(self.options.offset)
 
-        for ident in idents:
+        while True:
 
-            article = self._string_json(articlemeta.get_article(*ident))
+            slice_idents = idents[start: stop]
 
-            if article['document_type'] in types:
+            logger.info('From %d to %d' % (start, stop))
 
-                citation = citation_meta(article)
+            articles = []
+            for ident in slice_idents:
+                article = self._string_json(articlemeta.get_article(*ident))
 
-                article_id = '%s-%s' % (article['code'], article['collection'])
+                if article['document_type'] in allowed_types:
+                    articles.append(citation_meta(article))
 
-                self.icitation.index_citation(citation, article_id=article_id)
+            logger.debug(self.icitation.bulk_citation(articles))
 
-                logger.info('INDEXED: %s' % article['code'])
-            else:
-                logger.info('NOTINDEXED:%s its a %s' % (article['code'], article['document_type']))
+            if not slice_idents:
+                break
+
+            start += offset
+            stop += offset
 
     def run(self):
         """
@@ -277,7 +287,7 @@ class PCitation(object):
             idents = self._difflist(articlemeta_ids, elasticsearch_ids)
             logger.info('Total itens that will be index: %s' % len(idents))
 
-            self._index(idents)
+            self._bulk(idents)
 
             # Remove itens (B-A)
             remove_idents = self._difflist(elasticsearch_ids, articlemeta_ids)
@@ -291,7 +301,7 @@ class PCitation(object):
         elif self.options.full:
             logger.info('You select full processing... this will take a while')
 
-            self._index(articlemeta_ids)
+            self._bulk(articlemeta_ids)
 
         elif self.options.rebuild_index:
             logger.info('You select Rebuild Index processing, deleting %d items in Index Citation.' % cite_total)
@@ -299,7 +309,7 @@ class PCitation(object):
 
             self.icitation.del_all_citation()
 
-            self._index(articlemeta_ids)
+            self._bulk(articlemeta_ids)
 
         self.finished = datetime.now()
 

@@ -1,5 +1,6 @@
 # coding: utf-8
 from elasticsearch import Elasticsearch
+from elasticsearch import helpers
 
 
 class ICitation(object):
@@ -124,6 +125,16 @@ class ICitation(object):
 
         return self.es_conn.index(index=self.index, id=article_id, doc_type='citation',
                                   body=doc)
+
+    def bulk_citation(self, articles):
+        """
+        Index article and validate if have some attributes.
+
+        :param articles: list of articles
+
+        """
+
+        return helpers.bulk(self.es_conn, articles)
 
     def del_all_citation(self):
         """
