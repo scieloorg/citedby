@@ -15,7 +15,8 @@ class ICitation(object):
         http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
         """
         self.index = index
-        self.es_conn = Elasticsearch(hosts, **kwargs)
+        self.es_conn = Elasticsearch(hosts, retry_on_timeout=True,
+                                     max_retries=3, **kwargs)
 
         if kwargs.get('check_es', None):
             if not self._ping():
@@ -201,7 +202,7 @@ class ICitation(object):
         must_param = []
 
         if not titles or not isinstance(titles, list):
-            None
+            return None
 
         for title in titles:
             should_param.append({

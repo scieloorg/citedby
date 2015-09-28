@@ -47,9 +47,13 @@ def query_by_pid(pid, metaonly=False):
         filters['author_surname'] = article_meta['first_author']['surname']
         filters['year'] = article_meta['publication_year']
 
-        citations = format_citation(icindex.search_citation(**filters))
+        meta = icindex.search_citation(**filters)
 
-    article_meta['total_received'] = len(citations)
+        if meta:
+            citations = format_citation(meta)
+            article_meta['total_received'] = len(citations)
+        else:
+            return []
 
     if 'citations' in article_meta:
         article_meta['total_granted'] = len(article_meta['citations'])
