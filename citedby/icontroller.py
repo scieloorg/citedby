@@ -53,7 +53,7 @@ def query_by_pid(pid, metaonly=False):
             citations = format_citation(meta)
             article_meta['total_received'] = len(citations)
         else:
-            return []
+            article_meta['total_received'] = 0
 
     if 'citations' in article_meta:
         article_meta['total_granted'] = len(article_meta['citations'])
