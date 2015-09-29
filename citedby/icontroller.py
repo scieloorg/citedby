@@ -40,7 +40,10 @@ def query_by_pid(pid, metaonly=False):
     article_meta = es_response['hits']['hits'][0]['_source']
 
     citations = []
-
+    
+    article_meta['total_received'] = 0
+    article_meta['total_granted'] = 0
+    
     if ('titles' in article_meta and 'first_author' in article_meta and 'publication_year' in article_meta):
 
         filters['titles'] = article_meta['titles']
@@ -52,8 +55,6 @@ def query_by_pid(pid, metaonly=False):
         if meta:
             citations = format_citation(meta)
             article_meta['total_received'] = len(citations)
-        else:
-            article_meta['total_received'] = 0
 
     if 'citations' in article_meta:
         article_meta['total_granted'] = len(article_meta['citations'])
