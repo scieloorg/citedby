@@ -5,13 +5,6 @@ from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.settings import asbool, aslist
 
-from icontroller import (query_by_pid,
-                         query_by_doi,
-                         query_by_meta,
-                         get_status_memcached,
-                         get_status_cluster)
-
-
 @view_config(route_name='index', request_method='GET')
 def index(request):
     return Response('Cited by SciELO API')
@@ -21,10 +14,16 @@ def index(request):
 def status(request):
 
     mems_addr = aslist(
-        request.registry.settings.get('memcached_arguments_url', None))
+        request.registry.settings.get('memcached_arguments_url', [])
+    )
 
-    return {'health': {'is_alive_es_cluster': get_status_cluster(),
-            'is_alive_memcached': get_status_memcached(mems_addr)}}
+    response = {
+        'health': {
+            'is_alive_es_cluster': request.controller.get_status_cluster()
+        }
+    }
+
+    return response
 
 
 @view_config(route_name='citedby_pid', request_method='GET', renderer='jsonp')
@@ -39,7 +38,11 @@ def citedby_pid(request):
 
     metaonly = asbool(request.GET.get('metaonly'))
 
-    articles = query_by_pid(request.GET.get('q'), metaonly)
+    articles = request.controller.query_by_pid(
+        request.GET.get('q'),
+        request.GET.get('collection', None),
+        metaonly
+    )
 
     return articles
 
@@ -56,7 +59,7 @@ def citedby_doi(request):
 
     metaonly = asbool(request.GET.get('metaonly'))
 
-    articles = query_by_doi(request.GET.get('q'), metaonly)
+    articles = request.controller.query_by_doi(request.GET.get('q'), metaonly)
 
     return articles
 
@@ -73,8 +76,11 @@ def citedby_meta(request):
 
     metaonly = asbool(request.GET.get('metaonly'))
 
-    articles = query_by_meta(request.GET.get('title', ''),
-                             request.GET.get('author', ''),
-                             request.GET.get('year', ''),
-                             metaonly)
+    articles = request.controller.query_by_meta(
+        request.GET.get('title', ''),
+        request.GET.get('author', ''),
+        request.GET.get('year', ''),
+        metaonly
+    )
+
     return articles

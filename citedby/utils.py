@@ -2,6 +2,10 @@
 
 import requests
 import logging
+import os
+import weakref
+
+from ConfigParser import SafeConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -11,12 +15,9 @@ logger.addHandler(logging.NullHandler())
 def fetch_data(resource):
     """
     Fetches any resource.
-
     :param resource: any resource
     :returns: requests.response object
-
     The param resource must be a valid URL
-    example: ``http:///api/v1/article?code=S2238-10312012000300006``
     """
     try:
         response = requests.get(resource)
@@ -81,19 +82,58 @@ def format_citation(citations):
     return l
 
 
-def key_generator(namespace, fn, **kw):
+class SingletonMixin(object):
     """
-    Function to generate the keys of memcached.
-
-    Truncate the key in 250 caracters
+    Adds a singleton behaviour to an existing class.
+    weakrefs are used in order to keep a low memory footprint.
+    As a result, args and kwargs passed to classes initializers
+    must be of weakly refereable types.
     """
-    fname = fn.__name__
+    _instances = weakref.WeakValueDictionary()
 
-    def generate_key(*arg):
+    def __new__(cls, *args, **kwargs):
+        key = (cls, args, tuple(kwargs.items()))
 
-        key_str = namespace + fname + "_" + "_".join(unicode(s).encode(
-                  'utf-8', 'ignore') for s in arg)
+        if key in cls._instances:
+            return cls._instances[key]
 
-        return key_str[0:250]
+        new_instance = super(type(cls), cls).__new__(cls, *args, **kwargs)
+        cls._instances[key] = new_instance
 
-    return generate_key
+        return new_instance
+
+
+class Configuration(SingletonMixin):
+    """
+    Acts as a proxy to the ConfigParser module
+    """
+    def __init__(self, fp, parser_dep=SafeConfigParser):
+        self.conf = parser_dep()
+        self.conf.readfp(fp)
+
+    @classmethod
+    def from_env(cls):
+        try:
+            filepath =  os.environ['CITEDBY_SETTINGS_FILE']
+        except KeyError:
+            raise ValueError('missing env variable CITEDBY_SETTINGS_FILE')
+
+        return cls.from_file(filepath)
+
+    @classmethod
+    def from_file(cls, filepath):
+        """
+        Returns an instance of Configuration
+        ``filepath`` is a text string.
+        """
+        fp = open(filepath, 'rb')
+        return cls(fp)
+
+    def __getattr__(self, attr):
+        return getattr(self.conf, attr)
+
+    def items(self):
+        """Settings as key-value pair.
+        """
+        return [(section, dict(self.conf.items(section, raw=True))) for \
+            section in [section for section in self.conf.sections()]]

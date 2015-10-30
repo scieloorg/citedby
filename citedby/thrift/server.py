@@ -4,83 +4,86 @@
 import os
 import json
 import argparse
-import thriftpy
-from thriftpy.rpc import make_server
 from ConfigParser import SafeConfigParser
 
+import thriftpy
+import thriftpywrap
 
-from citedby.icitation import ICitation
-from dogpile.cache import make_region
-from citedby.icontroller import (query_by_pid,
-                                 query_by_doi,
-                                 query_by_meta)
+from pyramid.settings import aslist
 
-from citedby.utils import key_generator
-
-ADDRESS = '0.0.0.0'
-PORT = '11610'
+from citedby.controller import controller, ServerError
+from citedby import utils
 
 citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
                                os.path.abspath(__file__)), 'citedby.thrift'))
 
-
 class Dispatcher(object):
+
+    def __init__(self):
+
+        config = utils.Configuration.from_env()
+        settings = dict(config.items())
+        self._controller = controller(
+            aslist(settings['app:main']['elasticsearch_host']),
+            index=settings['app:main']['elasticsearch_index'],
+            sniff_on_start=True,
+            sniff_on_connection_fail=True,
+            timeout=60
+        )
+
+    def search(self, body, parameters):
+
+        params = {i.key:i.value for i in parameters}
+        params['doc_type'] = 'citation'
+        params['body'] = json.loads(body)
+
+        try:
+            data = self._controller.bibliometric_search(params)
+        except ValueError as e:
+            logging.error(e.message)
+            raise citedby_thrift.ValueError(message=e.message)
+        except ServerError as e:
+            raise citedby_thrift.ServerError(message=e.message)
+
+        try:
+            data_str = json.dumps(data)
+        except ValueError as e:
+            logging.error('Invalid JSON data: %s' % data_str)
+            raise citedby_thrift.ValueError(message=e.message)
+
+        return data_str
 
     def citedby_pid(self, q, metaonly):
         try:
-            return json.dumps(query_by_pid(q, metaonly))
+            return json.dumps(
+                self._controller.query_by_pid(q, metaonly)
+            )
         except Exception as e:
             raise citedby_thrift.ServerError(
-                            'Server Error: icontroller.query_by_pid(%s, %s)'
-                            % (q, metaonly))
+                'Server Error: icontroller.query_by_pid(%s, %s)'
+                % (q, metaonly)
+            )
 
     def citedby_doi(self, q, metaonly):
         try:
-            return json.dumps(query_by_doi(q, metaonly))
+            return json.dumps(
+                self._controller.query_by_doi(q, metaonly)
+            )
         except:
             raise citedby_thrift.ServerError(
-                            'Server Error: icontroller.query_by_doi(%s, %s)'
-                            % (q, metaonly))
+                'Server Error: icontroller.query_by_doi(%s, %s)'
+                % (q, metaonly)
+            )
 
     def citedby_meta(self, title, author_surname, year, metaonly):
         try:
             return json.dumps(
-                query_by_meta(title, author_surname, year, metaonly))
+                self._controller.query_by_meta(title, author_surname, year, metaonly)
+            )
         except:
             raise citedby_thrift.ServerError(
-                   'Server Error: icontroller.citedbymeta(%s, %s, %s, %s)'
-                   % (title, author_surname, year, metaonly))
+               'Server Error: icontroller.citedbymeta(%s, %s, %s, %s)'
+               % (title, author_surname, year, metaonly)
+            )
 
-
-def main():
-
-    parser = argparse.ArgumentParser(
-        description="Citedby Thrift Server."
-    )
-
-    parser.add_argument(
-        '--address',
-        '-a',
-        default=ADDRESS,
-        help='Binding Address'
-    )
-
-    parser.add_argument(
-        '--port',
-        '-p',
-        default=PORT,
-        help='Binding Port'
-    )
-
-    args = parser.parse_args()
-
-    server = make_server(citedby_thrift.Citedby,
-                         Dispatcher(), args.address, args.port)
-
-    print("Started server on IP: %s:%s" % (args.address, args.port))
-
-    server.serve()
-
-
-if __name__ == "__main__":
-    main()
+main = thriftpywrap.ConsoleApp(citedby_thrift.Citedby, Dispatcher)
