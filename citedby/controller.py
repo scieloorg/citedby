@@ -297,6 +297,11 @@ class Controller(Elasticsearch):
         if not titles or not isinstance(titles, list):
             return None
 
+        titles = [i for i in titles if i]
+
+        if len(titles) == 0:
+            return None
+
         for title in titles:
             should_param.append({
                             "fuzzy_like_this_field": {
@@ -352,12 +357,19 @@ class Controller(Elasticsearch):
         article_meta['issn'] = document.journal.scielo_issn
         article_meta['publication_year'] = document.publication_date[0:4]
         article_meta['url'] = document.html_url()
-        article_meta['titles'] = [document.original_title()] + [t for l, t in document.translated_titles().items()]
         article_meta['collection'] = document.collection_acronym
         article_meta['authors'] = document.authors
         article_meta['translated_titles'] = document.translated_titles()
         article_meta['doi'] = document.doi
 
+
+        article_meta['titles'] = []
+
+        if document.original_title():
+            article_meta['titles'].append(document.original_title())
+
+        if document.translated_titles():
+            article_meta['titles'] + [t for l, t in document.translated_titles().items() if t]
 
         citations = []
         
