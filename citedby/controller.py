@@ -54,7 +54,7 @@ def controller(*args, **kwargs):
 class Controller(Elasticsearch):
 
     articlemeta_client = articlemeta()
-    base_index = 'citations_beta_1'
+    base_index = 'citations'
 
     def _query_dispatcher(self, *args, **kwargs):
 
