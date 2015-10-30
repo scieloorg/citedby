@@ -23,7 +23,7 @@ test_requires = requires+['nose']
 
 setup(
     name='citedby',
-    version='1.5',
+    version='2.10',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     long_description=open(os.path.join(here, 'README.md')).read() + '\n\n' + open(os.path.join(here, 'CHANGES.txt')).read(),
     classifiers=[
