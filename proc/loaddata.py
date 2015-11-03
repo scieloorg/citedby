@@ -113,8 +113,10 @@ def citation_meta(document):
 
             if cit.source:
                 c_dict['reference_source'] = cit.source
-                c_dict['reference_source_cleaned'] = remove_tags(remove_accents(cit.source)).lower()
-
+                try:
+                    c_dict['reference_source_cleaned'] = remove_tags(remove_accents(cit.source)).lower()
+                except:
+                    c_dict['reference_source_cleaned'] = cit.source
             if cit.title():
                 c_dict['reference_title'] = cit.title()
             elif cit.chapter_title:
