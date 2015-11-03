@@ -214,6 +214,10 @@ class Controller(Elasticsearch):
                            "type": "string",
                            "index" : "not_analyzed"
                         },
+                        "reference_source_cleaned": {
+                           "type": "string",
+                           "index" : "not_analyzed"
+                        },
                         "reference_start_page": {
                             "type": "string",
                             "index" : "not_analyzed"

@@ -8,6 +8,8 @@ import textwrap
 import optparse
 import logging.config
 from datetime import datetime
+import unicodedata
+import re
 
 from pyramid.settings import aslist
 from xylose.scielodocument import Article
@@ -22,6 +24,15 @@ settings = dict(config.items())
 
 # set logger
 logger = logging.getLogger('pcitations')
+
+TAG_RE = re.compile(r'<[^>]+>')
+
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+def remove_accents(text):
+    nfkd_form = unicodedata.normalize('NFKD', text.strip())
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def citation_meta(document):
@@ -102,6 +113,7 @@ def citation_meta(document):
 
             if cit.source:
                 c_dict['reference_source'] = cit.source
+                c_dict['reference_source_cleaned'] = remove_tags(remove_accents(cit.source)).lower()
 
             if cit.title():
                 c_dict['reference_title'] = cit.title()
