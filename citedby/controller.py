@@ -182,6 +182,10 @@ class Controller(Elasticsearch):
                             "type": "string",
                             "index" : "not_analyzed"
                         },
+                        "titles_cleaned": {
+                            "type": "string",
+                            "index" : "not_analyzed"
+                        },
                         "url": {
                             "type": "string",
                             "index" : "not_analyzed"
