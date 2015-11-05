@@ -30,9 +30,13 @@ TAG_RE = re.compile(r'<[^>]+>')
 def remove_tags(text):
     return TAG_RE.sub('', text)
 
-def remove_accents(text):
-    nfkd_form = unicodedata.normalize('NFKD', text.strip())
-    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+def cleanup_string(text):
+    
+    nfd_form = unicodedata.normalize('NFD', text.strip().lower())
+    
+    cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
+
+    return cleaned_str
 
 
 def citation_meta(document):
@@ -114,7 +118,7 @@ def citation_meta(document):
             if cit.source:
                 c_dict['reference_source'] = cit.source
                 try:
-                    c_dict['reference_source_cleaned'] = remove_tags(remove_accents(cit.source)).lower()
+                    c_dict['reference_source_cleaned'] = remove_tags(cleanup_string(cit.source)).lower()
                 except:
                     c_dict['reference_source_cleaned'] = cit.source
             if cit.title():

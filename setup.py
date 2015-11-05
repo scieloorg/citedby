@@ -19,13 +19,16 @@ requires = [
             'pyramid_debugtoolbar',
            ]
 
-test_requires = requires+['nose']
+test_requires = []
 
 setup(
     name='citedby',
     version='2.10',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
-    long_description=open(os.path.join(here, 'README.md')).read() + '\n\n' + open(os.path.join(here, 'CHANGES.txt')).read(),
+    author='SciELO',
+    author_email='scielo-dev@googlegroups.com',
+    url='http://docs.scielo.org/projects/citedby/en/latest/',
+    packages=['citedby'],
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
@@ -36,20 +39,17 @@ setup(
         "Topic :: Utilities",
     ],
     dependency_links=[
-        "git+https://github.com/scieloorg/xylose@0.33#egg=xylose",
+        "git+https://github.com/scieloorg/xylose@0.35#egg=xylose",
         "git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap"
     ],
-    author='SciELO',
-    author_email='scielo-dev@googlegroups.com',
     license='BSD 2-Clause',
-    url='http://docs.scielo.org/projects/citedby/en/latest/',
     keywords='SciELO CitedBy API RESTFul',
-    packages=['citedby'],
     include_package_data=True,
     zip_safe=False,
+    setup_requires=["nose>=1.0", "coverage"],
     install_requires=requires,
     tests_require=test_requires,
-    test_suite="citedby",
+    test_suite="nose.collector",
     entry_points="""\
     [paste.app_factory]
     main = citedby:main
