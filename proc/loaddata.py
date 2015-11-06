@@ -76,6 +76,7 @@ def citation_meta(document):
         c_dict = {}
 
         c_dict['titles'] = []
+        c_dict['titles_cleaned'] = []
         c_dict['url'] = document.html_url()
         c_dict['issn'] = document.journal.scielo_issn
         c_dict['pid'] = document.publisher_id
