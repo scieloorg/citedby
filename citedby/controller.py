@@ -181,7 +181,7 @@ class Controller(Elasticsearch):
                         "titles": {
                             "type": "string",
                             "index" : "not_analyzed"
-                        }
+                        },
                         "url": {
                             "type": "string",
                             "index" : "not_analyzed"
