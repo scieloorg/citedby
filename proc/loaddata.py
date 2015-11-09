@@ -32,8 +32,11 @@ def remove_tags(text):
 
 def cleanup_string(text):
     
-    nfd_form = unicodedata.normalize('NFD', text.strip().lower())
-    
+    try:
+        nfd_form = unicodedata.normalize('NFD', text.strip().lower())
+    except:
+        return text
+
     cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
 
     return remove_tags(cleaned_str)
@@ -91,11 +94,9 @@ def citation_meta(document):
 
         if document.translated_titles():
             c_dict['titles'] = [t for l, t in document.translated_titles().items() if t != None]
-            c_dict['titles_cleaned'] = [cleanup_string(t) for l, t in document.translated_titles().items() if t != None]
 
         if document.original_title():
             c_dict['titles'].append(cleanup_string(document.original_title()))
-            c_dict['titles_cleaned'].append(cleanup_string(document.original_title()))
 
         if document.authors:
             c_dict['authors'] = document.authors
@@ -125,8 +126,10 @@ def citation_meta(document):
                     c_dict['reference_source_cleaned'] = cit.source
             if cit.title():
                 c_dict['reference_title'] = cit.title()
+                c_dict['reference_title_cleaned'] = cleanup_string(cit.title())
             elif cit.chapter_title:
                 c_dict['reference_title'] = cit.chapter_title
+                c_dict['reference_title_cleaned'] = cleanup_string(cit.chapter_title)
 
             if cit.date:
                 c_dict['reference_publication_year'] = cit.date[:4]

@@ -181,11 +181,7 @@ class Controller(Elasticsearch):
                         "titles": {
                             "type": "string",
                             "index" : "not_analyzed"
-                        },
-                        "titles_cleaned": {
-                            "type": "string",
-                            "index" : "not_analyzed"
-                        },
+                        }
                         "url": {
                             "type": "string",
                             "index" : "not_analyzed"
@@ -227,6 +223,10 @@ class Controller(Elasticsearch):
                             "index" : "not_analyzed"
                         },
                         "reference_title": {
+                            "type": "string",
+                            "index" : "not_analyzed"
+                        },
+                        "reference_title_cleaned": {
                             "type": "string",
                             "index" : "not_analyzed"
                         },
