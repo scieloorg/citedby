@@ -22,10 +22,33 @@ logger = logging.getLogger(__name__)
 config = utils.Configuration.from_env()
 settings = dict(config.items())
 
-# set logger
-logger = logging.getLogger('pcitations')
-
 TAG_RE = re.compile(r'<[^>]+>')
+
+def _config_logging(logging_level='INFO', logging_file=None):
+
+    allowed_levels = {
+        'DEBUG': logging.DEBUG,
+        'INFO': logging.INFO,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+        'CRITICAL': logging.CRITICAL
+    }
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    logger.setLevel(allowed_levels.get(logging_level, 'INFO'))
+
+    if logging_file:
+        hl = logging.FileHandler(logging_file, mode='a')
+    else:
+        hl = logging.StreamHandler()
+
+    hl.setFormatter(formatter)
+    hl.setLevel(allowed_levels.get(logging_level, 'INFO'))
+
+    logger.addHandler(hl)
+
+    return logger
 
 def remove_tags(text):
     return TAG_RE.sub('', text)
@@ -188,13 +211,25 @@ class PCitation(object):
                       help='this will remove all data in ES and\
                              index all documents')
 
-    parser.add_option('-o', '--offset', action='store', default=5000,
-                      help='Bulk offset, default= 5000')
+    parser.add_option(
+        '--logging_file',
+        '-o',
+        help='Full path to the log file'
+    )
+
+    parser.add_option(
+        '--logging_level',
+        '-l',
+        default='DEBUG',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Logggin level'
+    )
 
     def __init__(self, argv):
         self.started = None
         self.finished = None
         self.options, self.args = self.parser.parse_args(argv)
+        _config_logging(self.options.logging_level, self.options.logging_file)
 
         hosts = aslist(settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200'))
         index = settings['app:main'].get('elasticsearch_index', 'citations')
@@ -230,10 +265,12 @@ class PCitation(object):
         else:
             return jdata
 
-    def _bulk(self, documents):
+    def _bulk(self):
 
-        for document in documents:
+        for document in self.articlemeta.documents():
+            logger.debug('bulking document %s, %s' % (document.publisher_id, document.collection_acronym))
             for reference in citation_meta(document):
+                logger.debug('bulking reference %s' % (reference['_id']))
                 self.controller.index_citation(reference, reference['_id'])
 
     def run(self):
@@ -245,11 +282,9 @@ class PCitation(object):
 
         logger.info('Load Data Script (index citation)')
 
-        logger.info('Get all ids from articlemeta')
-
         self.controller.load_mapping()
 
-        documents = self.articlemeta.documents()
+        logger.info('Get all ids from articlemeta')
 
         if self.options.full:
             logger.info('You have selected full processing... this will take a while')
@@ -259,11 +294,11 @@ class PCitation(object):
 
                 self.controller.index_reset()
 
-            self._bulk(documents)
+            self._bulk()
 
         else:
             logger.info('You have selected incremental processing...')
-            self._bulk(documents)
+            self._bulk()
 
         self.finished = datetime.now()
 
