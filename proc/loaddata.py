@@ -10,6 +10,7 @@ import logging.config
 from datetime import datetime
 import unicodedata
 import re
+import time
 
 from pyramid.settings import aslist
 from xylose.scielodocument import Article
@@ -23,6 +24,26 @@ config = utils.Configuration.from_env()
 settings = dict(config.items())
 
 TAG_RE = re.compile(r'<[^>]+>')
+
+IGNORE_LIST = (
+    'spa_0102-311X',
+    'spa_1413-8123',
+    'spa_2237-9622',
+    'spa_1414-3283',
+    'spa_0213-9111',
+    'spa_1555-7960',
+    'spa_1415-790X',
+    'spa_0213-9111',
+    'spa_0864-3466',
+    'spa_0213-9111',
+    'spa_0124-0064',
+    'spa_0034-8910',
+    'spa_1135-5727',
+    'spa_0213-9111',
+    'spa_1726-4634',
+    'spa_1851-8265',
+    'spa_0036-3634'
+)
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -269,9 +290,27 @@ class PCitation(object):
 
         for document in self.articlemeta.documents():
             logger.debug('bulking document %s, %s' % (document.publisher_id, document.collection_acronym))
+
+            if '_'.join([document.collection_acronym, document.scielo_issn]) in IGNORE_LIST:
+                logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                continue
+
+            attempts = 0
             for reference in citation_meta(document):
                 logger.debug('bulking reference %s' % (reference['_id']))
-                self.controller.index_citation(reference, reference['_id'])
+                while True:
+                    try:
+                        self.controller.index_citation(reference, reference['_id'])
+                        logger.debug('Reference loaded %s' % reference['_id'])
+                        break
+                    except:
+                        attempts += 1
+                        logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                        time.sleep(2)
+
+                    if attempts == 10:
+                        logger.error('fail to bult: %s' % reference['_id'])
+                        break
 
     def run(self):
         """
@@ -291,7 +330,6 @@ class PCitation(object):
 
             if self.options.rebuild_index:
                 logger.info('This will remove EVERYTHING from your search index')
-
                 self.controller.index_reset()
 
             self._bulk()
