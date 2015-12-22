@@ -8,6 +8,7 @@ import textwrap
 import optparse
 import logging.config
 from datetime import datetime
+from datetime import timedelta
 import unicodedata
 import re
 import time
@@ -44,6 +45,8 @@ IGNORE_LIST = (
     'spa_1851-8265',
     'spa_0036-3634'
 )
+
+FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -233,6 +236,13 @@ class PCitation(object):
                              index all documents')
 
     parser.add_option(
+        '--from_date',
+        '-b',
+        default=FROM_DATE,
+        help='From processing date (YYYY-MM-DD). Default (%s)' % FROM_DATE
+    )
+
+    parser.add_option(
         '--logging_file',
         '-o',
         help='Full path to the log file'
@@ -312,6 +322,43 @@ class PCitation(object):
                         logger.error('fail to bult: %s' % reference['_id'])
                         break
 
+    def _bulk_incremental(self, from_date=FROM_DATE):
+
+        for event, document in self.articlemeta.documents_history(from_date=from_date):
+            if event.event == 'delete':
+                logger.debug('%s (%s) document %s, %s' % (event.event, event.date, event.code, event.collection))
+
+                self.controller.del_citation(
+                    event.collection,
+                    event.code
+                )
+                logger.debug('document deleted %s, %s' % (event.code, event.collection))
+                continue
+
+            if event.event in ['update', 'add']:
+                logger.debug('%s (%s) document %s, %s' % (event.event, event.date, document.publisher_id, document.collection_acronym))
+
+                if '_'.join([document.collection_acronym, document.scielo_issn]) in IGNORE_LIST:
+                    logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                    continue
+
+                attempts = 0
+                for reference in citation_meta(document):
+                    logger.debug('bulking reference %s' % (reference['_id']))
+                    while True:
+                        try:
+                            self.controller.index_citation(reference, reference['_id'])
+                            logger.debug('Reference loaded %s' % reference['_id'])
+                            break
+                        except:
+                            attempts += 1
+                            logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                            time.sleep(2)
+
+                        if attempts == 10:
+                            logger.error('fail to bult: %s' % reference['_id'])
+                            break
+
     def run(self):
         """
         Run the Loaddata switching between full and incremental indexation
@@ -335,8 +382,9 @@ class PCitation(object):
             self._bulk()
 
         else:
-            logger.info('You have selected incremental processing...')
-            self._bulk()
+            logger.info('You have selected incremental processing... It will include, update and remove records according to ArticleMeta history change API.')
+
+            self._bulk_incremental()
 
         self.finished = datetime.now()
 

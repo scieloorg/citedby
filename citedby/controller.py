@@ -269,23 +269,27 @@ class Controller(Elasticsearch):
         return self.index(index=self.base_index, id=article_id, doc_type='citation', body=doc)
 
 
-    def del_citation(self, ident):
-        """
-        Remove citation by identifier, (u'S0898-9081938912378', u'scl').
-        """
+    def del_citation(self, collection, code):
 
         body = {
             "query": {
                 "bool": {
                     "must": [
-                        {"match_phrase": {"code": ident[1]}},
-                        {"match_phrase": {"collection": ident[0]}}
+                        {"match": {"code": code}},
+                        {"match": {"collection": collection}}
                     ]
                 }
-            }
+            },
+            "size": 10000
         }
 
-        return self.delete_by_query(index=self.base_index, body=body)
+        itens = self.search(index=self.base_index, body=body)
+
+        for item in itens.get('hits', {'hits': []})['hits']:
+            ident = item.get('_id', None)
+            if not ident:
+                continue
+            self.delete(index=self.base_index, doc_type='citation', id=ident)
 
     def search_citation(self, titles, author_surname=None, year=None, size=1000):
         """
@@ -429,7 +433,6 @@ class Controller(Elasticsearch):
             return {'article': article_meta}
         else:
             return {'article': article_meta, 'cited_by': citations}
-
 
     @cache_region.cache_on_arguments()
     def query_by_meta(self, title='', author_surname='', year='', metaonly=False):

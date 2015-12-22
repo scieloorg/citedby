@@ -117,5 +117,33 @@ class ArticleMeta(object):
 
             offset += 1000
 
+    def documents_history(self, collection=None, issn=None, from_date=None,
+        until_date=None, fmt='xylose'):
+        offset = 0
+        while True:
+            identifiers = self.client.article_history_changes(
+                collection=collection, issn=issn, from_date=from_date,
+                until_date=until_date, limit=LIMIT, offset=offset)
+
+            if len(identifiers) == 0:
+                raise StopIteration
+
+            for identifier in identifiers:
+
+                document = self.document(
+                    code=identifier.code,
+                    collection=identifier.collection,
+                    replace_journal_metadata=True, 
+                    fmt=fmt
+                )
+
+                if identifier.event == 'delete':
+                    yield (identifier, None)
+
+                if document.data:
+                    yield (identifier, document)
+
+            offset += 1000
+
     def collections(self):
         return [i for i in self.client.get_collection_identifiers()]
