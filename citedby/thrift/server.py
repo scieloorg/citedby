@@ -12,6 +12,7 @@ import thriftpywrap
 from pyramid.settings import aslist
 
 from citedby.controller import controller, ServerError
+from citedby.controller import cache_region as controller_cache_region
 from citedby import utils
 
 citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
@@ -30,6 +31,15 @@ class Dispatcher(object):
             sniff_on_connection_fail=True,
             timeout=60
         )
+
+        ## Cache Settings Config
+        if 'memcached_host' in settings['app:main']:
+            cache_config = {}
+            cache_config['expiration_time'] = int(settings['app:main'].get('memcached_expiration_time', 2592000)) # a month cache
+            cache_config['arguments'] = {'url': settings['app:main']['memcached_host'], 'binary': True}
+            controller_cache_region.configure('dogpile.cache.pylibmc', **cache_config)
+        else:
+            controller_cache_region.configure('dogpile.cache.null')
 
     def search(self, body, parameters):
 
@@ -53,25 +63,26 @@ class Dispatcher(object):
 
         return data_str
 
-    def citedby_pid(self, q, metaonly):
+    def citedby_pid(self, query, metaonly):
+        import pdb; pdb.set_trace()
         try:
             return json.dumps(
-                self._controller.query_by_pid(q, metaonly)
+                self._controller.query_by_pid(query, metaonly)
             )
         except Exception as e:
             raise citedby_thrift.ServerError(
-                'Server Error: icontroller.query_by_pid(%s, %s)'
+                'Server Error: controller.query_by_pid(%s, %s)'
                 % (q, metaonly)
             )
 
-    def citedby_doi(self, q, metaonly):
+    def citedby_doi(self, query, metaonly):
         try:
             return json.dumps(
-                self._controller.query_by_doi(q, metaonly)
+                self._controller.query_by_doi(query, metaonly)
             )
         except:
             raise citedby_thrift.ServerError(
-                'Server Error: icontroller.query_by_doi(%s, %s)'
+                'Server Error: controller.query_by_doi(%s, %s)'
                 % (q, metaonly)
             )
 
@@ -82,7 +93,7 @@ class Dispatcher(object):
             )
         except:
             raise citedby_thrift.ServerError(
-               'Server Error: icontroller.citedbymeta(%s, %s, %s, %s)'
+               'Server Error: controller.citedbymeta(%s, %s, %s, %s)'
                % (title, author_surname, year, metaonly)
             )
 
