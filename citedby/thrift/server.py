@@ -64,7 +64,6 @@ class Dispatcher(object):
         return data_str
 
     def citedby_pid(self, query, metaonly):
-        import pdb; pdb.set_trace()
         try:
             return json.dumps(
                 self._controller.query_by_pid(query, metaonly)

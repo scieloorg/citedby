@@ -11,5 +11,5 @@ thriftpy==0.2.0
 chaussette==1.2
 gevent==1.0.1
 -e git+git://github.com/scieloorg/xylose.git@0.42#egg=xylose
--e git+git://github.com/scieloorg/citedby@2.11#egg=citedby
+-e git+git://github.com/scieloorg/citedby@2.12#egg=citedby
 -e git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap
