@@ -365,7 +365,7 @@ class Controller(Elasticsearch):
         article_meta['code'] = document.publisher_id
         article_meta['start_page'] = document.start_page
         article_meta['end_page'] = document.end_page
-        article_meta['first_author'] = document.authors[0]
+        article_meta['first_author'] = document.authors[0] if document.authors and len(document.authors > 0) else None
         article_meta['issn'] = document.journal.scielo_issn
         article_meta['publication_year'] = document.publication_date[0:4]
         article_meta['url'] = document.html_url()
@@ -387,10 +387,11 @@ class Controller(Elasticsearch):
         
         article_meta['total_received'] = 0
         
-        if ('titles' in article_meta and 'first_author' in article_meta and 'publication_year' in article_meta):
+        if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('first_author', False)):
 
             filters['titles'] = article_meta['titles']
-            filters['author_surname'] = article_meta['first_author']['surname']
+            if article_meta['first_author'].get('surname', None):
+                filters['author_surname'] = article_meta['first_author']['surname'] 
             filters['year'] = article_meta['publication_year']
 
             meta = self.search_citation(**filters)
