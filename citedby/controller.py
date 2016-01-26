@@ -387,7 +387,7 @@ class Controller(Elasticsearch):
         
         article_meta['total_received'] = 0
         
-        if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('first_author', False)):
+        if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('publication_year', False)):
 
             filters['titles'] = article_meta['titles']
             if article_meta['first_author'].get('surname', None):
