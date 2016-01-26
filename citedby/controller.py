@@ -365,7 +365,7 @@ class Controller(Elasticsearch):
         article_meta['code'] = document.publisher_id
         article_meta['start_page'] = document.start_page
         article_meta['end_page'] = document.end_page
-        article_meta['first_author'] = document.authors[0] if document.authors and len(document.authors > 0) else None
+        article_meta['first_author'] = document.authors[0] if document.authors and len(document.authors) > 0 else None
         article_meta['issn'] = document.journal.scielo_issn
         article_meta['publication_year'] = document.publication_date[0:4]
         article_meta['url'] = document.html_url()
