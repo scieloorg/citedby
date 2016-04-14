@@ -1,8 +1,10 @@
 # coding: utf-8
 
 import requests
+import unicodedata
 import logging
 import os
+import re
 import weakref
 
 from ConfigParser import SafeConfigParser
@@ -10,6 +12,42 @@ from ConfigParser import SafeConfigParser
 logger = logging.getLogger(__name__)
 
 logger.addHandler(logging.NullHandler())
+
+TAG_RE = re.compile(r'<[^>]+>')
+
+
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+
+def cleanup_string(text):
+
+    try:
+        nfd_form = unicodedata.normalize('NFD', text.strip().lower())
+    except TypeError:
+        nfd_form = unicodedata.normalize('NFD', unicode(text.strip().lower()))
+
+    cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
+
+    return remove_tags(cleaned_str)
+
+
+def dogpile_controller_key_generator(namespace, fn, *kwargs):
+
+    fname = fn.__name__
+
+    def generate_key(*the_args, **the_kwargs):
+
+        tp = tuple([
+            str(namespace),
+            str(fname),
+            str(the_args[1:]),
+            tuple(the_kwargs.items())
+        ])
+
+        return str(hash(tp))
+
+    return generate_key
 
 
 def fetch_data(resource):

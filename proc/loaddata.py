@@ -9,8 +9,6 @@ import optparse
 import logging.config
 from datetime import datetime
 from datetime import timedelta
-import unicodedata
-import re
 import time
 
 from pyramid.settings import aslist
@@ -23,8 +21,6 @@ logger = logging.getLogger(__name__)
 
 config = utils.Configuration.from_env()
 settings = dict(config.items())
-
-TAG_RE = re.compile(r'<[^>]+>')
 
 IGNORE_LIST = (
     'spa_0102-311X',
@@ -47,6 +43,7 @@ IGNORE_LIST = (
 )
 
 FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
+
 
 def _config_logging(logging_level='INFO', logging_file=None):
 
@@ -73,20 +70,6 @@ def _config_logging(logging_level='INFO', logging_file=None):
     logger.addHandler(hl)
 
     return logger
-
-def remove_tags(text):
-    return TAG_RE.sub('', text)
-
-def cleanup_string(text):
-    
-    try:
-        nfd_form = unicodedata.normalize('NFD', text.strip().lower())
-    except:
-        return text
-
-    cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
-
-    return remove_tags(cleaned_str)
 
 
 def citation_meta(document):
@@ -143,7 +126,7 @@ def citation_meta(document):
             c_dict['titles'] = [t for l, t in document.translated_titles().items() if t != None]
 
         if document.original_title():
-            c_dict['titles'].append(cleanup_string(document.original_title()))
+            c_dict['titles'].append(document.original_title())
 
         if document.authors:
             c_dict['authors'] = document.authors
@@ -168,15 +151,15 @@ def citation_meta(document):
             if cit.source:
                 c_dict['reference_source'] = cit.source
                 try:
-                    c_dict['reference_source_cleaned'] = cleanup_string(cit.source)
+                    c_dict['reference_source_cleaned'] = utils.cleanup_string(cit.source)
                 except:
                     c_dict['reference_source_cleaned'] = cit.source
             if cit.title():
                 c_dict['reference_title'] = cit.title()
-                c_dict['reference_title_cleaned'] = cleanup_string(cit.title())
+                c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.title())
             elif cit.chapter_title:
                 c_dict['reference_title'] = cit.chapter_title
-                c_dict['reference_title_cleaned'] = cleanup_string(cit.chapter_title)
+                c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.chapter_title)
 
             if cit.date:
                 c_dict['reference_publication_year'] = cit.date[:4]
@@ -185,10 +168,33 @@ def citation_meta(document):
                 c_dict['reference_authors'] = cit.authors
 
             if cit.first_author:
-                c_dict['reference_first_author'] = ' '.join([
-                    cit.first_author.get('given_names', ''),
-                    cit.first_author.get('surname', '')
-                ])
+                c_dict['reference_first_author'] = [
+                    ' '.join([
+                        cit.first_author.get('given_names', ''),
+                        cit.first_author.get('surname', '')
+                    ]),
+                    ' '.join([
+                        cit.first_author.get('surname', ''),
+                        cit.first_author.get('given_names', '')
+                    ])
+                ]
+
+                c_dict['reference_first_author_cleaned'] = [
+                    ' '.join([
+                        utils.cleanup_string(cit.first_author.get('given_names', '')),
+                        utils.cleanup_string(cit.first_author.get('surname', ''))
+                    ]),
+                    ' '.join([
+                        utils.cleanup_string(cit.first_author.get('surname', '')),
+                        utils.cleanup_string(cit.first_author.get('given_names', ''))
+                    ])
+                ]
+
+            if cit.volume:
+                c_dict['reference_volume'] = cit.volume
+
+            if cit.issue:
+                c_dict['reference_number'] = cit.issue
 
             if cit.start_page:
                 c_dict['reference_start_page'] = cit.start_page
@@ -206,6 +212,7 @@ def citation_meta(document):
             ])
 
             yield c_dict
+
 
 class PCitation(object):
     """
@@ -299,7 +306,7 @@ class PCitation(object):
     def _bulk(self):
 
         for document in self.articlemeta.documents():
-            logger.debug('bulking document %s, %s' % (document.publisher_id, document.collection_acronym))
+            logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
             if '_'.join([document.collection_acronym, document.scielo_issn]) in IGNORE_LIST:
                 logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
@@ -307,7 +314,7 @@ class PCitation(object):
 
             attempts = 0
             for reference in citation_meta(document):
-                logger.debug('bulking reference %s' % (reference['_id']))
+                logger.debug('Loading reference %s' % (reference['_id']))
                 while True:
                     try:
                         self.controller.index_citation(reference, reference['_id'])

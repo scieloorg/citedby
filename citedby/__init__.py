@@ -5,6 +5,7 @@ from pyramid.settings import aslist
 from citedby import controller
 from citedby.controller import cache_region as controller_cache_region
 
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -30,9 +31,12 @@ def main(global_config, **settings):
     ## Cache Settings Config
     if 'memcached_host' in settings:
         cache_config = {}
-        cache_config['expiration_time'] = int(settings.get('memcached_expiration_time', 2592000)) # a month cache
-        cache_config['arguments'] = {'url': settings['memcached_host'], 'binary': True}
-        controller_cache_region.configure('dogpile.cache.pylibmc', **cache_config)
+        cache_config['expiration_time'] = int(
+            settings.get('memcached_expiration_time', 2592000))  # a month cache
+        cache_config['arguments'] = {
+            'url': settings['memcached_host'], 'binary': True}
+        controller_cache_region.configure(
+            'dogpile.cache.pylibmc', **cache_config)
     else:
         controller_cache_region.configure('dogpile.cache.null')
 
