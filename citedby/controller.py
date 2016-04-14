@@ -9,8 +9,14 @@ from elasticsearch import helpers
 
 from thrift_clients import clients
 from utils import load_from_crossref, format_citation
+import utils
 
-cache_region = make_region(name="citedby")
+
+cache_region = make_region(
+    name="citedby",
+    function_key_generator=utils.dogpile_controller_key_generator
+)
+
 
 class ServerError(Exception):
 
@@ -19,6 +25,7 @@ class ServerError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
 
 def get_status_memcached(mems_addr=None):
     '''
@@ -47,9 +54,11 @@ def articlemeta(host='articlemeta.scielo.org:11720'):
 
     return clients.ArticleMeta(address, port)
 
+
 def controller(*args, **kwargs):
 
     return Controller(*args, **kwargs)
+
 
 class Controller(Elasticsearch):
 
@@ -102,141 +111,155 @@ class Controller(Elasticsearch):
                                 },
                                 "role": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 },
                                 "surname": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "index": "not_analyzed"
                                 },
                                 "xref": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 }
                             }
                         },
                         "code": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "pid": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "collection": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "subject_areas": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "document_type": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "doi": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "end_page": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "first_author": {
                             "dynamic": "strict",
                             "properties": {
                                 "given_names": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 },
                                 "role": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 },
                                 "surname": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 },
                                 "xref": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 }
                             }
                         },
                         "issn": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "publication_year": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "source": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "start_page": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "titles": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "url": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "reference_authors": {
                             "dynamic": "strict",
                             "properties": {
-                            "given_names": {
+                                "given_names": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 },
                                 "surname": {
                                     "type": "string",
-                                    "index" : "not_analyzed"
+                                    "index": "not_analyzed"
                                 }
                             }
                         },
                         "reference_end_page": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "reference_first_author": {
-                            "type": "string"
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "reference_first_author_cleaned": {
+                            "type": "string",
+                            "index": "not_analyzed"
                         },
                         "reference_publication_year": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "reference_source": {
-                           "type": "string",
-                           "index" : "not_analyzed"
+                            "type": "string",
+                            "index": "not_analyzed"
                         },
                         "reference_source_cleaned": {
-                           "type": "string",
-                           "index" : "not_analyzed"
+                            "type": "string",
+                            "index": "not_analyzed"
                         },
                         "reference_start_page": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "reference_title": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         },
                         "reference_title_cleaned": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
+                        },
+                        "reference_volume": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "reference_number": {
+                            "type": "string",
+                            "index": "not_analyzed"
                         },
                         "reference_index_number": {
                             "type": "string",
-                            "index" : "not_analyzed"
+                            "index": "not_analyzed"
                         }
                     }
                 }
-            }    
+            }
         }
 
         self.indices.create(
@@ -268,7 +291,6 @@ class Controller(Elasticsearch):
 
         return self.index(index=self.base_index, id=article_id, doc_type='citation', body=doc)
 
-
     def del_citation(self, collection, code):
 
         body = {
@@ -299,51 +321,51 @@ class Controller(Elasticsearch):
         :param author_surname: The surname of first author
         :param year: Is the publication year
 
-        This method will search for citations that have smilarity titles and
+        This method will search for citations that have similar titles and
         exact first author surname and exact publication_year
         """
 
-        should_param = []
         must_param = []
 
         if not titles or not isinstance(titles, list):
             return None
 
-        titles = [i for i in titles if i]
+        titles = [utils.cleanup_string(i) for i in titles if i]
 
         if len(titles) == 0:
             return None
 
         for title in titles:
-            should_param.append({
-                            "fuzzy_like_this_field": {
-                                "reference_title": {
-                                    "like_text": title,
-                                    "max_query_terms": 10,
-                                    "prefix_length": 3
-                                }
-                            }
-                        })
+            must_param.append({
+                "fuzzy": {
+                    "reference_title_cleaned": {
+                        "value": title,
+                        "fuzziness": 2
+                    }
+                }
+            })
 
         if author_surname:
             must_param.append({
-                        "match": {
-                          "reference_first_author": author_surname
-                            }
-                        })
+                "fuzzy": {
+                    "reference_first_author_cleaned": {
+                        "value": utils.cleanup_string(author_surname),
+                        "fuzziness": 2
+                    }
+                }
+            })
 
         if year:
             must_param.append({
-                          "match": {
-                            "reference_publication_year": year
-                          }
-                        })
+                "match": {
+                    "reference_publication_year": year
+                }
+            })
 
         body = {
             "query": {
                 "bool": {
                     "must": must_param,
-                    "should": should_param,
                     "minimum_number_should_match": 1
                 }
             }
@@ -374,7 +396,6 @@ class Controller(Elasticsearch):
         article_meta['translated_titles'] = document.translated_titles()
         article_meta['doi'] = document.doi
 
-
         article_meta['titles'] = []
 
         if document.original_title():
@@ -384,9 +405,9 @@ class Controller(Elasticsearch):
             article_meta['titles'] + [t for l, t in document.translated_titles().items() if t]
 
         citations = []
-        
+
         article_meta['total_received'] = 0
-        
+
         if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('publication_year', False)):
 
             filters['titles'] = article_meta.get('titles', None)
@@ -407,7 +428,6 @@ class Controller(Elasticsearch):
             return {'article': article_meta}
         else:
             return {'article': article_meta, 'cited_by': citations}
-
 
     @cache_region.cache_on_arguments()
     def query_by_doi(self, doi, metaonly=False):
