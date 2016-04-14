@@ -131,8 +131,8 @@ def citation_meta(document):
         if document.authors:
             c_dict['authors'] = document.authors
 
-        if document.subject_areas:
-            c_dict['subject_areas'] = document.subject_areas
+        if document.journal.subject_areas:
+            c_dict['subject_areas'] = document.journal.subject_areas
 
         if document.first_author:
             c_dict['first_author'] = document.first_author
@@ -308,7 +308,7 @@ class PCitation(object):
         for document in self.articlemeta.documents():
             logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
-            if '_'.join([document.collection_acronym, document.scielo_issn]) in IGNORE_LIST:
+            if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
                 logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
                 continue
 

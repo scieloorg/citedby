@@ -107,7 +107,8 @@ class Controller(Elasticsearch):
                             "dynamic": "strict",
                             "properties": {
                                 "given_names": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "index": "not_analyzed"
                                 },
                                 "role": {
                                     "type": "string",
