@@ -412,7 +412,10 @@ class Controller(Elasticsearch):
         if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('publication_year', False)):
 
             filters['titles'] = article_meta.get('titles', None)
-            filters['author_surname'] = article_meta.get('first_author', {}).get('surname', None)
+            filters['author_surname'] = ' '.join([
+                article_meta.get('first_author', {}).get('surname', ''),
+                article_meta.get('first_author', {}).get('given_names', '')
+            ])
             filters['year'] = article_meta.get('publication_year', None)
 
             meta = self.search_citation(**filters)
