@@ -29,7 +29,7 @@ def cleanup_string(text):
 
     cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
 
-    return remove_tags(cleaned_str)
+    return remove_tags(cleaned_str).lower()
 
 
 def dogpile_controller_key_generator(namespace, fn, *kwargs):
