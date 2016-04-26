@@ -157,9 +157,11 @@ def citation_meta(document):
             if cit.title():
                 c_dict['reference_title'] = cit.title()
                 c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.title())
+                c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.title())
             elif cit.chapter_title:
                 c_dict['reference_title'] = cit.chapter_title
                 c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.chapter_title)
+                c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.chapter_title)
 
             if cit.date:
                 c_dict['reference_publication_year'] = cit.date[:4]

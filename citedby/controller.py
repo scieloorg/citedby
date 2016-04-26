@@ -246,6 +246,9 @@ class Controller(Elasticsearch):
                             "type": "string",
                             "index": "not_analyzed"
                         },
+                        "reference_title_analyzed": {
+                            "type": "string"
+                        },
                         "reference_volume": {
                             "type": "string",
                             "index": "not_analyzed"
