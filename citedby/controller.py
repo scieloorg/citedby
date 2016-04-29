@@ -341,11 +341,8 @@ class Controller(Elasticsearch):
 
         for title in titles:
             must_param.append({
-                "fuzzy": {
-                    "reference_title_cleaned": {
-                        "value": title,
-                        "fuzziness": 2
-                    }
+                "match": {
+                    "reference_title_analyzed": title
                 }
             })
 
