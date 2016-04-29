@@ -400,7 +400,7 @@ class Controller(Elasticsearch):
         article_meta['end_page'] = document.end_page
         article_meta['first_author'] = document.authors[0] if document.authors and len(document.authors) > 0 else None
         article_meta['issn'] = document.journal.scielo_issn
-        article_meta['publication_year'] = document.publication_date[0:4]
+        article_meta['publication_year'] = document.publication_date[0:4] if document.publication_date else None
         article_meta['url'] = document.html_url()
         article_meta['collection'] = document.collection_acronym
         article_meta['authors'] = document.authors
@@ -419,13 +419,15 @@ class Controller(Elasticsearch):
 
         article_meta['total_received'] = 0
 
-        if (article_meta.get('titles', False) and article_meta.get('first_author', False) and article_meta.get('publication_year', False)):
-
+        if (article_meta.get('titles', False) and (article_meta.get('first_author', False) or article_meta.get('publication_year', False))):
             filters['titles'] = article_meta.get('titles', None)
-            filters['author_surname'] = ' '.join([
-                article_meta.get('first_author', {}).get('surname', ''),
-                article_meta.get('first_author', {}).get('given_names', '')
-            ])
+            if article_meta['first_author']:
+                filters['author_surname'] = ' '.join([
+                    article_meta.get('first_author', {}).get('surname', ''),
+                    article_meta.get('first_author', {}).get('given_names', '')
+                ])
+            else:
+                article_meta['first_author'] == None
             filters['year'] = article_meta.get('publication_year', None)
 
             meta = self.search_citation(**filters)
