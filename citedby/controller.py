@@ -340,11 +340,21 @@ class Controller(Elasticsearch):
             return None
 
         for title in titles:
-            must_param.append({
-                "match": {
-                    "reference_title_analyzed": title
-                }
-            })
+            if not author_surname or not year:
+                must_param.append({
+                    "fuzzy": {
+                        "reference_title_cleaned": {
+                            "value": title,
+                            "fuzziness": 2
+                        }
+                    }
+                })
+            else:
+                must_param.append({
+                    "match": {
+                        "reference_title_analyzed": title
+                    }
+                })
 
         if author_surname:
             must_param.append({
