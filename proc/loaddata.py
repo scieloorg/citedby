@@ -5,7 +5,7 @@ import os
 import sys
 import json
 import textwrap
-import optparse
+import argparse
 import logging.config
 from datetime import datetime
 from datetime import timedelta
@@ -104,8 +104,7 @@ def citation_meta(document):
         }
     """
 
-    if document.citations:
-
+    for cit in document.citations or []:
         c_dict = {}
 
         c_dict['titles'] = []
@@ -146,74 +145,73 @@ def citation_meta(document):
         if document.publication_date:
             c_dict['publication_year'] = document.publication_date[:4]
 
-        for cit in document.citations:
 
-            if cit.source:
-                c_dict['reference_source'] = cit.source
-                try:
-                    c_dict['reference_source_cleaned'] = utils.cleanup_string(cit.source)
-                except:
-                    c_dict['reference_source_cleaned'] = cit.source
-            if cit.title():
-                c_dict['reference_title'] = cit.title()
-                c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.title())
-                c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.title())
-            elif cit.chapter_title:
-                c_dict['reference_title'] = cit.chapter_title
-                c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.chapter_title)
-                c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.chapter_title)
+        if cit.source:
+            c_dict['reference_source'] = cit.source
+            try:
+                c_dict['reference_source_cleaned'] = utils.cleanup_string(cit.source)
+            except:
+                c_dict['reference_source_cleaned'] = cit.source
+        if cit.title():
+            c_dict['reference_title'] = cit.title()
+            c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.title())
+            c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.title())
+        elif cit.chapter_title:
+            c_dict['reference_title'] = cit.chapter_title
+            c_dict['reference_title_cleaned'] = utils.cleanup_string(cit.chapter_title)
+            c_dict['reference_title_analyzed'] = utils.cleanup_string(cit.chapter_title)
 
-            if cit.date:
-                c_dict['reference_publication_year'] = cit.date[:4]
+        if cit.date:
+            c_dict['reference_publication_year'] = cit.date[:4]
 
-            if cit.authors:
-                c_dict['reference_authors'] = cit.authors
+        if cit.authors:
+            c_dict['reference_authors'] = cit.authors
 
-            if cit.first_author:
-                c_dict['reference_first_author'] = [
-                    ' '.join([
-                        cit.first_author.get('given_names', ''),
-                        cit.first_author.get('surname', '')
-                    ]),
-                    ' '.join([
-                        cit.first_author.get('surname', ''),
-                        cit.first_author.get('given_names', '')
-                    ])
-                ]
+        if cit.first_author:
+            c_dict['reference_first_author'] = [
+                ' '.join([
+                    cit.first_author.get('given_names', ''),
+                    cit.first_author.get('surname', '')
+                ]),
+                ' '.join([
+                    cit.first_author.get('surname', ''),
+                    cit.first_author.get('given_names', '')
+                ])
+            ]
 
-                c_dict['reference_first_author_cleaned'] = [
-                    ' '.join([
-                        utils.cleanup_string(cit.first_author.get('given_names', '')),
-                        utils.cleanup_string(cit.first_author.get('surname', ''))
-                    ]),
-                    ' '.join([
-                        utils.cleanup_string(cit.first_author.get('surname', '')),
-                        utils.cleanup_string(cit.first_author.get('given_names', ''))
-                    ])
-                ]
+            c_dict['reference_first_author_cleaned'] = [
+                ' '.join([
+                    utils.cleanup_string(cit.first_author.get('given_names', '')),
+                    utils.cleanup_string(cit.first_author.get('surname', ''))
+                ]),
+                ' '.join([
+                    utils.cleanup_string(cit.first_author.get('surname', '')),
+                    utils.cleanup_string(cit.first_author.get('given_names', ''))
+                ])
+            ]
 
-            if cit.volume:
-                c_dict['reference_volume'] = cit.volume
+        if cit.volume:
+            c_dict['reference_volume'] = cit.volume
 
-            if cit.issue:
-                c_dict['reference_number'] = cit.issue
+        if cit.issue:
+            c_dict['reference_number'] = cit.issue
 
-            if cit.start_page:
-                c_dict['reference_start_page'] = cit.start_page
+        if cit.start_page:
+            c_dict['reference_start_page'] = cit.start_page
 
-            if cit.end_page:
-                c_dict['reference_end_page'] = cit.end_page
+        if cit.end_page:
+            c_dict['reference_end_page'] = cit.end_page
 
-            if cit.end_page:
-                c_dict['reference_index_number'] = str(cit.index_number)
+        if cit.end_page:
+            c_dict['reference_index_number'] = str(cit.index_number)
 
-            c_dict['_id'] = '-'.join([
-                document.collection_acronym,
-                document.publisher_id,
-                str(cit.index_number)
-            ])
+        c_dict['_id'] = '-'.join([
+            document.collection_acronym,
+            document.publisher_id,
+            str(cit.index_number)
+        ])
 
-            yield c_dict
+        yield c_dict
 
 
 class PCitation(object):
@@ -234,30 +232,49 @@ class PCitation(object):
     Edit logging.ini to change logging definitions.
     """
 
-    parser = optparse.OptionParser(
+    parser = argparse.ArgumentParser(
         textwrap.dedent(usage), version="prog 0.9 - beta")
 
-    parser.add_option('-f', '--full', action='store_true',
-                      help='update all documents and insert the difference')
+    parser.add_argument(
+        'issns',
+        nargs='*',
+        help='ISSN\'s separated by spaces'
+    )
 
-    parser.add_option('-r', '--rebuild_index', action='store_true',
-                      help='this will remove all data in ES and\
-                             index all documents')
+    parser.add_argument(
+        '-c',
+        '--collection',
+        help='Collection acronym'
+    )
 
-    parser.add_option(
+    parser.add_argument(
+        '-f',
+        '--full',
+        action='store_true',
+        help='update all documents and insert the difference'
+    )
+
+    parser.add_argument(
+        '-r',
+        '--rebuild_index',
+        action='store_true',
+        help='this will remove all data in ES and index all documents'
+    )
+
+    parser.add_argument(
         '--from_date',
         '-b',
         default=FROM_DATE,
         help='From processing date (YYYY-MM-DD). Default (%s)' % FROM_DATE
     )
 
-    parser.add_option(
+    parser.add_argument(
         '--logging_file',
         '-o',
         help='Full path to the log file'
     )
 
-    parser.add_option(
+    parser.add_argument(
         '--logging_level',
         '-l',
         default='DEBUG',
@@ -268,8 +285,10 @@ class PCitation(object):
     def __init__(self, argv):
         self.started = None
         self.finished = None
-        self.options, self.args = self.parser.parse_args(argv)
-        _config_logging(self.options.logging_level, self.options.logging_file)
+        self.args = self.parser.parse_args()
+        _config_logging(self.args.logging_level, self.args.logging_file)
+
+        self.issns = self.args.issns or [None]
 
         hosts = aslist(settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200'))
         index = settings['app:main'].get('elasticsearch_index', 'citations')
@@ -307,29 +326,30 @@ class PCitation(object):
 
     def _bulk(self):
 
-        for document in self.articlemeta.documents():
-            logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
+        for issn in self.issns:
+            for document in self.articlemeta.documents(collection=self.args.collection, issn=issn):
+                logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
-            if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
-                logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
-                continue
+                if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
+                    logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                    continue
 
-            attempts = 0
-            for reference in citation_meta(document):
-                logger.debug('Loading reference %s' % (reference['_id']))
-                while True:
-                    try:
-                        self.controller.index_citation(reference, reference['_id'])
-                        logger.debug('Reference loaded %s' % reference['_id'])
-                        break
-                    except:
-                        attempts += 1
-                        logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
-                        time.sleep(2)
+                attempts = 0
+                for reference in citation_meta(document):
+                    logger.debug('Loading reference %s' % (reference['_id']))
+                    while True:
+                        try:
+                            self.controller.index_citation(reference, reference['_id'])
+                            logger.debug('Reference loaded %s' % reference['_id'])
+                            break
+                        except:
+                            attempts += 1
+                            logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                            time.sleep(2)
 
-                    if attempts == 10:
-                        logger.error('fail to bult: %s' % reference['_id'])
-                        break
+                        if attempts == 10:
+                            logger.error('fail to bult: %s' % reference['_id'])
+                            break
 
     def _bulk_incremental(self, from_date=FROM_DATE):
 
@@ -381,10 +401,10 @@ class PCitation(object):
 
         logger.info('Get all ids from articlemeta')
 
-        if self.options.full:
+        if self.args.full:
             logger.info('You have selected full processing... this will take a while')
 
-            if self.options.rebuild_index:
+            if self.args.rebuild_index:
                 logger.info('This will remove EVERYTHING from your search index')
                 self.controller.index_reset()
 

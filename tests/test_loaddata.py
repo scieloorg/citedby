@@ -1,13 +1,14 @@
 # coding: utf-8
 import unittest
 
-from proc import loaddata
+from citedby import utils
+
 
 class LoaddataTest(unittest.TestCase):
 
     def test_cleanup_string_1(self):
 
-        result = loaddata.cleanup_string(u'Revista de Saúde Pública')
+        result = utils.cleanup_string(u'Revista de Saúde Pública')
 
         expected = u'revista de saude publica'
 
@@ -15,7 +16,7 @@ class LoaddataTest(unittest.TestCase):
 
     def test_cleanup_string_2(self):
 
-        result = loaddata.cleanup_string(u'Rev. de Saúde Púb')
+        result = utils.cleanup_string(u'Rev. de Saúde Púb')
 
         expected = u'rev de saude pub'
 
@@ -23,7 +24,7 @@ class LoaddataTest(unittest.TestCase):
 
     def test_cleanup_string_3(self):
 
-        result = loaddata.cleanup_string(u'Rev. de Saúde (Púb)')
+        result = utils.cleanup_string(u'Rev. de Saúde (Púb)')
 
         expected = u'rev de saude pub'
 
