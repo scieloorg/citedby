@@ -10,6 +10,9 @@ import logging.config
 from datetime import datetime
 from datetime import timedelta
 import time
+import multiprocessing
+import itertools
+import threading
 
 from pyramid.settings import aslist
 from xylose.scielodocument import Article
@@ -269,6 +272,14 @@ class PCitation(object):
     )
 
     parser.add_argument(
+        '--processes',
+        '-p',
+        type=int,
+        default=1,
+        help='Number of processes per CPU'
+    )
+
+    parser.add_argument(
         '--logging_file',
         '-o',
         help='Full path to the log file'
@@ -324,32 +335,58 @@ class PCitation(object):
         else:
             return jdata
 
+    def _worker(self, docs, t):
+
+        attempts = 0
+        for reference in docs:
+            logger.debug('Running thread %s' % t)
+            logger.debug('Loading reference %s' % (reference['_id']))
+            while True:
+                try:
+                    self.controller.index_citation(reference, reference['_id'])
+                    logger.debug('Reference loaded %s' % reference['_id'])
+                    break
+                except:
+                    attempts += 1
+                    logger.warning('fail to bulk: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                    time.sleep(2)
+
+                if attempts == 10:
+                    logger.error('fail to bulk: %s' % reference['_id'])
+                    break
+
     def _bulk(self):
+        max_threads = multiprocessing.cpu_count() * self.args.processes
 
-        for issn in self.issns:
-            for document in self.articlemeta.documents(collection=self.args.collection, issn=issn):
-                logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
+        def _gen_iterdocs():
+            """Produz um gerador de geradores de documentos.
+            """
 
-                if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
-                    logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
-                    continue
+            for issn in self.issns:
+                for document in self.articlemeta.documents(collection=self.args.collection, issn=issn):
+                    logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
-                attempts = 0
-                for reference in citation_meta(document):
-                    logger.debug('Loading reference %s' % (reference['_id']))
-                    while True:
-                        try:
-                            self.controller.index_citation(reference, reference['_id'])
-                            logger.debug('Reference loaded %s' % reference['_id'])
-                            break
-                        except:
-                            attempts += 1
-                            logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
-                            time.sleep(2)
+                    if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
+                        logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                        continue
 
-                        if attempts == 10:
-                            logger.error('fail to bult: %s' % reference['_id'])
-                            break
+                    iterdocs = (cite for cite in citation_meta(document))
+
+                    yield iterdocs
+
+        iterdocs = itertools.chain.from_iterable(_gen_iterdocs())
+        safe_iterdocs = utils.ThreadSafeIter(iterdocs)
+
+        jobs = []
+        for t in range(max_threads):
+            thread = threading.Thread(target=self._worker,
+                                      args=(safe_iterdocs, t))
+            jobs.append(thread)
+            thread.start()
+            logger.info('Thread running %s' % thread)
+
+        for job in jobs:
+            job.join()
 
     def _bulk_incremental(self, from_date=FROM_DATE):
 

@@ -5,6 +5,7 @@ from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.settings import asbool, aslist
 
+
 @view_config(route_name='index', request_method='GET')
 def index(request):
     return Response('Cited by SciELO API')

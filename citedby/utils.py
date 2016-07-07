@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import weakref
+import threading
 
 from ConfigParser import SafeConfigParser
 
@@ -14,6 +15,23 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 TAG_RE = re.compile(r'<[^>]+>')
+
+
+class ThreadSafeIter(object):
+    """Wraps an iterable for safe use in a threaded environment.
+    """
+    def __init__(self, it):
+        self.it = iter(it)
+        self.lock = threading.Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.it)
+
+    next = __next__
 
 
 def remove_tags(text):
