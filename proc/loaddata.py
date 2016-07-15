@@ -404,7 +404,7 @@ class PCitation(object):
             if event.event in ['update', 'add']:
                 logger.debug('%s (%s) document %s, %s' % (event.event, event.date, document.publisher_id, document.collection_acronym))
 
-                if '_'.join([document.collection_acronym, document.scielo_issn]) in IGNORE_LIST:
+                if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
                     logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
                     continue
 
