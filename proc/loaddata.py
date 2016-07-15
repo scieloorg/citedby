@@ -391,7 +391,7 @@ class PCitation(object):
     def _bulk_incremental(self, from_date=FROM_DATE):
 
         for event, document in self.articlemeta.documents_history(from_date=from_date):
-            if event.event == 'delete':
+            if event.event == 'delete' and event.code and event.collection:
                 logger.debug('%s (%s) document %s, %s' % (event.event, event.date, event.code, event.collection))
 
                 self.controller.del_citation(
