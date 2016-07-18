@@ -18,6 +18,7 @@ from citedby import utils
 citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
                                os.path.abspath(__file__)), 'citedby.thrift'))
 
+
 class Dispatcher(object):
 
     def __init__(self):
@@ -29,7 +30,7 @@ class Dispatcher(object):
             index=settings['app:main']['elasticsearch_index'],
             sniff_on_start=True,
             sniff_on_connection_fail=True,
-            timeout=60
+            timeout=600
         )
 
         ## Cache Settings Config
