@@ -18,7 +18,7 @@ def main(global_config, **settings):
             aslist(settings['elasticsearch_host']),
             sniff_on_start=True,
             sniff_on_connection_fail=True,
-            timeout=60
+            timeout=600
         )
 
     config.add_route('index', '/')
