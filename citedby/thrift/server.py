@@ -4,7 +4,6 @@
 import os
 import json
 import argparse
-from ConfigParser import SafeConfigParser
 
 import thriftpy
 import thriftpywrap
@@ -25,11 +24,10 @@ class Dispatcher(object):
 
         config = utils.Configuration.from_env()
         settings = dict(config.items())
+
         self._controller = controller(
             aslist(settings['app:main']['elasticsearch_host']),
             index=settings['app:main']['elasticsearch_index'],
-            sniff_on_start=True,
-            sniff_on_connection_fail=True,
             timeout=600
         )
 
@@ -44,7 +42,7 @@ class Dispatcher(object):
 
     def search(self, body, parameters):
 
-        params = {i.key:i.value for i in parameters}
+        params = {i.key: i.value for i in parameters}
         params['doc_type'] = 'citation'
         params['body'] = json.loads(body)
 

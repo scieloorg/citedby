@@ -10,7 +10,6 @@ requires = [
             'elasticsearch',
             'python-memcached',
             'python-binary-memcached',
-            'dogpile',
             'dogpile.cache',
             'pylibmc',
             'thriftpy',
@@ -23,7 +22,7 @@ test_requires = []
 
 setup(
     name='citedby',
-    version='2.2.3',
+    version='2.3.4',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',
@@ -39,7 +38,7 @@ setup(
         "Topic :: Utilities",
     ],
     dependency_links=[
-        "git+https://github.com/scieloorg/xylose@0.35#egg=xylose",
+        "git+https://github.com/scieloorg/xylose@1.15.5#egg=xylose",
         "git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap"
     ],
     license='BSD 2-Clause',

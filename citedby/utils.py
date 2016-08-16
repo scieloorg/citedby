@@ -8,7 +8,7 @@ import re
 import weakref
 import threading
 
-from ConfigParser import SafeConfigParser
+from configparser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +147,7 @@ class SingletonMixin(object):
     """
     _instances = weakref.WeakValueDictionary()
 
-    def __new__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs):
         key = (cls, args, tuple(kwargs.items()))
 
         if key in cls._instances:
@@ -163,14 +163,14 @@ class Configuration(SingletonMixin):
     """
     Acts as a proxy to the ConfigParser module
     """
-    def __init__(self, fp, parser_dep=SafeConfigParser):
+    def __init__(self, fp, parser_dep=ConfigParser):
         self.conf = parser_dep()
-        self.conf.readfp(fp)
+        self.conf.read_file(fp)
 
     @classmethod
     def from_env(cls):
         try:
-            filepath =  os.environ['CITEDBY_SETTINGS_FILE']
+            filepath = os.environ['CITEDBY_SETTINGS_FILE']
         except KeyError:
             raise ValueError('missing env variable CITEDBY_SETTINGS_FILE')
 
@@ -180,9 +180,10 @@ class Configuration(SingletonMixin):
     def from_file(cls, filepath):
         """
         Returns an instance of Configuration
+
         ``filepath`` is a text string.
         """
-        fp = open(filepath, 'rb')
+        fp = open(filepath)
         return cls(fp)
 
     def __getattr__(self, attr):
@@ -191,5 +192,5 @@ class Configuration(SingletonMixin):
     def items(self):
         """Settings as key-value pair.
         """
-        return [(section, dict(self.conf.items(section, raw=True))) for \
-            section in [section for section in self.conf.sections()]]
+        return [(section, dict(self.conf.items(section, raw=True))) for
+                section in [section for section in self.conf.sections()]]

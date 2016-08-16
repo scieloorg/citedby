@@ -8,8 +8,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
 from thrift_clients import clients
-from utils import load_from_crossref, format_citation
-import utils
+from citedby.utils import load_from_crossref, format_citation
+from citedby import utils
 
 
 cache_region = make_region(
