@@ -5,7 +5,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
             'pyramid',
-            'paster',
             'requests',
             'elasticsearch',
             'python-memcached',
@@ -14,15 +13,15 @@ requires = [
             'pylibmc',
             'thriftpy',
             'thriftpywrap',
-            'fabric',
             'pyramid_debugtoolbar',
+            'waitress'
            ]
 
 test_requires = []
 
 setup(
     name='citedby',
-    version='2.3.4',
+    version='2.4.4',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',
@@ -55,6 +54,5 @@ setup(
     [console_scripts]
     citedby_thriftserver = citedby.thrift.server:main
     citedby_load_citations = proc.loaddata:main
-    citedby_warmup = proc.warmup:main
     """,
 )

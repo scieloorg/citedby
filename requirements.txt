@@ -1,14 +1,10 @@
-pyramid==1.5.4
-paster==0.8
-waitress==0.8.9
-requests==2.6.0
-elasticsearch==1.4.0
+requests==2.7.0
+elasticsearch==1.5.0
 python-memcached==1.54
 python-binary-memcached==0.24.3
 dogpile.cache==0.6.1
-thriftpy==0.2.0
-chaussette==1.2
-gevent==1.1.2
+thriftpy==0.3.1
+pyramid==1.5.7
 -e git+git://github.com/scieloorg/xylose.git@1.15.5#egg=xylose
 -e git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap
--e git+git://github.com/scieloorg/citedby@2.3.4#egg=citedby
+-e git+git://github.com/scieloorg/citedby@docker#egg=citedby
