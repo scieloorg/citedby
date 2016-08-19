@@ -1,0 +1,30 @@
+version: '2'
+
+networks:
+  citedby_network:
+    external: true
+
+services:
+
+  citedby_memcached:
+    image: memcached
+    restart: always
+    ports:
+      - "11211:11211"
+    hostname: citedby_memcached
+    networks:
+      - citedby_network
+
+  citedby:
+    build: .
+    restart: always
+    working_dir: /app
+    networks: 
+      - citedby_network
+    ports:
+      - "11622:11620"
+      - "6545:8000"
+    links:
+      - citedby_memcached:citedby-memcached
+    environment:
+      - MEMCACHED_HOST=citedby_memcached
