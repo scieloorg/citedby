@@ -6,7 +6,7 @@ networks:
 
 services:
 
-  citedby_memcached:
+  memcached:
     image: memcached
     restart: always
     ports:
@@ -15,16 +15,16 @@ services:
     networks:
       - citedby_network
 
-  citedby:
-    build: .
+  webapp:
+    build: scieloorg/citedby:stable
     restart: always
     working_dir: /app
     networks: 
       - citedby_network
     ports:
-      - "11622:11620"
-      - "6545:8000"
+      - "11620:11620"
+      - "6543:8000"
     links:
-      - citedby_memcached:citedby-memcached
+      - memcached:memcached
     environment:
-      - MEMCACHED_HOST=citedby_memcached
+      - MEMCACHED_HOST=memcached
