@@ -307,7 +307,6 @@ class PCitation(object):
         self.controller = controller(
             hosts=hosts,
             timeout=60,
-            sniff_on_start=True,
             sniff_on_connection_fail=True
         )
 
