@@ -16,8 +16,6 @@ def main(global_config, **settings):
     def add_controller(request):
         return controller.controller(
             aslist(settings['elasticsearch_host']),
-            sniff_on_connection_fail=True,
-            sniff_timeout=10,
             timeout=600
         )
 
