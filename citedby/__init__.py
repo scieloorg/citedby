@@ -16,9 +16,7 @@ def main(global_config, **settings):
     def add_controller(request):
         return controller.controller(
             aslist(settings['elasticsearch_host']),
-            sniff_on_connection_fail=True,
-            sniff_timeout=100,
-            timeout=600
+            sniff_on_connection_fail=True
         )
 
     config.add_route('index', '/')
