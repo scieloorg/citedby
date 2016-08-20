@@ -16,7 +16,6 @@ def main(global_config, **settings):
     def add_controller(request):
         return controller.controller(
             aslist(settings['elasticsearch_host']),
-
             timeout=600
         )
 
