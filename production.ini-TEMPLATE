@@ -15,7 +15,7 @@ pyramid.default_locale_name = en
 # ES hosts
 #Use host:9200 or host
 elasticsearch_host = 127.0.0.1:9200
-elasticsearch_inde = citations
+elasticsearch_index = citations
 
 # ArticleMeta Thriftserver Host
 articlemeta = articlemeta.scielo.org:11720

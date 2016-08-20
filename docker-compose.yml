@@ -1,0 +1,30 @@
+version: '2'
+
+networks:
+  citedby_network:
+    external: true
+
+services:
+
+  memcached:
+    image: memcached
+    restart: always
+    ports:
+      - "11211:11211"
+    hostname: citedby_memcached
+    networks:
+      - citedby_network
+
+  webapp:
+    build: scieloorg/citedby:stable
+    restart: always
+    working_dir: /app
+    networks: 
+      - citedby_network
+    ports:
+      - "11620:11620"
+      - "6543:8000"
+    links:
+      - memcached:memcached
+    environment:
+      - MEMCACHED_HOST=memcached
