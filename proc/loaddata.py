@@ -236,7 +236,7 @@ class PCitation(object):
     """
 
     parser = argparse.ArgumentParser(
-        textwrap.dedent(usage), version="prog 0.9 - beta")
+        textwrap.dedent(usage))
 
     parser.add_argument(
         'issns',
