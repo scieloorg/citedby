@@ -14,7 +14,8 @@ requires = [
             'thriftpy',
             'thriftpywrap',
             'pyramid_debugtoolbar',
-            'waitress'
+            'waitress',
+            'xylose'
            ]
 
 test_requires = []
