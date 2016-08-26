@@ -27,7 +27,7 @@ Source
 
 Ter ambiente virtual criado e inicializado.
 
-block-code::
+.. code-block::
 
     git clone https://github.com/scieloorg/citedby.git
     cd citedby
@@ -37,7 +37,7 @@ block-code::
 Docker
 ------
 
-block-code::
+.. code-block::
 
     docker pull scieloorg/citedby
     docker run --name citedby -e ELASTSEARCH_HOST=esd.scielo.org:9200 -p 6545:8000 -p 11622:11620 -d scieloorg/citedby
