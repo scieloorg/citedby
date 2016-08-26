@@ -9,12 +9,12 @@ Usage documentation are available at: [SciELO CitedBy RESTFul API](http://docs.s
 Build Status
 ============
 
-Master::
+Master:
 
 .. image:: https://travis-ci.org/scieloorg/citedby.svg?branch=master
     :target: https://travis-ci.org/scieloorg/citedby
 
-Beta::
+Beta:
 
 .. image:: https://travis-ci.org/scieloorg/citedby.svg?branch=beta
     :target: https://travis-ci.org/scieloorg/citedby
