@@ -15,11 +15,12 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 RUN pip install gunicorn
+
+ENV CITEDBY_SETTINGS_FILE=/app/production.ini
+
 RUN cd src/citedby
 RUN python setup.py tests
 RUN cd /app
-
-ENV CITEDBY_SETTINGS_FILE=/app/production.ini
 
 EXPOSE 11620
 EXPOSE 8000
