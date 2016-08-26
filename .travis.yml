@@ -1,0 +1,11 @@
+language: python
+python:
+  - 3.5
+env:
+  - CITEDBY_SETTINGS_FILE=./config.ini
+install: 
+  - python setup.py install
+script:
+  - python setup.py test
+before_script:
+  - cp ./development.ini-TEMPLATE ./config.ini
