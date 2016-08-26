@@ -18,8 +18,6 @@ RUN pip install gunicorn
 
 ENV CITEDBY_SETTINGS_FILE=/app/production.ini
 
-RUN cd src/citedby && python setup.py test && cd -
-
 EXPOSE 11620
 EXPOSE 8000
 
