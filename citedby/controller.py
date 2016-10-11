@@ -48,7 +48,7 @@ def get_status_memcached(mems_addr=None):
     return memcacheds
 
 
-def articlemeta(host='articlemeta.scielo.org:11720'):
+def articlemeta(host='articlemeta.scielo.org:11620'):
 
     address, port = host.split(':')
 
