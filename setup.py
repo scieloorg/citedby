@@ -38,7 +38,7 @@ setup(
         "Topic :: Utilities",
     ],
     dependency_links=[
-        "git+https://github.com/scieloorg/xylose@1.15.5#egg=xylose",
+        "git+https://github.com/scieloorg/xylose@1.16.5#egg=xylose",
         "git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap"
     ],
     license='BSD 2-Clause',
