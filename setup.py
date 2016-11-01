@@ -9,6 +9,7 @@ requires = [
             'elasticsearch',
             'python-memcached',
             'python-binary-memcached',
+            'pyramid-debugtoolbar',
             'dogpile.cache',
             'pylibmc',
             'thriftpy',
@@ -23,7 +24,7 @@ test_requires = []
 
 setup(
     name='citedby',
-    version='2.8.6',
+    version='2.9.6',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',

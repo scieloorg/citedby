@@ -8,7 +8,10 @@ import re
 import weakref
 import threading
 
-from configparser import ConfigParser
+try:
+    from configparser import ConfigParser
+except:
+    from ConfigParser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +168,12 @@ class Configuration(SingletonMixin):
     """
     def __init__(self, fp, parser_dep=ConfigParser):
         self.conf = parser_dep()
-        self.conf.read_file(fp)
+
+        # Python 3 and 2 compatibility
+        try:
+            self.conf.read_file(fp)
+        except:
+            self.conf.readfp(fp)
 
     @classmethod
     def from_env(cls):

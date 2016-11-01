@@ -456,7 +456,7 @@ class Controller(Elasticsearch):
         article_meta['author'] = ''
         article_meta['year'] = meta['year']
 
-        meta = self.search_citation(titles=[article_meta['title']], year=article_meta['year'])
+        meta = self.search_citation(titles=article_meta['title'], year=article_meta['year'])
 
         if meta:
             citations = format_citation(meta)
