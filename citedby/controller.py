@@ -7,7 +7,7 @@ import elasticsearch
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
-from thrift_clients import clients
+from articlemeta.client import ThriftClient
 from citedby.utils import load_from_crossref, format_citation
 from citedby import utils
 
@@ -48,11 +48,9 @@ def get_status_memcached(mems_addr=None):
     return memcacheds
 
 
-def articlemeta(host='articlemeta.scielo.org:11620'):
+def articlemeta(domain='articlemeta.scielo.org:11620'):
 
-    address, port = host.split(':')
-
-    return clients.ArticleMeta(address, port)
+    return ThriftClient(domain=domain)
 
 
 def controller(*args, **kwargs):
@@ -389,7 +387,7 @@ class Controller(Elasticsearch):
 
         filters = {}
 
-        document = self.articlemeta_client.document(pid, collection=collection)
+        document = self.articlemeta_client.document(pid, collection)
 
         if not document:
             return []
