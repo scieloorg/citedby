@@ -42,10 +42,12 @@ IGNORE_LIST = (
     'spa_0213-9111',
     'spa_1726-4634',
     'spa_1851-8265',
-    'spa_0036-3634'
+    'spa_0036-3634',
+    'rve_2216-0973'
 )
 
 FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
+UNTIL_DATE = datetime.now().isoformat()[:10]
 
 
 def _config_logging(logging_level='INFO', logging_file=None):
@@ -272,6 +274,13 @@ class PCitation(object):
     )
 
     parser.add_argument(
+        '--until_date',
+        '-u',
+        default=FROM_DATE,
+        help='Until processing date (YYYY-MM-DD). Default (%s)' % UNTIL_DATE
+    )
+
+    parser.add_argument(
         '--processes',
         '-p',
         type=int,
@@ -362,7 +371,7 @@ class PCitation(object):
             """
 
             for issn in self.issns:
-                for document in self.articlemeta.documents(collection=self.args.collection, issn=issn):
+                for document in self.articlemeta.documents(collection=self.args.collection, issn=issn, from_date=self.args.from_date, until_date=self.args.until_date):
                     logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
                     if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
@@ -387,9 +396,9 @@ class PCitation(object):
         for job in jobs:
             job.join()
 
-    def _bulk_incremental(self, from_date=FROM_DATE):
+    def _bulk_incremental(self):
 
-        for event, document in self.articlemeta.documents_history(from_date=from_date):
+        for event, document in self.articlemeta.documents_history(collection=self.args.collection, from_date=self.args.from_date, until_date=self.args.until_date):
             if event.event == 'delete' and event.code and event.collection:
                 logger.debug('%s (%s) document %s, %s' % (event.event, event.date, event.code, event.collection))
 
