@@ -420,9 +420,6 @@ class Controller(Elasticsearch):
                 result['hits']['total'] += new_result['hits']['total']
                 result['hits']['hits'] += new_result['hits']['hits']
 
-        if result['hits']['total'] > 0 and len(titles) > 1:
-            import pdb; pdb.set_trace()
-
         return result
 
     @cache_region.cache_on_arguments()
@@ -454,7 +451,7 @@ class Controller(Elasticsearch):
             article_meta['titles'].append(document.original_title())
 
         if document.translated_titles():
-            article_meta['titles'] + [t for l, t in document.translated_titles().items() if t]
+            article_meta['titles'] += [t for l, t in document.translated_titles().items() if t]
 
         citations = []
 
