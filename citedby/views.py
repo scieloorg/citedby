@@ -78,10 +78,10 @@ def citedby_meta(request):
     metaonly = asbool(request.GET.get('metaonly'))
 
     articles = request.controller.query_by_meta(
-        request.GET.get('title', ''),
-        request.GET.get('author', ''),
-        request.GET.get('year', ''),
-        metaonly
+        title=request.GET.get('title', ''),
+        author_name=request.GET.get('author', ''),
+        year=request.GET.get('year', ''),
+        metaonly=metaonly
     )
 
     return articles

@@ -4,6 +4,7 @@
 import os
 import json
 import argparse
+import logging
 
 import thriftpy
 import thriftpywrap
@@ -16,6 +17,8 @@ from citedby import utils
 
 citedby_thrift = thriftpy.load(os.path.join(os.path.dirname(
                                os.path.abspath(__file__)), 'citedby.thrift'))
+
+logger = logging.getLogger(__name__)
 
 
 class Dispatcher(object):
@@ -65,31 +68,35 @@ class Dispatcher(object):
     def citedby_pid(self, query, metaonly):
         try:
             return json.dumps(
-                self._controller.query_by_pid(query, metaonly)
+                self._controller.query_by_pid(query, metaonly=metaonly)
             )
         except Exception as e:
+            logger.exception(e)
             raise citedby_thrift.ServerError(
                 'Server Error: controller.query_by_pid(%s, %s)'
-                % (q, metaonly)
+                % (query, metaonly)
             )
 
     def citedby_doi(self, query, metaonly):
         try:
             return json.dumps(
-                self._controller.query_by_doi(query, metaonly)
+                self._controller.query_by_doi(query, metaonly=metaonly)
             )
-        except:
+        except Exception as e:
+            logger.exception(e)
             raise citedby_thrift.ServerError(
                 'Server Error: controller.query_by_doi(%s, %s)'
-                % (q, metaonly)
+                % (query, metaonly)
             )
 
     def citedby_meta(self, title, author_surname, year, metaonly):
         try:
             return json.dumps(
-                self._controller.query_by_meta(title, author_surname, year, metaonly)
+                self._controller.query_by_meta(
+                    title, author_surname, year, metaonly=metaonly)
             )
-        except:
+        except Exception as e:
+            logger.exception(e)
             raise citedby_thrift.ServerError(
                'Server Error: controller.citedbymeta(%s, %s, %s, %s)'
                % (title, author_surname, year, metaonly)

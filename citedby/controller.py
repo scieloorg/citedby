@@ -48,6 +48,33 @@ def get_status_memcached(mems_addr=None):
     return memcacheds
 
 
+def get_author_name_forms(name):
+    """
+    This method returns a list of forms the name of an author could be written
+    in a citation.
+    """
+    name = utils.cleanup_string(name)
+    splited = name.split(' ')
+
+    for item in splited:
+        if len(item) == 1:  # The name is already formated.
+            return [name]
+
+    forms = []
+
+    # normal form
+    forms.append(name)
+
+    # surname, given_names not abbreviated
+    splited = [i for i in splited if len(i) >= 3]
+    splited.insert(0, splited.pop())
+    forms.append(' '.join(splited))
+
+    # surname, given_names not abbreviated
+    forms.append(' '.join([splited[0]]+[i[0] for i in splited[1:]]))
+    return forms
+
+
 def articlemeta(domain='articlemeta.scielo.org:11620'):
 
     return ThriftClient(domain=domain)
@@ -321,19 +348,20 @@ class Controller(Elasticsearch):
                 continue
             self.delete(index=self.base_index, doc_type='citation', id=ident)
 
-    def search_citation(self, titles, author_surname=None, year=None, size=1000):
+    def search_citation(self, titles, author_names=None, year=None, size=1000):
         """
         Search citations by ``title``, ``author`` and ``year``.
 
         :param titles: Titles of article in any language
-        :param author_surname: The surname of first author
+        :param author_name: The name of first author
         :param year: Is the publication year
 
         This method will search for citations that have similar titles and
-        exact first author surname and exact publication_year
+        exact first author name and exact publication_year
         """
 
-        must_param = []
+        filter_param = []
+        should_param = []
 
         if not titles or not isinstance(titles, list):
             return None
@@ -343,50 +371,59 @@ class Controller(Elasticsearch):
         if len(titles) == 0:
             return None
 
+        result = None
+
         for title in titles:
-            if not author_surname or not year:
-                must_param.append({
-                    "fuzzy": {
-                        "reference_title_cleaned": {
-                            "value": title,
-                            "fuzziness": 2
-                        }
-                    }
-                })
-            else:
-                must_param.append({
-                    "match": {
-                        "reference_title_analyzed": title
-                    }
-                })
-
-        if author_surname:
-            must_param.append({
-                "fuzzy": {
-                    "reference_first_author_cleaned": {
-                        "value": utils.cleanup_string(author_surname),
-                        "fuzziness": 2
-                    }
-                }
-            })
-
-        if year:
-            must_param.append({
+            filter_param.append({
                 "match": {
-                    "reference_publication_year": year
+                    "reference_title_cleaned": {
+                        "query": title,
+                        "fuzziness": 2,
+                        "prefix_length": 1
+                    }
                 }
             })
 
-        body = {
-            "query": {
-                "bool": {
-                    "must": must_param,
-                    "minimum_number_should_match": 1
+            if author_names:
+                for author in author_names:
+                    should_param.append({
+                        "match": {
+                            "reference_first_author_cleaned": {
+                                "query": utils.cleanup_string(author),
+                                "fuzziness": 1,
+                                "prefix_length": 1
+                            }
+                        }
+                    })
+
+            if year:
+                filter_param.append({
+                    "match": {
+                        "reference_publication_year": year
+                    }
+                })
+
+            body = {
+                "query": {
+                    "bool": {
+                        "filter": filter_param,
+                        "should": should_param,
+                        "minimum_number_should_match": 1
+                    }
                 }
             }
-        }
 
-        return self._query_dispatcher(body=body, size=size)
+            if not result:
+                result = self._query_dispatcher(body=body, size=size)
+            else:
+                new_result = self._query_dispatcher(body=body, size=size)
+                result['hits']['total'] += new_result['hits']['total']
+                result['hits']['hits'] += new_result['hits']['hits']
+
+        if result['hits']['total'] > 0 and len(titles) > 1:
+            import pdb; pdb.set_trace()
+
+        return result
 
     @cache_region.cache_on_arguments()
     def query_by_pid(self, pid, collection=None, metaonly=False):
@@ -425,13 +462,17 @@ class Controller(Elasticsearch):
 
         if (article_meta.get('titles', False) and (article_meta.get('first_author', False) or article_meta.get('publication_year', False))):
             filters['titles'] = article_meta.get('titles', None)
+
             if article_meta['first_author']:
-                filters['author_surname'] = ' '.join([
-                    article_meta.get('first_author', {}).get('surname', ''),
-                    article_meta.get('first_author', {}).get('given_names', '')
+
+                author_name = ' '.join([
+                    article_meta.get('first_author', {}).get('given_names', ''),
+                    article_meta.get('first_author', {}).get('surname', '')
                 ])
+                filters['author_names'] = get_author_name_forms(author_name)
             else:
-                article_meta['first_author'] == None
+                article_meta['first_authors'] == None
+
             filters['year'] = article_meta.get('publication_year', None)
 
             meta = self.search_citation(**filters)
@@ -458,11 +499,14 @@ class Controller(Elasticsearch):
             return []
 
         article_meta = {}
-        article_meta['title'] = [meta['title']]
+        article_meta['title'] = meta['title']
         article_meta['author'] = ''
         article_meta['year'] = meta['year']
 
-        meta = self.search_citation(titles=article_meta['title'], year=article_meta['year'])
+        meta = self.search_citation(
+            titles=[article_meta['title']],
+            year=article_meta['year']
+        )
 
         if meta:
             citations = format_citation(meta)
@@ -475,14 +519,18 @@ class Controller(Elasticsearch):
             return {'article': article_meta, 'cited_by': citations}
 
     @cache_region.cache_on_arguments()
-    def query_by_meta(self, title='', author_surname='', year='', metaonly=False):
+    def query_by_meta(self, title='', author_name='', year='', metaonly=False):
 
         article_meta = {}
         article_meta['title'] = title
-        article_meta['author'] = author_surname
+        article_meta['author'] = author_name
         article_meta['year'] = year
 
-        meta = self.search_citation(titles=[title], author_surname=author_surname, year=year)
+        meta = self.search_citation(
+            titles=[article_meta['title']],
+            author_names=[article_meta['author']],
+            year=article_meta['year']
+        )
 
         if meta:
             citations = format_citation(meta)
