@@ -125,6 +125,9 @@ def format_citation(citations):
     """
     l = []
 
+    if not citations:
+        return l
+
     for citation in citations['hits']['hits']:
 
         citation_source = citation['_source']

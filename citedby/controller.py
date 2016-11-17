@@ -493,17 +493,20 @@ class Controller(Elasticsearch):
             return []
 
         article_meta = {}
-        article_meta['title'] = meta['title']
-        article_meta['author'] = ''
-        article_meta['year'] = meta['year']
+        article_meta['titles'] = [meta.get('title', None)] if meta.get('title', None) else []
+        article_meta['year'] = meta.get('year', '')
+        article_meta['author_names'] = meta.get('author', '')
 
-        meta = self.search_citation(
-            titles=[article_meta['title']],
-            year=article_meta['year']
-        )
+        if not article_meta['author_names']:
+            del(article_meta['author_names'])
 
-        if meta:
-            citations = format_citation(meta)
+        if not article_meta['year']:
+            del(article_meta['year'])
+
+        if article_meta['titles']:
+            meta = self.search_citation(**article_meta)
+
+        citations = format_citation(meta) if meta else []
 
         article_meta['total_received'] = len(citations)
 
@@ -513,18 +516,21 @@ class Controller(Elasticsearch):
             return {'article': article_meta, 'cited_by': citations}
 
     @cache_region.cache_on_arguments()
-    def query_by_meta(self, title='', author_name='', year='', metaonly=False):
+    def query_by_meta(self, title=None, author_name=None, year=None, metaonly=False):
 
         article_meta = {}
-        article_meta['title'] = title
-        article_meta['author'] = author_name
-        article_meta['year'] = year
 
-        meta = self.search_citation(
-            titles=[article_meta['title']],
-            author_names=[article_meta['author']],
-            year=article_meta['year']
-        )
+        article_meta['titles'] = [title]
+
+        if author_name:
+            article_meta['author_names'] = author_name
+
+        if year:
+            article_meta['year'] = year
+
+        meta = None
+        if article_meta['titles']:
+            meta = self.search_citation(**article_meta)
 
         if meta:
             citations = format_citation(meta)
