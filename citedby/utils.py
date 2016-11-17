@@ -7,6 +7,7 @@ import os
 import re
 import weakref
 import threading
+import string
 
 try:
     from configparser import ConfigParser
@@ -48,7 +49,7 @@ def cleanup_string(text):
     except TypeError:
         nfd_form = unicodedata.normalize('NFD', unicode(text.strip().lower()))
 
-    cleaned_str = u''.join(x for x in nfd_form if unicodedata.category(x)[0] == 'L' or x == ' ')
+    cleaned_str = u''.join(x for x in nfd_form if x in string.ascii_letters or x == ' ')
 
     return remove_tags(cleaned_str).lower()
 

@@ -377,7 +377,7 @@ class Controller(Elasticsearch):
             filter_param.append({
                 "match": {
                     "reference_title_cleaned": {
-                        "query": title,
+                        "query": utils.cleanup_string(title),
                         "fuzziness": 2,
                         "prefix_length": 1
                     }
@@ -468,19 +468,18 @@ class Controller(Elasticsearch):
                 ])
                 filters['author_names'] = get_author_name_forms(author_name)
             else:
-                article_meta['first_authors'] == None
+                article_meta['first_author'] == None
 
             filters['year'] = article_meta.get('publication_year', None)
+
+            if document.publisher_id == 'S0100-879X1998000600015':
+                import pdb; pdb.set_trace()
 
             meta = self.search_citation(**filters)
 
             if meta:
                 citations = format_citation(meta)
                 article_meta['total_received'] = len(citations)
-
-        if 'citations' in article_meta:
-            article_meta['total_granted'] = len(article_meta['citations'])
-            del(article_meta['citations'])
 
         if metaonly:
             return {'article': article_meta}
