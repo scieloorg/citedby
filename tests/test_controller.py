@@ -49,3 +49,13 @@ class ControllerTest(unittest.TestCase):
         )
 
         self.assertEqual(sorted(result), expected)
+
+    def test_get_author_name_forms_5(self):
+
+        result = controller.get_author_name_forms(u'LI MA')
+
+        expected = sorted([
+            'li ma'
+        ])
+
+        self.assertEqual(sorted(result), expected)

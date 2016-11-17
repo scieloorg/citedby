@@ -75,7 +75,8 @@ def get_author_name_forms(name):
 
         # surname, given_names not abbreviated
         forms.append(' '.join([splited[0]]+[i[0] for i in splited[1:]]))
-        return forms
+
+    return forms
 
 
 def articlemeta(domain='articlemeta.scielo.org:11620'):
