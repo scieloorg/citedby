@@ -346,6 +346,7 @@ class Controller(Elasticsearch):
             ident = item.get('_id', None)
             if not ident:
                 continue
+
             self.delete(index=self.base_index, doc_type='citation', id=ident)
 
     def search_citation(self, titles, author_names=None, year=None, size=1000):
@@ -471,9 +472,6 @@ class Controller(Elasticsearch):
                 article_meta['first_author'] == None
 
             filters['year'] = article_meta.get('publication_year', None)
-
-            if document.publisher_id == 'S0100-879X1998000600015':
-                import pdb; pdb.set_trace()
 
             meta = self.search_citation(**filters)
 
