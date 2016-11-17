@@ -53,6 +53,7 @@ def get_author_name_forms(name):
     This method returns a list of forms the name of an author could be written
     in a citation.
     """
+
     name = utils.cleanup_string(name)
     splited = name.split(' ')
 
@@ -67,12 +68,14 @@ def get_author_name_forms(name):
 
     # surname, given_names not abbreviated
     splited = [i for i in splited if len(i) >= 3]
-    splited.insert(0, splited.pop())
-    forms.append(' '.join(splited))
 
-    # surname, given_names not abbreviated
-    forms.append(' '.join([splited[0]]+[i[0] for i in splited[1:]]))
-    return forms
+    if len(splited) > 1:
+        splited.insert(0, splited.pop())
+        forms.append(' '.join(splited))
+
+        # surname, given_names not abbreviated
+        forms.append(' '.join([splited[0]]+[i[0] for i in splited[1:]]))
+        return forms
 
 
 def articlemeta(domain='articlemeta.scielo.org:11620'):
