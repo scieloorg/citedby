@@ -43,7 +43,8 @@ IGNORE_LIST = (
     'spa_1726-4634',
     'spa_1851-8265',
     'spa_0036-3634',
-    'rve_2216-0973'
+    'rve_2216-0973',
+    'rve_0104-1169'
 )
 
 FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
