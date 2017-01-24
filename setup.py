@@ -24,7 +24,7 @@ test_requires = []
 
 setup(
     name='citedby',
-    version='2.13.9',
+    version='2.14.9',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',

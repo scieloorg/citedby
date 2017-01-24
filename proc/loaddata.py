@@ -44,7 +44,8 @@ IGNORE_LIST = (
     'spa_1851-8265',
     'spa_0036-3634',
     'rve_2216-0973',
-    'rve_0104-1169'
+    'rve_0104-1169',
+    'rve_0104-0707'
 )
 
 FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
@@ -151,7 +152,6 @@ def citation_meta(document):
         if document.publication_date:
             c_dict['publication_year'] = document.publication_date[:4]
 
-
         if cit.source:
             c_dict['reference_source'] = cit.source
             try:
@@ -210,6 +210,10 @@ def citation_meta(document):
 
         if cit.end_page:
             c_dict['reference_index_number'] = str(cit.index_number)
+
+        if document.publishing_house:
+            c_dict['reference_publishing_house'] = document.publisher
+            c_dict['reference_publishing_house_cleaned'] = utils.cleanup_string(document.publisher)
 
         c_dict['_id'] = '-'.join([
             document.collection_acronym,

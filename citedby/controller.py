@@ -289,6 +289,14 @@ class Controller(Elasticsearch):
                         "reference_index_number": {
                             "type": "string",
                             "index": "not_analyzed"
+                        },
+                        "reference_publishing_house": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "reference_publishing_house_cleaned": {
+                            "type": "string",
+                            "index": "not_analyzed"
                         }
                     }
                 }
