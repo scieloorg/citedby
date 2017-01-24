@@ -211,7 +211,7 @@ def citation_meta(document):
         if cit.end_page:
             c_dict['reference_index_number'] = str(cit.index_number)
 
-        if document.publishing_house:
+        if document.publisher:
             c_dict['reference_publishing_house'] = document.publisher
             c_dict['reference_publishing_house_cleaned'] = utils.cleanup_string(document.publisher)
 
