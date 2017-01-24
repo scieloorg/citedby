@@ -211,9 +211,9 @@ def citation_meta(document):
         if cit.end_page:
             c_dict['reference_index_number'] = str(cit.index_number)
 
-        if document.publisher:
-            c_dict['reference_publishing_house'] = document.publisher
-            c_dict['reference_publishing_house_cleaned'] = utils.cleanup_string(document.publisher)
+        if cit.publisher:
+            c_dict['reference_publishing_house'] = cit.publisher
+            c_dict['reference_publishing_house_cleaned'] = utils.cleanup_string(cit.publisher)
 
         c_dict['_id'] = '-'.join([
             document.collection_acronym,
