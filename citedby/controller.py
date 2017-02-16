@@ -79,7 +79,7 @@ def get_author_name_forms(name):
     return forms
 
 
-def articlemeta(domain='articlemeta.scielo.org:11620'):
+def articlemeta(domain='articlemeta.scielo.org:11621'):
 
     return ThriftClient(domain=domain)
 
@@ -440,6 +440,7 @@ class Controller(Elasticsearch):
 
         filters = {}
 
+        import pdb; pdb.set_trace()
         document = self.articlemeta_client.document(pid, collection)
 
         if not document:

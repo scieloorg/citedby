@@ -17,14 +17,14 @@ requires = [
             'pyramid_debugtoolbar',
             'waitress',
             'xylose>=1.16.5',
-            'articlemetaapi>=1.5.10'
+            'articlemetaapi>=1.6.16'
            ]
 
 test_requires = []
 
 setup(
     name='citedby',
-    version='2.14.11',
+    version='2.14.12',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',
