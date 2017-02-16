@@ -440,7 +440,6 @@ class Controller(Elasticsearch):
 
         filters = {}
 
-        import pdb; pdb.set_trace()
         document = self.articlemeta_client.document(pid, collection)
 
         if not document:
