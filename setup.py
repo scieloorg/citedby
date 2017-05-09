@@ -16,15 +16,15 @@ requires = [
             'thriftpywrap',
             'pyramid_debugtoolbar',
             'waitress',
-            'xylose>=1.16.5',
-            'articlemetaapi>=1.6.16'
+            'xylose>=1.18.6',
+            'articlemetaapi>=1.11.16'
            ]
 
 test_requires = []
 
 setup(
     name='citedby',
-    version='2.14.13',
+    version='2.15.13',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',

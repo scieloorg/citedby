@@ -25,27 +25,23 @@ logger = logging.getLogger(__name__)
 config = utils.Configuration.from_env()
 settings = dict(config.items())
 
-IGNORE_LIST = (
-    'spa_0102-311X',
-    'spa_1413-8123',
-    'spa_2237-9622',
-    'spa_1414-3283',
-    'spa_0213-9111',
-    'spa_1555-7960',
-    'spa_1415-790X',
-    'spa_0213-9111',
-    'spa_0864-3466',
-    'spa_0213-9111',
-    'spa_0124-0064',
-    'spa_0034-8910',
-    'spa_1135-5727',
-    'spa_0213-9111',
-    'spa_1726-4634',
-    'spa_1851-8265',
-    'spa_0036-3634',
-    'rve_2216-0973',
-    'rve_0104-1169',
-    'rve_0104-0707'
+
+MASTER_COLLECTIONS = (
+    'arg',
+    'bol',
+    'chl',
+    'col',
+    'cri',
+    'cub',
+    'ecu',
+    'esp',
+    'mex',
+    'per',
+    'prt',
+    'sza',
+    'ury',
+    'ven',
+    'scl'
 )
 
 FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
@@ -77,6 +73,30 @@ def _config_logging(logging_level='INFO', logging_file=None):
     logger.addHandler(hl)
 
     return logger
+
+
+def build_ignore_list():
+    """
+    This method builds a ignore list of Collection and ISSN's to avoid include
+    citations of documents present in more than one collection. It will prioritize
+    the documents of journals available in Country collections.
+    """
+    logger.debug('Loading journals to build Collection and ISSN ignore list')
+
+    journals = {}
+    for journal in articlemeta().journals():
+        res = journals.setdefault(journal.scielo_issn, set())
+        res.add(journal.collection_acronym)
+
+    to_ignore = []
+    for issn, collections in journals.items():
+
+        if len(collections) == 1:
+            continue
+
+        to_ignore += ['_'.join([i, issn]) for i in collections if i not in MASTER_COLLECTIONS]
+
+    return to_ignore
 
 
 def citation_meta(document):
@@ -326,6 +346,8 @@ class PCitation(object):
 
         self.articlemeta = articlemeta()
 
+        self.ignore_list = build_ignore_list()
+
     def _duration(self):
         """
         Return datetime process duration
@@ -379,7 +401,7 @@ class PCitation(object):
                 for document in self.articlemeta.documents(collection=self.args.collection, issn=issn, from_date=self.args.from_date, until_date=self.args.until_date):
                     logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
 
-                    if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
+                    if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in self.ignore_list:
                         logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
                         continue
 
@@ -417,7 +439,7 @@ class PCitation(object):
             if event.event in ['update', 'add']:
                 logger.debug('%s (%s) document %s, %s' % (event.event, event.date, document.publisher_id, document.collection_acronym))
 
-                if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in IGNORE_LIST:
+                if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in self.ignore_list:
                     logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
                     continue
 
