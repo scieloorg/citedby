@@ -5,19 +5,19 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
             'pyramid',
-            'requests',
+            'requests>=1.11.1',
             'elasticsearch',
             'python-memcached',
             'python-binary-memcached',
             'pyramid-debugtoolbar',
             'dogpile.cache',
             'pylibmc',
-            'thriftpy',
+            'thriftpy==0.3.1',
             'thriftpywrap',
             'pyramid_debugtoolbar',
             'waitress',
-            'xylose>=1.18.6',
-            'articlemetaapi>=1.11.16'
+            'xylose>=1.19.6',
+            'articlemetaapi>=1.14.19'
            ]
 
 test_requires = []
