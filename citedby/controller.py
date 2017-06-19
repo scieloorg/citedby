@@ -1,11 +1,11 @@
 # coding: utf-8
 import logging
+import sys
 from dogpile.cache import make_region
 from pylibmc.test import make_test_client, NotAliveError
 
 import elasticsearch
 from elasticsearch import Elasticsearch
-from elasticsearch import helpers
 
 from articlemeta.client import ThriftClient
 from citedby.utils import load_from_crossref, format_citation
@@ -104,17 +104,17 @@ class Controller(Elasticsearch):
             message = 'ElasticSearch SerializationError'
             logging.error(message)
             raise ServerError(message)
-        except elasticsearch.TransportError as e:
-            message = 'ElasticSearch TransportError: %s' % e.error
-            logging.error(message)
-            raise ServerError(message)
         except elasticsearch.ConnectionError as e:
             message = 'ElasticSearch ConnectionError: %s' % e.error
             logging.error(message)
             raise ServerError(message)
+        except elasticsearch.TransportError as e:
+            message = 'ElasticSearch TransportError: %s' % e.error
+            logging.error(message)
+            raise ServerError(message)
         except:
             message = "Unexpected error: %s" % sys.exc_info()[0]
-            logging.error()
+            logging.error(message)
             raise ServerError(message)
 
         return data
@@ -310,7 +310,7 @@ class Controller(Elasticsearch):
         }
 
         self.indices.create(
-            index=self.base_index, body=citations_settings_mappings, ignore=400)
+            index=self.base_index, body=citations_settings_mappings)
 
     def _ping(self):
         """
@@ -319,7 +319,7 @@ class Controller(Elasticsearch):
         return bool(self.ping())
 
     def index_reset(self):
-        self.indices.delete(index=self.base_index, ignore=[400, 404])
+        self.indices.delete(index=self.base_index)
         self.load_mapping()
 
     def index_citation(self, doc, article_id):

@@ -82,9 +82,9 @@ def fetch_data(resource):
     try:
         response = requests.get(resource)
     except requests.exceptions.RequestException as e:
-        logger.error('%s. Unable to connect to resource.' % e)
+        logger.error('%s. Unable to connect to resource.', e)
     else:
-        logger.debug('Get resource: %s' % resource)
+        logger.debug('Get resource: %s', resource)
         return response
 
 

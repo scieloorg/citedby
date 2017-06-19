@@ -3,7 +3,6 @@
 
 import os
 import json
-import argparse
 import logging
 
 import thriftpy
@@ -60,7 +59,7 @@ class Dispatcher(object):
         try:
             data_str = json.dumps(data)
         except ValueError as e:
-            logging.error('Invalid JSON data: %s' % data_str)
+            logging.error('Invalid JSON data: %s', data_str)
             raise citedby_thrift.ValueError(message=e.message)
 
         return data_str

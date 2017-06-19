@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # !coding: utf-8
 
-import os
 import sys
 import json
 import textwrap
@@ -15,7 +14,6 @@ import itertools
 import threading
 
 from pyramid.settings import aslist
-from xylose.scielodocument import Article
 
 from citedby import utils
 from citedby.controller import controller, articlemeta
@@ -374,20 +372,20 @@ class PCitation(object):
 
         attempts = 0
         for reference in docs:
-            logger.debug('Running thread %s' % t)
-            logger.debug('Loading reference %s' % (reference['_id']))
+            logger.debug('Running thread %s', t)
+            logger.debug('Loading reference %s', reference['_id'])
             while True:
                 try:
                     self.controller.index_citation(reference, reference['_id'])
-                    logger.debug('Reference loaded %s' % reference['_id'])
+                    logger.debug('Reference loaded %s', reference['_id'])
                     break
                 except:
                     attempts += 1
-                    logger.warning('fail to bulk: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                    logger.warning('fail to bulk: %s retry (%d/10) in 2 seconds', reference['_id'], attempts)
                     time.sleep(2)
 
                 if attempts == 10:
-                    logger.error('fail to bulk: %s' % reference['_id'])
+                    logger.error('fail to bulk: %s', reference['_id'])
                     break
 
     def _bulk(self):
@@ -399,10 +397,10 @@ class PCitation(object):
 
             for issn in self.issns:
                 for document in self.articlemeta.documents(collection=self.args.collection, issn=issn, from_date=self.args.from_date, until_date=self.args.until_date):
-                    logger.debug('Loading document %s, %s' % (document.publisher_id, document.collection_acronym))
+                    logger.debug('Loading document %s, %s', document.publisher_id, document.collection_acronym)
 
                     if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in self.ignore_list:
-                        logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                        logger.debug('In ignore list, skippind document %s, %s', document.publisher_id, document.collection_acronym)
                         continue
 
                     iterdocs = (cite for cite in citation_meta(document))
@@ -418,7 +416,7 @@ class PCitation(object):
                                       args=(safe_iterdocs, t))
             jobs.append(thread)
             thread.start()
-            logger.info('Thread running %s' % thread)
+            logger.info('Thread running %s', thread)
 
         for job in jobs:
             job.join()
@@ -427,20 +425,20 @@ class PCitation(object):
 
         for event, document in self.articlemeta.documents_history(collection=self.args.collection, from_date=self.args.from_date, until_date=self.args.until_date):
             if event.event == 'delete' and event.code and event.collection:
-                logger.debug('%s (%s) document %s, %s' % (event.event, event.date, event.code, event.collection))
+                logger.debug('%s (%s) document %s, %s', event.event, event.date, event.code, event.collection)
 
                 self.controller.del_citation(
                     event.collection,
                     event.code
                 )
-                logger.debug('document deleted %s, %s' % (event.code, event.collection))
+                logger.debug('document deleted %s, %s', event.code, event.collection)
                 continue
 
             if event.event in ['update', 'add']:
-                logger.debug('%s (%s) document %s, %s' % (event.event, event.date, document.publisher_id, document.collection_acronym))
+                logger.debug('%s (%s) document %s, %s', event.event, event.date, document.publisher_id, document.collection_acronym)
 
                 if '_'.join([document.collection_acronym, document.journal.scielo_issn]) in self.ignore_list:
-                    logger.debug('In ignore list, skippind document %s, %s' % (document.publisher_id, document.collection_acronym))
+                    logger.debug('In ignore list, skippind document %s, %s', document.publisher_id, document.collection_acronym)
                     continue
 
                 attempts = 0
@@ -449,15 +447,15 @@ class PCitation(object):
                     while True:
                         try:
                             self.controller.index_citation(reference, reference['_id'])
-                            logger.debug('Reference loaded %s' % reference['_id'])
+                            logger.debug('Reference loaded %s', reference['_id'])
                             break
                         except:
                             attempts += 1
-                            logger.warning('fail to bult: %s retry (%d/10) in 2 seconds' % (reference['_id'], attempts))
+                            logger.warning('fail to bult: %s retry (%d/10) in 2 seconds', reference['_id'], attempts)
                             time.sleep(2)
 
                         if attempts == 10:
-                            logger.error('fail to bult: %s' % reference['_id'])
+                            logger.error('fail to bult: %s', reference['_id'])
                             break
 
     def run(self):

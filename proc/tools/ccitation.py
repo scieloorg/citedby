@@ -1,7 +1,9 @@
 #!/usr/bin/python
 #coding: utf-8
 
+
 import os.path
+import time
 import sys
 import csv
 import json
@@ -75,10 +77,10 @@ class CCitation(object):
 
             while True:
                 try:
-                    log.info('Try to get the resource again: {0}'.format(resource))
+                    logger.info('Try to get the resource again: {0}'.format(resource))
                     return requests.get(resource)
                 except requests.exceptions.RequestException as e:
-                    log.error('Sleep for 10 second to try again: {0}'.format(resource))
+                    logger.error('Sleep for 10 second to try again: {0}'.format(resource))
                     time.sleep(10)
 
         else:
