@@ -5,7 +5,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
             'pyramid',
-            'requests>=1.11.1',
+            'requests>=1.18.1',
             'elasticsearch',
             'python-memcached',
             'python-binary-memcached',
@@ -24,7 +24,7 @@ test_requires = []
 
 setup(
     name='citedby',
-    version='2.15.13',
+    version='2.16.13',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',

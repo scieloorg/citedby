@@ -18,7 +18,7 @@ elasticsearch_host = 127.0.0.1:9200
 elasticsearch_index = citations
 
 # ArticleMeta Thriftserver Host
-articlemeta = articlemeta.scielo.org:11720
+articlemeta = articlemeta.scielo.org:11621
 
 # Memcached configuration
 # Expiration time: 1 hour = 3600s / 24 hours = 86400s / 30 days = 2592000s
