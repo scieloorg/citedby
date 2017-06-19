@@ -20,7 +20,7 @@ pyramid.includes =
 
 # ES hosts
 #Use host:9200 or host
-elasticsearch_host = 127.0.0.1:9200
+elasticsearch_host = 127.0.0.1:920
 elasticsearch_index = citations
 
 # ArticleMeta Thriftserver Host
