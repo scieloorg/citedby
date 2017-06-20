@@ -147,7 +147,7 @@ def citation_meta(document):
             c_dict['source'] = document.journal.title
 
         if document.translated_titles():
-            c_dict['titles'] = [t for l, t in document.translated_titles().items() if t != None]
+            c_dict['titles'] = [v for v in document.translated_titles().values() if v != None]
 
         if document.original_title():
             c_dict['titles'].append(document.original_title())
@@ -334,7 +334,6 @@ class PCitation(object):
         self.issns = self.args.issns or [None]
 
         hosts = aslist(settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200'))
-        index = settings['app:main'].get('elasticsearch_index', 'citations')
 
         self.controller = controller(
             hosts=hosts,
@@ -443,7 +442,7 @@ class PCitation(object):
 
                 attempts = 0
                 for reference in citation_meta(document):
-                    logger.debug('bulking reference %s' % (reference['_id']))
+                    logger.debug('bulking reference %s', reference['_id'])
                     while True:
                         try:
                             self.controller.index_citation(reference, reference['_id'])
@@ -487,7 +486,7 @@ class PCitation(object):
 
         self.finished = datetime.now()
 
-        logger.info("Total processing time: %s sec." % self._duration())
+        logger.info("Total processing time: %s sec.", self._duration())
 
 
 def main(argv=sys.argv[1:]):

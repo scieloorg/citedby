@@ -14,10 +14,6 @@ def index(request):
 @view_config(route_name='status', request_method='GET', renderer='jsonp')
 def status(request):
 
-    mems_addr = aslist(
-        request.registry.settings.get('memcached_arguments_url', [])
-    )
-
     response = {
         'health': {
             'is_alive_es_cluster': request.controller.get_status_cluster()

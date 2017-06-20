@@ -485,7 +485,7 @@ class Controller(Elasticsearch):
                 ])
                 filters['author_names'] = get_author_name_forms(author_name)
             else:
-                article_meta['first_author'] == None
+                article_meta['first_author'] = None
 
             filters['year'] = article_meta.get('publication_year', None)
 

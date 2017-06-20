@@ -11,7 +11,6 @@ import textwrap
 import optparse
 import logging.config
 from datetime import datetime
-from progressbar import ProgressBar
 
 import requests
 from citedby.icitation import ICitation
