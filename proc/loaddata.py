@@ -17,6 +17,7 @@ from pyramid.settings import aslist
 
 from citedby import utils
 from citedby.controller import controller, articlemeta
+from citedby.controller import MappingError
 
 logger = logging.getLogger(__name__)
 
@@ -299,7 +300,7 @@ class PCitation(object):
     parser.add_argument(
         '--until_date',
         '-u',
-        default=FROM_DATE,
+        default=UNTIL_DATE,
         help='Until processing date (YYYY-MM-DD). Default (%s)' % UNTIL_DATE
     )
 
@@ -466,12 +467,16 @@ class PCitation(object):
 
         logger.info('Load Data Script (index citation)')
 
-        self.controller.load_mapping()
+        try:
+            self.controller.load_mapping()
+            logger.debug('Index do not have mapping, running index mapping task')
+        except MappingError:
+            logger.debug('Index is already mapped, skiping mapping task')
 
-        logger.info('Get all ids from articlemeta')
+        logger.info('Get all ids from articlemeta between %s and %s', self.args.from_date, self.args.until_date)
 
         if self.args.full:
-            logger.info('You have selected full processing... this will take a while')
+            logger.info('You have selected full processing... this will include and update records according to ArticleMeta Identifiers API')
 
             if self.args.rebuild_index:
                 logger.info('This will remove EVERYTHING from your search index')

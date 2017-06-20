@@ -6,6 +6,7 @@ from pylibmc.test import make_test_client, NotAliveError
 
 import elasticsearch
 from elasticsearch import Elasticsearch
+from elasticsearch import exceptions
 
 from articlemeta.client import ThriftClient
 from citedby.utils import load_from_crossref, format_citation
@@ -25,6 +26,11 @@ class ServerError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
+
+class MappingError(Exception):
+
+    pass
 
 
 def get_status_memcached(mems_addr=None):
@@ -309,8 +315,10 @@ class Controller(Elasticsearch):
             }
         }
 
-        self.indices.create(
-            index=self.base_index, body=citations_settings_mappings)
+        try:
+            self.indices.create(index=self.base_index, body=citations_settings_mappings)
+        except exceptions.RequestError as e:
+            raise MappingError(str(e))
 
     def _ping(self):
         """
