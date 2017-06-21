@@ -99,10 +99,11 @@ def build_ignore_list():
     citations of documents present in more than one collection. It will prioritize
     the documents of journals available in Country collections.
     """
-    logger.debug('Loading journals to build Collection and ISSN ignore list')
+    logger.info('Loading journals to build Collection and ISSN ignore list')
 
     journals = {}
     for journal in articlemeta().journals():
+        logger.debug('Loading journal %s (%s)', journal.title, journal.scielo_issn)
         res = journals.setdefault(journal.scielo_issn, set())
         res.add(journal.collection_acronym)
 
