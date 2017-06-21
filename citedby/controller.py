@@ -98,7 +98,12 @@ def controller(*args, **kwargs):
 class Controller(Elasticsearch):
 
     articlemeta_client = articlemeta()
-    base_index = 'citations'
+
+    def set_base_index(self, index):
+
+        self.base_index = index
+
+        return self
 
     def _query_dispatcher(self, *args, **kwargs):
 
@@ -156,6 +161,10 @@ class Controller(Elasticsearch):
                                 "xref": {
                                     "type": "string",
                                     "index": "not_analyzed"
+                                },
+                                "orcid": {
+                                    "type": "string",
+                                    "index": "not_analyzed"
                                 }
                             }
                         },
@@ -203,6 +212,10 @@ class Controller(Elasticsearch):
                                     "index": "not_analyzed"
                                 },
                                 "xref": {
+                                    "type": "string",
+                                    "index": "not_analyzed"
+                                },
+                                "orcid": {
                                     "type": "string",
                                     "index": "not_analyzed"
                                 }
@@ -316,7 +329,11 @@ class Controller(Elasticsearch):
         }
 
         try:
-            self.indices.create(index=self.base_index, body=citations_settings_mappings)
+            self.indices.create(
+                index=self.base_index,
+                body=citations_settings_mappings,
+                ignore=[400, 404]
+            )
         except exceptions.RequestError as e:
             raise MappingError(str(e))
 
@@ -327,7 +344,7 @@ class Controller(Elasticsearch):
         return bool(self.ping())
 
     def index_reset(self):
-        self.indices.delete(index=self.base_index)
+        self.indices.delete(index=self.base_index, ignore=[400, 404])
         self.load_mapping()
 
     def index_citation(self, doc, article_id):
@@ -338,10 +355,13 @@ class Controller(Elasticsearch):
         ``collection``, must be a dicionary.
         """
 
+        doc = dict(doc)
+        del(doc['_id'])
+
         if not isinstance(doc, dict):
             raise TypeError('param doc must be a dicionary!')
 
-        if not ('code' or 'collection') in doc:
+        if 'code' not in doc or 'collection' not in doc:
             raise ValueError('param doc must contain keys code and collection')
 
         return self.index(index=self.base_index, id=article_id, doc_type='citation', body=doc)
@@ -435,9 +455,9 @@ class Controller(Elasticsearch):
             }
 
             if not result:
-                result = self._query_dispatcher(body=body, size=size)
+                result = self._query_dispatcher(index=self.base_index, body=body, size=size)
             else:
-                new_result = self._query_dispatcher(body=body, size=size)
+                new_result = self._query_dispatcher(index=self.base_index, body=body, size=size)
                 result['hits']['total'] += new_result['hits']['total']
                 result['hits']['hits'] += new_result['hits']['hits']
 

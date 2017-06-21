@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # !coding: utf-8
-
+import os
 import sys
 import json
 import textwrap
@@ -43,35 +43,54 @@ MASTER_COLLECTIONS = (
     'scl'
 )
 
-FROM_DATE = (datetime.now()-timedelta(60)).isoformat()[:10]
+FROM = datetime.now() - timedelta(days=30)
+FROM_DATE = FROM.isoformat()[:10]
 UNTIL_DATE = datetime.now().isoformat()[:10]
 
+SENTRY_HANDLER = os.environ.get('SENTRY_HANDLER', None)
+LOGGING_LEVEL = os.environ.get('LOGGING_LEVEL', 'DEBUG')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
 
-def _config_logging(logging_level='INFO', logging_file=None):
-
-    allowed_levels = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-        'CRITICAL': logging.CRITICAL
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            'datefmt': '%H:%M:%S',
+            },
+        },
+    'handlers': {
+        'console': {
+            'level': LOGGING_LEVEL,
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+            }
+        },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': LOGGING_LEVEL,
+            'propagate': False,
+            },
+        'proc.loaddata': {
+            'level': LOGGING_LEVEL,
+            'propagate': True,
+        },
     }
+}
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+if SENTRY_HANDLER:
+    LOGGING['handlers']['sentry'] = {
+        'level': 'ERROR',
+        'class': 'raven.handlers.logging.SentryHandler',
+        'dsn': SENTRY_HANDLER,
+    }
+    LOGGING['loggers']['']['handlers'].append('sentry')
 
-    logger.setLevel(allowed_levels.get(logging_level, 'INFO'))
-
-    if logging_file:
-        hl = logging.FileHandler(logging_file, mode='a')
-    else:
-        hl = logging.StreamHandler()
-
-    hl.setFormatter(formatter)
-    hl.setLevel(allowed_levels.get(logging_level, 'INFO'))
-
-    logger.addHandler(hl)
-
-    return logger
+ELASTICSEARCH_HOST = os.environ.get(
+    'ELASTICSEARCH_HOST',
+    settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200')
+)
 
 
 def build_ignore_list():
@@ -313,15 +332,9 @@ class PCitation(object):
     )
 
     parser.add_argument(
-        '--logging_file',
-        '-o',
-        help='Full path to the log file'
-    )
-
-    parser.add_argument(
         '--logging_level',
         '-l',
-        default='DEBUG',
+        default=LOGGING_LEVEL,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help='Logggin level'
     )
@@ -330,17 +343,30 @@ class PCitation(object):
         self.started = None
         self.finished = None
         self.args = self.parser.parse_args()
-        _config_logging(self.args.logging_level, self.args.logging_file)
+
+        LOGGING['handlers']['console']['level'] = self.args.logging_level
+        for content in LOGGING['loggers'].values():
+            content['level'] = self.args.logging_level
+        logging.config.dictConfig(LOGGING)
 
         self.issns = self.args.issns or [None]
 
-        hosts = aslist(settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200'))
-
-        self.controller = controller(
-            hosts=hosts,
-            timeout=60,
-            sniff_on_connection_fail=True
+        es = os.environ.get(
+            'ELASTICSEARCH_HOST',
+            settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200')
         )
+
+        es_index = os.environ.get(
+            'ELASTICSEARCH_INDEX',
+            settings['app:main'].get('elasticsearch_index', 'citations')
+        )
+
+        self.index = es_index
+        self.controller = controller(
+            hosts=es,
+            timeout=600,
+            sniff_on_connection_fail=True
+        ).set_base_index(index=es_index)
 
         self.articlemeta = articlemeta()
 
@@ -374,6 +400,7 @@ class PCitation(object):
         for reference in docs:
             logger.debug('Running thread %s', t)
             logger.debug('Loading reference %s', reference['_id'])
+            attempts = 0
             while True:
                 try:
                     self.controller.index_citation(reference, reference['_id'])
@@ -434,6 +461,9 @@ class PCitation(object):
                 logger.debug('document deleted %s, %s', event.code, event.collection)
                 continue
 
+            if document.data is None:
+                continue
+
             if event.event in ['update', 'add']:
                 logger.debug('%s (%s) document %s, %s', event.event, event.date, document.publisher_id, document.collection_acronym)
 
@@ -441,7 +471,6 @@ class PCitation(object):
                     logger.debug('In ignore list, skippind document %s, %s', document.publisher_id, document.collection_acronym)
                     continue
 
-                attempts = 0
                 for reference in citation_meta(document):
                     logger.debug('bulking reference %s', reference['_id'])
                     while True:
@@ -465,7 +494,7 @@ class PCitation(object):
 
         self.started = datetime.now()
 
-        logger.info('Load Data Script (index citation)')
+        logger.info('Load Data Script (index %s)', self.index)
 
         try:
             self.controller.load_mapping()

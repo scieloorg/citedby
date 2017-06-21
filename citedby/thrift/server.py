@@ -27,17 +27,37 @@ class Dispatcher(object):
         config = utils.Configuration.from_env()
         settings = dict(config.items())
 
+        es = os.environ.get(
+            'ELASTICSEARCH_HOST',
+            settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200')
+        )
+
+        es_index = os.environ.get(
+            'ELASTICSEARCH_INDEX',
+            settings['app:main'].get('elasticsearch_index', 'citations')
+        )
+
         self._controller = controller(
-            aslist(settings['app:main']['elasticsearch_host']),
-            index=settings['app:main']['elasticsearch_index'],
-            timeout=600
+            hosts=aslist(es),
+            timeout=600,
+            sniff_on_connection_fail=True
+        ).set_base_index(index=es_index)
+
+        memcached_host = os.environ.get(
+            'MEMCACHED_HOST',
+            settings['app:main'].get('memcached_host', None)
+        )
+
+        memcached_expiration_time = os.environ.get(
+            'MEMCACHED_EXPIRATION_TIME',
+            settings['app:main'].get('memcached_expiration_time', 2592000)  # a month cache
         )
 
         ## Cache Settings Config
         if 'memcached_host' in settings['app:main']:
             cache_config = {}
-            cache_config['expiration_time'] = int(settings['app:main'].get('memcached_expiration_time', 2592000)) # a month cache
-            cache_config['arguments'] = {'url': settings['app:main']['memcached_host'], 'binary': True}
+            cache_config['expiration_time'] = int(memcached_expiration_time) # a month cache
+            cache_config['arguments'] = {'url': memcached_host, 'binary': True}
             controller_cache_region.configure('dogpile.cache.pylibmc', **cache_config)
         else:
             controller_cache_region.configure('dogpile.cache.null')

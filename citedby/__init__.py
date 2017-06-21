@@ -1,3 +1,4 @@
+import os
 from pyramid.config import Configurator
 from pyramid.renderers import JSONP
 from pyramid.settings import aslist
@@ -14,11 +15,22 @@ def main(global_config, **settings):
     config.add_renderer('jsonp', JSONP(param_name='callback', indent=4))
 
     def add_controller(request):
+
+        es = os.environ.get(
+            'ELASTICSEARCH_HOST',
+            settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200')
+        )
+
+        es_index = os.environ.get(
+            'ELASTICSEARCH_INDEX',
+            settings['app:main'].get('elasticsearch_index', 'citations')
+        )
+
         return controller.controller(
-            aslist(settings['elasticsearch_host']),
+            aslist(es),
             sniff_on_connection_fail=True,
             timeout=600
-        )
+        ).set_base_index(es_index)
 
     config.add_route('index', '/')
     config.add_route('status', '/_status/')
@@ -27,15 +39,22 @@ def main(global_config, **settings):
     config.add_route('citedby_meta', '/api/v1/meta/')
     config.add_request_method(add_controller, 'controller', reify=True)
 
-    ## Cache Settings Config
-    if 'memcached_host' in settings:
+    # Cache Settings Config
+    memcached_host = os.environ.get(
+        'MEMCACHED_HOST',
+        settings.get('memcached_host', None)
+    )
+
+    memcached_expiration_time = os.environ.get(
+        'MEMCACHED_EXPIRATION_TIME',
+        settings.get('memcached_expiration_time', 2592000)  # a month cache
+    )
+
+    if 'memcached_host' is not None:
         cache_config = {}
-        cache_config['expiration_time'] = int(
-            settings.get('memcached_expiration_time', 2592000))  # a month cache
-        cache_config['arguments'] = {
-            'url': settings['memcached_host'], 'binary': True}
-        controller_cache_region.configure(
-            'dogpile.cache.pylibmc', **cache_config)
+        cache_config['expiration_time'] = int(memcached_expiration_time)
+        cache_config['arguments'] = {'url': memcached_host, 'binary': True}
+        controller_cache_region.configure('dogpile.cache.pylibmc', **cache_config)
     else:
         controller_cache_region.configure('dogpile.cache.null')
 
