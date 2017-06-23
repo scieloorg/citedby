@@ -18,12 +18,12 @@ def main(global_config, **settings):
 
         es = os.environ.get(
             'ELASTICSEARCH_HOST',
-            settings['app:main'].get('elasticsearch_host', '127.0.0.1:9200')
+            settings.get('elasticsearch_host', '127.0.0.1:9200')
         )
 
         es_index = os.environ.get(
             'ELASTICSEARCH_INDEX',
-            settings['app:main'].get('elasticsearch_index', 'citations')
+            settings.get('elasticsearch_index', 'citations')
         )
 
         return controller.controller(
