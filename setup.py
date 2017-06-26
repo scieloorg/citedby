@@ -11,7 +11,6 @@ requires = [
             'python-binary-memcached',
             'pyramid-debugtoolbar',
             'dogpile.cache',
-            'pylibmc',
             'thriftpy==0.3.1',
             'thriftpywrap',
             'pyramid_debugtoolbar',
