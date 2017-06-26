@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+===================
 CitedBy RESTful API
-----------------------------
+===================
 
 API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID.
 
@@ -20,282 +21,167 @@ API Versioning:
 | 2015-03-02 | v1      | Initial Version |
 +------------+---------+-----------------+
 
+---------
+Libraries
+---------
 
-Endpoints:
+To facilitate the use of the SciELO CitedBy API, SciELO provides an Python Library compatible with
+Python 3 and 2.
 
-.. attention::
-    Note that requesting a version of the API is indicate by query string,
-    so use /api/API_VERSION/ENDPOINT.
-.. attention::
-    v1 must be explicit on query string.
+Source code: https://github.com/scieloorg/citedbyapi
 
-/
--
+How to Install
+--------------
 
-
-"Cited by SciELO API".
-
-/pid/
------
-
-Retrieve “cited by” documents of a given PID (SciELO ID)
-
-Parameters:
-
-+------------+-----------------------------------------------------+-------------+
-| Paremeter  | Description                                         | Mandatory   |
-+============+=====================================================+=============+
-| **q**      | PID (SciELO) or any article unique code, required   | yes         |
-+------------+-----------------------------------------------------+-------------+
-| metaonly   | get only the article meta data without the citaitons| No          |
-+------------+-----------------------------------------------------+-------------+
-| callback   | JSONP callback method                               | No          |
-+------------+-----------------------------------------------------+-------------+
-
-Mandatory Parameters: *q* PID (SciELO) or any article unique code
+pip install citedbyapi
 
 
-``GET /api/v1/pid/?q=S0100-84551997000100001``
+How to Use
+----------
 
+.. code-block:: python
 
-Response::
+    In [1]: from citedby import client
 
+    In [2]: cl = client.RestfulClient()
 
-    {
-        "article": {
-            "total_received": 1,
-            "code": "S0100-84551997000100001",
-            "titles": [
-                "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
-            ],
-            "first_author": {
-                "surname": "Freitas"
-            },
-            "issn": "0100-8455",
-            "collection": "scl",
-            "total_granted": 26,
-            "source": "Brazilian Journal of Genetics",
-            "publication_year": "1997",
-            "authors": [
-                {
-                    "surname": "Freitas",
-                    "given_names": "Thales Renato O. de"
-                }
-            ],
-            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0100-84551997000100001&lng=en&tlng=en",
-            "translated_titles": {
-                "en": "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
-            },
-            "doi": "10.1590/S0100-84551997000100001"
-        },
-        "cited_by": [
-            {
-                "start_page": "2684",
-                "title": "Activation of rabbit muscle phosphofructokinase by F-actin and reconstituted thin filaments",
-                "first_author": {
-                    "surname": "Liou",
-                    "given_names": "R-S"
-                },
-                "publication_year": "1980",
-                "source": "Biochemistry",
-                "authors": [
-                    {
-                        "surname": "Liou",
-                        "given_names": "R-S"
-                    },
-                    {
-                        "surname": "Anderson",
-                        "given_names": "S"
-                    }
-                ],
-                "end_page": "2688"
-            }
-        ]
-    }
+    In [3]: cl.citedby_pid("S0074-02761998000200011")
+    Out[3]:
+    {'article': {'authors': [{'given_names': 'Cristina',
+        'role': 'ND',
+        'surname': 'Ferro',
+        'xref': ['A01']},
+       {'given_names': 'Estrella',
+        'role': 'ND',
+        'surname': 'Cárdenas',
+        'xref': ['A01']},
+       {'given_names': 'Dario',
+        'role': 'ND',
+        'surname': 'Corredor',
+        'xref': ['A02']},
+       {'given_names': 'Alberto',
+        'role': 'ND',
+        'surname': 'Morales',
+        'xref': ['A01']},
+       {'given_names': 'Leonard E',
+        'role': 'ND',
+        'surname': 'Munstermann',
+        'xref': ['A03']}],
+      'code': 'S0074-02761998000200011',
+      'collection': 'scl',
+      'doi': '10.1590/S0074-02761998000200011',
+      'end_page': '199',
+      'first_author': {'given_names': 'Cristina',
+       'role': 'ND',
+       'surname': 'Ferro',
+       'xref': ['A01']},
+      'issn': '0074-0276',
+      'publication_year': '1998',
+      'start_page': '195',
+      'titles': ['Life Cycle and Fecundity Analysis of Lutzomyia shannoni (Dyar) (Diptera: Psychodidae)'],
+      'total_received': 14,
+      'translated_titles': None,
+      'url': 'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02761998000200011&lng=en&tlng=en'},
+     'cited_by': [{'authors': [{'given_names': 'María Angélica',
+         'role': 'ND',
+         'surname': 'Contreras-Gutiérrez',
+         'xref': ['A01']},
+        {'given_names': 'Iván Darío',
+         'role': 'ND',
+         'surname': 'Vélez',
+         'xref': ['A01']},
+        {'given_names': 'Charles',
+         'role': 'ND',
+         'surname': 'Porter',
+         'xref': ['A03']},
+        {'given_names': 'Sandra Inés',
+         'role': 'ND',
+         'surname': 'Uribe',
+         'xref': ['A02']}],
+       'code': 'S0120-41572014000300017',
+       'end_page': '498',
+       'first_author': {'given_names': 'María Angélica',
+        'role': 'ND',
+        'surname': 'Contreras-Gutiérrez',
+        'xref': ['A01']},
+       'issn': '0120-4157',
+       'source': 'Biomédica',
+       'start_page': '483',
+       'titles': ['An updated checklist of Phlebotomine sand flies (Diptera: Psychodidae: Phlebotominae) from the Colombian Andean coffee-growing region',
+        'Lista actualizada de flebotomíneos (Diptera: Psychodidae: Phlebotominae) de la región cafetera colombiana'],
+       'url': 'http://www.scielo.org.co/scielo.php?script=sci_arttext&pid=S0120-41572014000300017&lng=en&tlng=en'},
+      {'authors': [{'given_names': 'Ronildo Baiatone',
+         'role': 'ND',
+         'surname': 'Alencar',
+         'xref': ['A01']}],
+       'code': 'S0044-59672007000200016',
+       'end_page': '292',
+       'first_author': {'given_names': 'Ronildo Baiatone',
+        'role': 'ND',
+        'surname': 'Alencar',
+        'xref': ['A01']},
+       'issn': '0044-5967',
+       'source': 'Acta Amazonica',
+       'start_page': '287',
+       'titles': ['Emergence of phlebotomine sandflies (Diptera: Psychodidade) in non-flooded forest floor in Central Amazon, Brazil: a modified emergence trap model',
+        'Emergência de flebotomíneos (Diptera: Psychodidae) em chão de floresta de terra firme na Amazônia Central do Brasil: uso de um modelo modificado de armadilha de emergência'],
+       'url': 'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0044-59672007000200016&lng=en&tlng=en'},
+      {'authors': [{'given_names': 'Jesús',
+         'role': 'ND',
+         'surname': 'Escovar',
+         'xref': ['A01']},
+        {'given_names': 'Felio J',
+         'role': 'ND',
+         'surname': 'Bello',
+         'xref': ['A01']},
+        {'given_names': 'Alberto',
+         'role': 'ND',
+         'surname': 'Morales',
+         'xref': ['A01']},
+        {'given_names': 'Ligia',
+         'role': 'ND',
+         'surname': 'Moncada',
+         'xref': ['A02']},
+        {'given_names': 'Estrella',
+         'role': 'ND',
+         'surname': 'Cárdenas',
+         'xref': ['A01']}],
+       'code': 'S0074-02762004000600012',
+       'end_page': '607',
+       'first_author': {'given_names': 'Jesús',
+        'role': 'ND',
+        'surname': 'Escovar',
+        'xref': ['A01']},
+       'issn': '0074-0276',
+       'source': 'Memórias do Instituto Oswaldo Cruz',
+       'start_page': '603',
+       'titles': ['Life tables and reproductive parameters of Lutzomyia spinicrassa (Diptera: Psychodidae) under laboratory conditions'],
+       'url': 'http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0074-02762004000600012&lng=en&tlng=en'}]}
 
+Loading file with citations in memory
+-------------------------------------
 
-``GET /api/v1/pid/?q=S0074-02761936000400003&metaonly=true``
+Para processos que demandam alta velocidade de processamento, o SciELO disponibiliza
+um arquivo .json com todas as citações recebidas de documentos SciELO. O formato
+segue o mesmo padrão do formato entregue pela API.
 
-Response::
+Para utilizar o arquivo é necessário fazer o download do mesmo em: http://static.scielo.org/citedby/citedbyapi.json.gz
 
+(Este arquivo será atualizado semestralmente)
 
-    {
-        "article": {
-            "total_received": 1,
-            "code": "S0100-84551997000100001",
-            "titles": [
-                "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
-            ],
-            "first_author": {
-                "surname": "Freitas"
-            },
-            "issn": "0100-8455",
-            "collection": "scl",
-            "total_granted": 26,
-            "source": "Brazilian Journal of Genetics",
-            "publication_year": "1997",
-            "authors": [
-                {
-                    "surname": "Freitas",
-                    "given_names": "Thales Renato O. de"
-                }
-            ],
-            "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0100-84551997000100001&lng=en&tlng=en",
-            "translated_titles": {
-                "en": "Chromosome polymorphism in Ctenomys minutus (Rodentia-Octodontidae)"
-            },
-            "doi": "10.1590/S0100-84551997000100001"
-        }
-    }
+O arquivo deve ser depositado em qualquer local no servidor onde a biblioteca citebyapi está instalada.
 
+Antes de utilizar a biblioteca é necessário configurar uma variável de ambiente que indica o local onde o arquivo foi depositado.
 
-/doi/
------
+export CITEDBYAPI_HEAP_FILE=~/Documents/citations.json
 
-Retrieve “cited by” documents of a given DOI (Document Objects Identifier)
+Na ausência deste arquivo, todas as requisições serão feitas diretamente para API, que possui tempo de resposta reduzido.
 
-Parameters:
+-------------
+Developer API
+-------------
 
-+------------+-----------------------------------------------------+-------------+
-| Paremeter  | Description                                         | Mandatory   |
-+============+=====================================================+=============+
-| **q**      | DOI(Document Objects Identifier), required          |yes          |
-+------------+-----------------------------------------------------+-------------+
-| metaonly   | get only the article meta data without the citaitons| No          |
-+------------+-----------------------------------------------------+-------------+
-| callback   | JSONP callback method                               | No          |
-+------------+-----------------------------------------------------+-------------+
+.. toctree::
+   :maxdepth: 1
 
-
-``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011``
-
-
-Response::
-
-
-    {
-        "article": {
-            "total_cited_by": 2,
-            "author": "",
-            "year": "2007",
-            "title": [
-                "Tecnologia Social de Mobilização para Arranjos Produtivos Locais: uma proposta de aplicabilidade"
-            ]
-        },
-        "cited_by": [
-            {
-                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1679-39512009000400001&lng=en&tlng=en",
-                "source": "Cadernos EBAPE.BR",
-                "issn": "1679-3951",
-                "titles": [
-                    "Environment, people and work, clusters beyond economic development in the opal mining in Pedro II, Piauí",
-                    "Ambiente, pessoas e labor: APLs além do desenvolvimento econômico na mineração de opalas em Pedro II, no Piauí"
-                ],
-                "code": "S1679-39512009000400001"
-            },
-            {
-                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1984-92302011000200004&lng=en&tlng=en",
-                "source": "Organização & Sociedade",
-                "issn": "1984-9230",
-                "titles": [
-                    "Identification of the challenges to the local productive arrangement of information technology in Fortaleza-CE",
-                    "Identificação dos desafios do arranjo produtivo local de tecnologia da informação de Fortaleza-CE"
-                ],
-                "code": "S1984-92302011000200004"
-            }
-        ]
-    }
-
-
-``GET /api/v1/doi/?q=10.1590/S1679-39512007000300011&metaonly=true``
-
-
-Response::
-
-
-    {
-        "article": {
-            "total_cited_by": 2,
-            "author": "",
-            "year": "2007",
-            "title": [
-                "Tecnologia Social de Mobilização para Arranjos Produtivos Locais: uma proposta de aplicabilidade"
-            ]
-        }
-    }
-
-/meta/
-------
-
-Retrieve “cited by” documents of a given parameter
-
-Parameters:
-
-+------------+-----------------------------------------------------+-------------+
-| Paremeter  | Description                                         | Mandatory   |
-+============+=====================================================+=============+
-| **title**  | Title of the article required                       | Yes         |
-+------------+-----------------------------------------------------+-------------+
-| author     | Name of the first author                            | No          |
-+------------+-----------------------------------------------------+-------------+
-| year       | Year of the article publication                     | No          |
-+------------+-----------------------------------------------------+-------------+
-| callback   | JSONP callback method                               | No          |
-+------------+-----------------------------------------------------+-------------+
-
-``GET /api/v1/meta/?title=The psychiatric comorbidity of epilepsy``
-
-.. attention::
-    research in this endpoint is more accurate when used with all parameters
-
-
-Response::
-
-
-    {
-        "article": {
-            "title": "The psychiatric comorbidity of epilepsy",
-            "total_cited_by": 31,
-            "year": "",
-            "author": ""
-        },
-        "cited_by": [
-            {
-                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492011000200006&lng=en&tlng=en",
-                "source": "Journal of Epilepsy and Clinical Neurophysiology",
-                "issn": "1676-2649",
-                "titles": [
-                    "Psychiatric and behavioral effects of the antiepileptic drugs and their action as mood stabilizers",
-                    "Efeitos psiqui\u00e1tricos e comportamentais das drogas antiepil\u00e9pticas e sua a\u00e7\u00e3o como moduladores de humor"
-                ],
-                "code": "S1676-26492011000200006"
-            },
-            {
-                "url": "http://www.scielo.br/scielo.php?script=sci_arttext&pid=S1676-26492010000400007&lng=en&tlng=en",
-                "source": "Journal of Epilepsy and Clinical Neurophysiology",
-                "issn": "1676-2649",
-                "titles": [
-                    "Translation and cross-cultural adaptation of the Interictal Dysphoric Disorder Inventory (IDDI)",
-                    "Tradu\u00e7\u00e3o e adapta\u00e7\u00e3o transcultural do Interictal Dysphoric Disorder Inventory (IDDI) para o Brasil"
-                ],
-                "code": "S1676-26492010000400007"
-            }
-        ]
-    }
-
-
-``GET /api/v1/meta/?title=The psychiatric comorbidity of epilepsy&metaonly=true``
-
-
-Response::
-
-
-    {
-        "article": {
-            "title": "The psychiatric comorbidity of epilepsy",
-            "total_cited_by": 31,
-            "year": "",
-            "author": ""
-        }
-
-    }
+   endpoints
