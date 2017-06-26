@@ -16,7 +16,7 @@ requires = [
             'thriftpywrap',
             'pyramid_debugtoolbar',
             'waitress',
-            'xylose>=1.19.6',
+            'xylose>=1.20.6',
             'articlemetaapi>=1.14.19'
            ]
 
