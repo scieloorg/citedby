@@ -4,14 +4,14 @@
    contain the root `toctree` directive.
 
 ===================
-CitedBy RESTful API
+CitedBy Restful API
 ===================
 
 API to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID.
 
 API URL: http://citedby.scielo.org
 
-Current API Version: v2.18.15
+Current API Version: 2.18.15
 
 ---------
 Libraries
