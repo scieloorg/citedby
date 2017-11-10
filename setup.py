@@ -5,7 +5,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 requires = [
             'pyramid',
-            'requests>=1.18.1',
+            'requests>=1.11.1',
             'elasticsearch',
             'python-memcached',
             'python-binary-memcached',
@@ -16,15 +16,15 @@ requires = [
             'thriftpywrap',
             'pyramid_debugtoolbar',
             'waitress',
-            'xylose>=1.20.6',
-            'articlemetaapi>=1.14.19'
+            'xylose>=1.30.0',
+            'articlemetaapi>=1.23.0'
            ]
 
 test_requires = []
 
 setup(
     name='citedby',
-    version='2.18.15',
+    version='2.19.0',
     description='API RESTFul to retrieve citations from SciELO articles to a given DOI, Article Title or SciELO ID',
     author='SciELO',
     author_email='scielo-dev@googlegroups.com',
