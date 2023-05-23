@@ -1,4 +1,4 @@
-requests==2.11.1
+requests==2.31.0
 elasticsearch==1.5.0
 python-memcached==1.54
 python-binary-memcached==0.24.3
