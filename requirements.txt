@@ -9,3 +9,4 @@ xylose==1.20.6
 articlemetaapi==1.14.19
 -e git+https://github.com/scieloorg/thriftpy-wrap@0.1.1#egg=thriftpywrap
 -e git+https://github.com/scieloorg/citedby@2.18.15#egg=citedby
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
